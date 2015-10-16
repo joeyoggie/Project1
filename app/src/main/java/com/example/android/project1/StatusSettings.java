@@ -23,6 +23,7 @@ public class StatusSettings extends ActionBarActivity implements AdapterView.OnI
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_status_settings);
+        setTitle("Status Privacy Settings");
 
         Spinner dropdown = (Spinner) findViewById(R.id.status_spinner);
         String[] items = new String[]{"Everyone", "My contacts", "Close friends", "Select from contacts"};

@@ -22,6 +22,7 @@ public class OnlinePresenceSettings extends ActionBarActivity implements Adapter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_online_presence_settings);
+        setTitle("Online Presence Privacy Settings");
 
         Spinner dropdown = (Spinner) findViewById(R.id.online_state_spinner);
         String[] items = new String[]{"Everyone", "My contacts", "Close friends", "Select from contacts"};

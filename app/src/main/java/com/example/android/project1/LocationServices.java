@@ -12,6 +12,7 @@ public class LocationServices extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_services);
+        setTitle("Location Services");
     }
 
     @Override

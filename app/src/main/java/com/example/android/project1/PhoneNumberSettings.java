@@ -22,6 +22,7 @@ public class PhoneNumberSettings extends ActionBarActivity implements AdapterVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_number_settings);
+        setTitle("Phone Number Privacy Settings");
 
         Spinner dropdown = (Spinner) findViewById(R.id.phone_number_spinner);
         String[] items = new String[]{"Everyone", "My contacts", "Close friends", "Select from contacts"};

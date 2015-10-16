@@ -22,6 +22,7 @@ public class ProfilePictureSettings extends ActionBarActivity implements Adapter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_picture_settings);
+        setTitle("Profile Picture Privacy Settings");
 
         Spinner dropdown = (Spinner) findViewById(R.id.profile_picture_spinner);
         String[] items = new String[]{"Everyone", "My contacts", "Close friends", "Select from contacts"};

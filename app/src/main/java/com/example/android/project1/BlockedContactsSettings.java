@@ -18,6 +18,7 @@ public class BlockedContactsSettings extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blocked_contacts_settings);
+        setTitle("Blocked Contacts");
 
         contactInfo = findViewById(R.id.blocked_contact_info);
         contactInfo.setVisibility(View.INVISIBLE);
