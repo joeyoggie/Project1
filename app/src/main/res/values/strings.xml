@@ -12,4 +12,6 @@
     <string name="title_activity_schedule_message">ScheduleMessage</string>
     <string name="title_activity_my_profile">MyProfile</string>
     <string name="title_activity_location_services">LocationServices</string>
+    <string name="title_activity_privacy_settings">PrivacySettings</string>
+    <string name="title_activity_main_page">MainPage</string>
 </resources>

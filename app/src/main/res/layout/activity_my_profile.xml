@@ -144,7 +144,8 @@
             android:paddingLeft="8dp"
             android:background="?android:attr/selectableItemBackground"
             android:text="Privacy settings"
-            android:textAllCaps="false">
+            android:textAllCaps="false"
+            android:onClick="goToPrivacySettings">
         </Button>
 
         <View

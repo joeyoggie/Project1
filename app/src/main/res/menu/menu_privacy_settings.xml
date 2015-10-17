@@ -10,16 +10,4 @@
         android:orderInCategory="100"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/location_services"
-        android:title="Location services"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
-
-
-    <item android:id="@+id/action_search"
-        android:icon="@drawable/default_profile_picture"
-        android:title="Search"
-        app:showAsAction="always" />
-
 </menu>

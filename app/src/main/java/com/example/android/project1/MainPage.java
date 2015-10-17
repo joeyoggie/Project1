@@ -1,56 +1,31 @@
 package com.example.android.project1;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 
-public class PrivacySettings extends ActionBarActivity {
+public class MainPage extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_privacy_settings);
-        setTitle("Privacy Settings");
+        setContentView(R.layout.activity_main_page);
     }
 
-    public void goToBlockedContactsSettings(View view)
+    public void goToPrivacySettings(View view)
     {
-        Intent intent = new Intent(this, BlockedContactsSettings.class);
-        startActivity(intent);
-    }
-
-    public void goToStatusActivity(View view)
-    {
-        Intent intent = new Intent(this, StatusSettings.class);
-        startActivity(intent);
-    }
-
-    public void goToProfilePictureActivity(View view)
-    {
-        Intent intent = new Intent(this, ProfilePictureSettings.class);
-        startActivity(intent);
-    }
-
-    public void goToPhoneNumberSettings(View view)
-    {
-        Intent intent = new Intent(this, PhoneNumberSettings.class);
-        startActivity(intent);
-    }
-
-    public void goToOnlinePresenceSettings(View view)
-    {
-        Intent intent = new Intent(this, OnlinePresenceSettings.class);
+        Intent intent = new Intent(this, PrivacySettings.class);
         startActivity(intent);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_privacy_settings, menu);
+        getMenuInflater().inflate(R.menu.menu_main_page, menu);
         return true;
     }
 
@@ -66,6 +41,19 @@ public class PrivacySettings extends ActionBarActivity {
             return true;
         }
 
+        if(id == R.id.action_search)
+        {
+            Intent intent = new Intent(this, MyProfile.class);
+            startActivity(intent);
+            return true;
+        }
+
+        if(id == R.id.location_services)
+        {
+            Intent intent = new Intent(this, LocationServices.class);
+            startActivity(intent);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 }

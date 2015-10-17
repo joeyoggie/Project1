@@ -1,9 +1,11 @@
 package com.example.android.project1;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 
 public class MyProfile extends ActionBarActivity {
@@ -13,6 +15,12 @@ public class MyProfile extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_profile);
         setTitle("My Profile");
+    }
+
+    public void goToPrivacySettings(View view)
+    {
+        Intent intent = new Intent(this, PrivacySettings.class);
+        startActivity(intent);
     }
 
     @Override
