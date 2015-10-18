@@ -1,36 +1,23 @@
 package com.example.android.project1;
 
-import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.PopupWindow;
-
-import android.view.ViewGroup.LayoutParams;
 
 
-public class MainPage extends ActionBarActivity {
+public class MainPageL extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_page);
-    }
-
-    public void goToPrivacySettings(View view)
-    {
-        Intent intent = new Intent(this, PrivacySettings.class);
-        startActivity(intent);
+        setContentView(R.layout.activity_main_page_l);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main_page, menu);
+        getMenuInflater().inflate(R.menu.menu_main_page_l, menu);
         return true;
     }
 
@@ -46,19 +33,6 @@ public class MainPage extends ActionBarActivity {
             return true;
         }
 
-        if(id == R.id.action_alt_profile)
-        {
-            Intent intent = new Intent(this, MyProfile.class);
-            startActivity(intent);
-            return true;
-        }
-
-        if(id == R.id.location_services)
-        {
-            Intent intent = new Intent(this, LocationServices.class);
-            startActivity(intent);
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 }

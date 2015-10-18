@@ -54,6 +54,10 @@
             android:name=".LocationServices"
             android:label="@string/title_activity_location_services" >
         </activity>
+        <activity
+            android:name=".MainPageL"
+            android:label="@string/title_activity_main_page_l" >
+        </activity>
     </application>
 
 </manifest>

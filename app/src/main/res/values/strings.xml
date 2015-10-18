@@ -14,4 +14,5 @@
     <string name="title_activity_location_services">LocationServices</string>
     <string name="title_activity_privacy_settings">PrivacySettings</string>
     <string name="title_activity_main_page">MainPage</string>
+    <string name="title_activity_main_page_l">MainPageL</string>
 </resources>
