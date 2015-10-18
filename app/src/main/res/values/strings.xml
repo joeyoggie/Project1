@@ -15,4 +15,5 @@
     <string name="title_activity_privacy_settings">PrivacySettings</string>
     <string name="title_activity_main_page">MainPage</string>
     <string name="title_activity_main_page_l">MainPageL</string>
+    <string name="title_activity_popup_message_dialog">PopupMessageDialog</string>
 </resources>

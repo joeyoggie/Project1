@@ -9,9 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.PopupWindow;
-
 import android.view.ViewGroup.LayoutParams;
-
+import android.support.v4.app.DialogFragment;
 
 public class MainPage extends ActionBarActivity {
 
@@ -19,12 +18,46 @@ public class MainPage extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
+
+        //POPUP
+        final Button btnOpenPopup = (Button)findViewById(R.id.openpopup);
+
+        btnOpenPopup.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                LayoutInflater layoutInflater
+                        = (LayoutInflater) getBaseContext()
+                        .getSystemService(LAYOUT_INFLATER_SERVICE);
+                View popupView = layoutInflater.inflate(R.layout.popup_scheduling, null);
+                final PopupWindow popupWindow = new PopupWindow(
+                        popupView,
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.WRAP_CONTENT);
+
+                Button btnDismiss = (Button) popupView.findViewById(R.id.dismiss);
+                btnDismiss.setOnClickListener(new Button.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        popupWindow.dismiss();
+                    }
+                });
+                popupWindow.showAsDropDown(btnOpenPopup, 0, -30);
+                popupWindow.setFocusable(true);
+                popupWindow.update();
+            }
+        });
+        //POPUP
     }
 
     public void goToPrivacySettings(View view)
     {
         Intent intent = new Intent(this, PrivacySettings.class);
         startActivity(intent);
+    }
+
+    public void openDialog(View view) {
+        DialogFragment newFragment = new PopupMessageDialog();
+        newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
     @Override
