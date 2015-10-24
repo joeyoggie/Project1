@@ -59,8 +59,8 @@
             android:label="@string/title_activity_main_page_l" >
         </activity>
         <activity
-            android:name=".PopupMessageDialog"
-            android:label="@string/title_activity_popup_message_dialog" >
+            android:name=".ChatPage"
+            android:label="@string/title_activity_chat_page" >
         </activity>
     </application>
 

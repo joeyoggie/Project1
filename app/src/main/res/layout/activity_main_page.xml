@@ -9,7 +9,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
+<!--
         <Button
             android:id="@+id/openpopup"
             android:layout_width="wrap_content"
@@ -26,8 +26,8 @@
             android:layout_centerHorizontal="true"
             android:text="Open Dialog"
             android:onClick="openDialog"/>
-
-        <ImageView
+-->
+        <ImageButton
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_alignParentTop="true"
@@ -35,7 +35,8 @@
             android:src="@mipmap/ic_launcher"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:onClick="goToChatPage"/>
 
         <TextView
             android:layout_height="wrap_content"
@@ -120,8 +121,7 @@
             android:outlineProvider="paddedBounds"
             android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
 
-
-        <ImageView
+        <ImageButton
             android:layout_below="@id/horizontal"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -129,7 +129,8 @@
             android:src="@mipmap/ic_launcher"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:onClick="goToChatPage"/>
 
         <TextView
             android:layout_below="@id/horizontal"
@@ -164,7 +165,8 @@
             android:layout_alignParentEnd="true"
             android:src="@drawable/new_message_plus_sign"
             android:scaleType="fitCenter"
-            android:clickable="true" />
+            android:clickable="true"
+            android:onClick="selectContacts"/>
 
         <!--<TextClock-->
         <!--android:layout_width="wrap_content"-->
@@ -208,9 +210,7 @@
             android:nestedScrollingEnabled="true"
             android:outlineProvider="paddedBounds"
             android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
-
         <!--<view-->
-
     </RelativeLayout>
 
     <RelativeLayout

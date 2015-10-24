@@ -1,16 +1,12 @@
 package com.example.android.project1;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.PopupWindow;
-import android.view.ViewGroup.LayoutParams;
-import android.support.v4.app.DialogFragment;
+
 
 public class MainPage extends ActionBarActivity {
 
@@ -18,7 +14,7 @@ public class MainPage extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
-
+/*
         //POPUP
         final Button btnOpenPopup = (Button)findViewById(R.id.openpopup);
 
@@ -47,6 +43,7 @@ public class MainPage extends ActionBarActivity {
             }
         });
         //POPUP
+*/
     }
 
     public void goToPrivacySettings(View view)
@@ -55,9 +52,15 @@ public class MainPage extends ActionBarActivity {
         startActivity(intent);
     }
 
-    public void openDialog(View view) {
-        DialogFragment newFragment = new PopupMessageDialog();
-        newFragment.show(getSupportFragmentManager(), "timePicker");
+    public void goToChatPage(View view) {
+        Intent intent = new Intent(this, ChatPage.class);
+        startActivity(intent);
+    }
+
+    public void selectContacts(View view)
+    {
+        Intent intent = new Intent(this, ContactsListView.class);
+        startActivity(intent);
     }
 
     @Override
