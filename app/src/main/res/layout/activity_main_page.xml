@@ -36,7 +36,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
-            android:onClick="goToChatPage"/>
+            android:onClick="goToChatPageWithListView"/>
 
         <TextView
             android:layout_height="wrap_content"
@@ -233,7 +233,8 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/default_profile_picture"
-                android:layout_marginTop="15dp" />
+                android:layout_marginTop="15dp"
+                android:onClick="goToRegistration"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -386,8 +387,9 @@
                 android:paddingLeft="8dp"
                 android:gravity="left|center_vertical"
                 android:background="?android:attr/selectableItemBackground"
-                android:text="About/Server status"
-                android:textAllCaps="false">
+                android:text="Registration"
+                android:textAllCaps="false"
+                android:onClick="goToRegistration">
             </Button>
 
             <View

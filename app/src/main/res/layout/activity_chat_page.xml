@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.android.project1.ChatPage">
+    tools:context="com.example.android.project1.ChatPageWithListView">
 
     <LinearLayout
         android:id="@+id/message_layout_received"
@@ -71,7 +71,7 @@
             android:layout_width="0dp"
             android:layout_weight="4"
             android:id="@+id/textInput"
-            android:hint="Reply...">
+            android:hint="Type your message here...">
             <requestFocus></requestFocus>
         </EditText>
 

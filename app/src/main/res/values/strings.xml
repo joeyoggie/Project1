@@ -17,4 +17,5 @@
     <string name="title_activity_main_page_l">MainPageL</string>
     <string name="title_activity_popup_message_dialog">PopupMessageDialog</string>
     <string name="title_activity_chat_page">ChatPage</string>
+    <string name="title_activity_registration">Registration</string>
 </resources>

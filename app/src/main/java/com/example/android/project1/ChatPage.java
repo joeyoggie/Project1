@@ -6,15 +6,16 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-
+/**
+ * Created by Joey on 11/9/2015.
+ */
 public class ChatPage extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_page);
-        setTitle("Nabila");
-        getSupportActionBar().setIcon(R.drawable.juan);
+        setTitle("RecepientNameHere");
     }
 
     @Override
@@ -40,7 +41,6 @@ public class ChatPage extends ActionBarActivity {
             DialogFragment newFragment = new PopupMessageDialog();
             newFragment.show(getSupportFragmentManager(), "timePicker");
         }
-
         return super.onOptionsItemSelected(item);
     }
 }

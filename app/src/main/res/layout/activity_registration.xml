@@ -1,0 +1,76 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    tools:context="com.example.android.project1.Registration">
+
+    <Button
+        android:id="@+id/get_info_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get info from server"
+        android:onClick="getInfo"/>
+
+    <TextView
+        android:id="@+id/status_text_view_static"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status code: "
+        android:layout_toRightOf="@id/get_info_button"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"/>
+
+    <TextView
+        android:id="@+id/status_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_toRightOf="@id/status_text_view_static" />
+
+    <EditText
+        android:id="@+id/entered_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/get_info_button"
+        android:hint="Username"/>
+
+    <EditText
+        android:id="@+id/entered_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/entered_username"
+        android:hint="Name"/>
+
+    <EditText
+        android:id="@+id/entered_phone_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/entered_name"
+        android:hint="Phone number"/>
+
+    <Button
+        android:id="@+id/submit_info_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/entered_phone_number"
+        android:text="Submit info"
+        android:onClick="submitInfo"/>
+
+    <TextView
+        android:id="@+id/content_text_view_static"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Response: "
+        android:layout_below="@id/submit_info_button"/>
+
+    <TextView
+        android:id="@+id/content_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_below="@id/content_text_view_static"/>
+
+</RelativeLayout>
