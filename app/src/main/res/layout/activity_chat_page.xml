@@ -5,6 +5,15 @@
     android:layout_height="match_parent"
     tools:context="com.example.android.project1.ChatPageWithListView">
 
+    <EditText
+        android:id="@+id/entered_recepient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:hint="Type your recepient here...">
+        <requestFocus></requestFocus>
+    </EditText>
+    <!--
     <LinearLayout
         android:id="@+id/message_layout_received"
         android:layout_width="wrap_content"
@@ -48,6 +57,16 @@
             android:layout_marginLeft="8dp"
             android:textStyle="bold"/>
     </LinearLayout>
+    -->
+
+    <ListView
+        android:id="@+id/list"
+        android:drawSelectorOnTop="false"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_below="@id/entered_recepient"
+        android:footerDividersEnabled="true">
+    </ListView>
 
     <LinearLayout
         android:id="@+id/message_sending_layout"
@@ -79,7 +98,8 @@
             android:layout_height="wrap_content"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:text="Send">
+            android:text="Send"
+            android:onClick="sendMessage">
         </Button>
     </LinearLayout>
 

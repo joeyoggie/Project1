@@ -97,7 +97,8 @@ public class MyInstanceIDListenerService extends IntentService {
         downloadThread d = new downloadThread();
 
         //Send the info in a background thread
-        d.execute("http://192.168.1.44:8080/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token));
+        //d.execute("http://192.168.1.44:8080/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token));
+        d.execute("http://197.45.183.87:8080/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token));
     }
 
     /**

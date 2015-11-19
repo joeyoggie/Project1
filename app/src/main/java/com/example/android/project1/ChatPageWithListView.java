@@ -1,16 +1,12 @@
 package com.example.android.project1;
 
 import android.app.ListActivity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
@@ -37,7 +33,7 @@ public class ChatPageWithListView extends ListActivity {
     List msgs;
 
     @Override
-     protected void onCreate(Bundle savedInstanceState) {
+     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_page_with_listview);
         msgs =  new ArrayList();
@@ -45,17 +41,6 @@ public class ChatPageWithListView extends ListActivity {
         setListAdapter(adapter);
 
         enteredRecepient = (EditText) findViewById(R.id.entered_recepient);
-
-
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String message = intent.getStringExtra("message");
-                msgs.add(new MessageData(message));
-                adapter.notifyDataSetChanged();
-            }
-        };
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("newMessageIntent"));
     }
 
     public void sendMessage(View view) {
@@ -81,9 +66,10 @@ public class ChatPageWithListView extends ListActivity {
 
             //Send the message info to the server in a background thread
             downloadThread download = new downloadThread();
-            download.execute("http://192.168.1.44:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
-        }
+            //download.execute("http://192.168.1.44:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
+            download.execute("http://197.45.183.87:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
 
+        }
     }
 
     @Override

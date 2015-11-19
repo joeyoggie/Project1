@@ -5,6 +5,10 @@ package com.example.android.project1;
  */
 public class MessageData {
     private String message;
+    //Use a DateTime object instead of a String
+    private String time;
+    //Determine whether message is sent or received (to align it left or right accordingly)
+    private boolean sent;
 
     public MessageData(String message) {
         this.message = message;

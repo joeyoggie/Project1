@@ -5,17 +5,27 @@
     android:layout_width="fill_parent"
     android:gravity="fill_horizontal"
     android:layout_height="wrap_content">
-    <RelativeLayout
+    <LinearLayout
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:padding="8dp"
         android:layout_margin="8dp"
+        android:orientation="horizontal"
         android:background="@android:color/darker_gray">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="right"
-            android:layout_marginRight="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
+            android:gravity="start"
             android:id="@+id/message_text" />
-    </RelativeLayout>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="8:30pm"
+            android:layout_marginLeft="8dp"
+            android:textStyle="bold"
+            android:id="@+id/time_box"/>
+    </LinearLayout>
 </LinearLayout>

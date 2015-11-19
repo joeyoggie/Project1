@@ -3,13 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="8dp"
     tools:context=".MainActivity">
     <EditText
         android:id="@+id/entered_recepient"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:hint="Type your recepient here...">
         <requestFocus></requestFocus>
     </EditText>
@@ -34,7 +33,7 @@
         <FrameLayout
             android:layout_height="0dp"
             android:layout_width="match_parent"
-            android:layout_weight="1">
+            android:layout_weight="2">
             <LinearLayout
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
@@ -48,7 +47,7 @@
                     android:layout_gravity="center"
                     />
                 <EditText
-                    android:layout_height="45dp"
+                    android:layout_height="fill_parent"
                     android:layout_width="0dp"
                     android:layout_weight="4"
                     android:id="@+id/textInput"
@@ -56,7 +55,7 @@
                 </EditText>
                 <Button
                     android:id="@+id/send_button"
-                    android:layout_height="wrap_content"
+                    android:layout_height="fill_parent"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:text="Send"

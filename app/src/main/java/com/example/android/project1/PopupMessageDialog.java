@@ -1,12 +1,9 @@
 package com.example.android.project1;
 
 import android.app.Dialog;
-import android.app.TimePickerDialog;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TimePicker;
 
@@ -36,6 +33,7 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // Do something with the time chosen by the user
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

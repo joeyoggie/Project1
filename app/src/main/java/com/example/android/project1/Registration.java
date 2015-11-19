@@ -106,7 +106,9 @@ public class Registration extends ActionBarActivity {
             downloadThread download = new downloadThread();
 
             //Get the info from the server in a background thread
-            download.execute("http://192.168.1.44:8080/MyFirstServlet/GetInfo?deviceID=" + deviceID);
+            //download.execute("http://192.168.1.44:8080/MyFirstServlet/GetInfo?deviceID=" + deviceID);
+            download.execute("http://197.45.183.87:8080/MyFirstServlet/GetInfo?deviceID=" + deviceID);
+
         }
         //If there's no internet connection
         else {
