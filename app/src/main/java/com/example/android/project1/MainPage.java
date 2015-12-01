@@ -57,11 +57,6 @@ public class MainPage extends ActionBarActivity {
         startActivity(intent);
     }
 
-    public void goToChatPageWithListView(View view) {
-        Intent intent = new Intent(this, ChatPageWithListView.class);
-        startActivity(intent);
-    }
-
     public void selectContacts(View view)
     {
         Intent intent = new Intent(this, ContactsListView.class);

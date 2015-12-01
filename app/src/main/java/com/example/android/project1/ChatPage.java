@@ -26,7 +26,9 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -109,11 +111,15 @@ public class ChatPage extends ActionBarActivity {
         if (netInfo != null && netInfo.isConnected()) {
             //Get the value of the textfields from the UI
             String recepientUserName = enteredRecepient.getText().toString();
+            Date date = new Date();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
+            String timestamp = simpleDateFormat.format(date);
+            Log.d("TIMESTAMP:",timestamp);
 
             //Send the message info to the server in a background thread
             downloadThread download = new downloadThread();
             //download.execute("http://192.168.1.44:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
-            download.execute("http://197.45.183.87:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
+            download.execute("http://197.45.183.87:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText)+"&timestamp="+URLEncoder.encode(timestamp));
         }
     }
 

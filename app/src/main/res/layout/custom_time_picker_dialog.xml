@@ -31,6 +31,7 @@
         android:layout_height="wrap_content" />
 
     <EditText
+        android:id="@+id/entered_scheduled_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Type your message here..." />
