@@ -9,208 +9,412 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-<!--
-        <Button
-            android:id="@+id/openpopup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="OPEN POPUP"/>
 
-        <Button
-            android:id="@+id/opendialog"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/contact_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/profile_picture"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:onClick="goToChatPage"/>
+
+            <TextView
+                android:id="@+id/contact_name"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_toRightOf="@id/profile_picture"
+                android:layout_alignTop="@id/profile_picture"
+                android:layout_marginTop="8dp"
+                android:text="Fady Magdy"
+                android:textSize="18dp"
+                android:textIsSelectable="false" />
+
+            <TextView
+                android:id="@+id/latest_message_preview"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Hiii :D"
+                android:layout_below="@+id/contact_name"
+                android:layout_toRightOf="@+id/profile_picture"
+                android:layout_alignBottom="@+id/profile_picture"
+                android:gravity="center"
+                android:textSize="12dp"
+                android:textColor="#010101" />
+
+            <TextView
+                android:id="@+id/latest_message_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3:30"
+                android:layout_alignTop="@+id/contact_name"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="8dp"/>
+
+            <RadioButton
+                android:id="@+id/online_status_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/contact_name"
+                android:layout_marginLeft="8dp"
+                android:layout_above="@+id/latest_message_preview"
+                android:layout_alignTop="@+id/contact_name"
+                android:checked="true"
+                android:textSize="50dp" />
+
+            <ImageView
+                android:id="@+id/horizontal_seperator"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10px"
+                android:paddingBottom="5px"
+                android:layout_height="1dp"
+                android:layout_width="fill_parent"
+                android:src="@android:drawable/divider_horizontal_bright"
+                android:layout_below="@id/profile_picture"
+                android:visibility="visible"
+                android:background="#25050404"
+                android:scaleType="fitXY"
+                android:nestedScrollingEnabled="true"
+                android:outlineProvider="paddedBounds"
+                android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
+
+        </RelativeLayout>
+
+
+
+        <RelativeLayout
+            android:id="@+id/contact_2"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/openpopup"
-            android:layout_centerHorizontal="true"
-            android:text="Open Dialog"
-            android:onClick="openDialog"/>
--->
+            android:layout_below="@id/contact_1">
+
+            <ImageButton
+                android:id="@+id/profile_picture_2"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:onClick="goToChatPage"/>
+
+            <TextView
+                android:id="@+id/contact_name_2"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_toRightOf="@id/profile_picture_2"
+                android:layout_alignTop="@id/profile_picture_2"
+                android:layout_marginTop="8dp"
+                android:text="Liza Antoun"
+                android:textSize="18dp"
+                android:textIsSelectable="false" />
+
+            <TextView
+                android:id="@+id/latest_message_preview_2"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Hiii :D"
+                android:layout_below="@+id/contact_name_2"
+                android:layout_toRightOf="@+id/profile_picture_2"
+                android:layout_alignBottom="@+id/profile_picture_2"
+                android:gravity="center"
+                android:textSize="12dp"
+                android:textColor="#010101" />
+
+            <TextView
+                android:id="@+id/latest_message_time_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3:30"
+                android:layout_alignTop="@+id/contact_name_2"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="8dp"/>
+
+            <RadioButton
+                android:id="@+id/online_status_indicator_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/contact_name_2"
+                android:layout_marginLeft="8dp"
+                android:layout_above="@+id/latest_message_preview_2"
+                android:layout_alignTop="@+id/contact_name_2"
+                android:checked="true"
+                android:textSize="50dp" />
+
+            <ImageView
+                android:id="@+id/horizontal_seperator_2"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10px"
+                android:paddingBottom="5px"
+                android:layout_height="1dp"
+                android:layout_width="fill_parent"
+                android:src="@android:drawable/divider_horizontal_bright"
+                android:layout_below="@id/profile_picture_2"
+                android:visibility="visible"
+                android:background="#25050404"
+                android:scaleType="fitXY"
+                android:nestedScrollingEnabled="true"
+                android:outlineProvider="paddedBounds"
+                android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/contact_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/contact_2">
+
+            <ImageButton
+                android:id="@+id/profile_picture_3"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:onClick="goToChatPage"/>
+
+            <TextView
+                android:id="@+id/contact_name_3"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_toRightOf="@id/profile_picture_3"
+                android:layout_alignTop="@id/profile_picture_3"
+                android:layout_marginTop="8dp"
+                android:text="Mark Mamdouh"
+                android:textSize="18dp"
+                android:textIsSelectable="false" />
+
+            <TextView
+                android:id="@+id/latest_message_preview_3"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Hiii :D"
+                android:layout_below="@+id/contact_name_3"
+                android:layout_toRightOf="@+id/profile_picture_3"
+                android:layout_alignBottom="@+id/profile_picture_3"
+                android:gravity="center"
+                android:textSize="12dp"
+                android:textColor="#010101" />
+
+            <TextView
+                android:id="@+id/latest_message_time_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3:30"
+                android:layout_alignTop="@+id/contact_name_3"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="8dp"/>
+
+            <RadioButton
+                android:id="@+id/online_status_indicator_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/contact_name_3"
+                android:layout_marginLeft="8dp"
+                android:layout_above="@+id/latest_message_preview_3"
+                android:layout_alignTop="@+id/contact_name_3"
+                android:checked="true"
+                android:textSize="50dp" />
+
+            <ImageView
+                android:id="@+id/horizontal_seperator_3"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10px"
+                android:paddingBottom="5px"
+                android:layout_height="1dp"
+                android:layout_width="fill_parent"
+                android:src="@android:drawable/divider_horizontal_bright"
+                android:layout_below="@id/profile_picture_3"
+                android:visibility="visible"
+                android:background="#25050404"
+                android:scaleType="fitXY"
+                android:nestedScrollingEnabled="true"
+                android:outlineProvider="paddedBounds"
+                android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/contact_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/contact_3">
+
+            <ImageButton
+                android:id="@+id/profile_picture_4"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:onClick="goToChatPage"/>
+
+            <TextView
+                android:id="@+id/contact_name_4"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_toRightOf="@id/profile_picture_4"
+                android:layout_alignTop="@id/profile_picture_4"
+                android:layout_marginTop="8dp"
+                android:text="Yostina Emad"
+                android:textSize="18dp"
+                android:textIsSelectable="false" />
+
+            <TextView
+                android:id="@+id/latest_message_preview_4"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Hiii :D"
+                android:layout_below="@+id/contact_name_4"
+                android:layout_toRightOf="@+id/profile_picture_4"
+                android:layout_alignBottom="@+id/profile_picture_4"
+                android:gravity="center"
+                android:textSize="12dp"
+                android:textColor="#010101" />
+
+            <TextView
+                android:id="@+id/latest_message_time_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3:30"
+                android:layout_alignTop="@+id/contact_name_4"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="8dp"/>
+
+            <RadioButton
+                android:id="@+id/online_status_indicator_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/contact_name_4"
+                android:layout_marginLeft="8dp"
+                android:layout_above="@+id/latest_message_preview_4"
+                android:layout_alignTop="@+id/contact_name_4"
+                android:checked="true"
+                android:textSize="50dp" />
+
+            <ImageView
+                android:id="@+id/horizontal_seperator_4"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10px"
+                android:paddingBottom="5px"
+                android:layout_height="1dp"
+                android:layout_width="fill_parent"
+                android:src="@android:drawable/divider_horizontal_bright"
+                android:layout_below="@id/profile_picture_4"
+                android:visibility="visible"
+                android:background="#25050404"
+                android:scaleType="fitXY"
+                android:nestedScrollingEnabled="true"
+                android:outlineProvider="paddedBounds"
+                android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/contact_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/contact_4">
+
+            <ImageButton
+                android:id="@+id/profile_picture_5"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:onClick="goToChatPage"/>
+
+            <TextView
+                android:id="@+id/contact_name_5"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_toRightOf="@id/profile_picture_5"
+                android:layout_alignTop="@id/profile_picture_5"
+                android:layout_marginTop="8dp"
+                android:text="Youssef Wagieh"
+                android:textSize="18dp"
+                android:textIsSelectable="false" />
+
+            <TextView
+                android:id="@+id/latest_message_preview_5"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Hiii :D"
+                android:layout_below="@+id/contact_name_5"
+                android:layout_toRightOf="@+id/profile_picture_5"
+                android:layout_alignBottom="@+id/profile_picture_5"
+                android:gravity="center"
+                android:textSize="12dp"
+                android:textColor="#010101" />
+
+            <TextView
+                android:id="@+id/latest_message_time_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3:30"
+                android:layout_alignTop="@+id/contact_name_5"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="8dp"/>
+
+            <RadioButton
+                android:id="@+id/online_status_indicator_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/contact_name_5"
+                android:layout_marginLeft="8dp"
+                android:layout_above="@+id/latest_message_preview_5"
+                android:layout_alignTop="@+id/contact_name_5"
+                android:checked="true"
+                android:textSize="50dp" />
+
+            <ImageView
+                android:id="@+id/horizontal_seperator_5"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="10px"
+                android:paddingBottom="5px"
+                android:layout_height="1dp"
+                android:layout_width="fill_parent"
+                android:src="@android:drawable/divider_horizontal_bright"
+                android:layout_below="@id/profile_picture_5"
+                android:visibility="visible"
+                android:background="#25050404"
+                android:scaleType="fitXY"
+                android:nestedScrollingEnabled="true"
+                android:outlineProvider="paddedBounds"
+                android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
+
+        </RelativeLayout>
+
+
         <ImageButton
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_alignParentTop="true"
-            android:id="@+id/profile"
-            android:src="@mipmap/ic_launcher"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:onClick="goToChatPage"/>
-
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_toRightOf="@id/profile"
-            android:id="@+id/name"
-            android:text="Liza Antoun"
-            android:textSize="17dp"
-            android:layout_marginTop="15dp"
-            android:textIsSelectable="false" />
-
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/status"
-            android:text="Hiii :D"
-            android:layout_below="@+id/name"
-            android:layout_toRightOf="@+id/profile"
-            android:layout_alignBottom="@+id/profile"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:textSize="13dp"
-            android:textColor="#010101" />
-
-        <ImageButton
+            android:id="@+id/new_message_image_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:id="@+id/imageButton"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/new_message_plus_sign"
-            android:scaleType="fitCenter"
-            android:clickable="true" />
-
-        <!--<TextClock-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/textClock"-->
-        <!-- -->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:text="3:30" />-->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3:30"
-            android:id="@+id/time"
-            android:layout_alignTop="@+id/radioButton"
-            android:layout_alignLeft="@+id/imageButton"
-            android:layout_alignStart="@+id/imageButton" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/radioButton"
-            android:layout_toRightOf="@id/name"
-            android:checked="true"
-            android:layout_above="@+id/status"
-            android:textSize="50dp"
-            android:layout_alignTop="@+id/name"
-            android:layout_toLeftOf="@+id/imageButton"
-            android:layout_toStartOf="@+id/imageButton" />
-        <!--<view-->
-
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="2dip"-->
-        <!--android:background="#010101"-->
-        <!--android:src="@mipmap/back"/>-->
-        <ImageView
-            android:id="@+id/horizontal"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="10px"
-            android:paddingBottom="5px"
-            android:layout_height="1dp"
-            android:layout_width="fill_parent"
-            android:src="@android:drawable/divider_horizontal_bright"
-            android:layout_below="@id/status"
-            android:visibility="visible"
-            android:background="#25050404"
-            android:scaleType="fitXY"
-            android:nestedScrollingEnabled="true"
-            android:outlineProvider="paddedBounds"
-            android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
-
-        <ImageButton
-            android:layout_below="@id/horizontal"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/profile2"
-            android:src="@mipmap/ic_launcher"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:onClick="goToChatPage"/>
-
-        <TextView
-            android:layout_below="@id/horizontal"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_toRightOf="@id/profile2"
-            android:id="@+id/name2"
-            android:text="Mina Antoun"
-            android:textSize="17dp"
-            android:layout_marginTop="15dp"
-            android:textIsSelectable="false" />
-
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/status2"
-            android:text="I told u yesterday"
-            android:layout_below="@+id/name2"
-            android:layout_toRightOf="@+id/profile2"
-            android:layout_alignBottom="@+id/profile2"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:textSize="13dp"
-            android:textColor="#010101" />
-
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:id="@+id/imageButton2"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
             android:src="@drawable/new_message_plus_sign"
             android:scaleType="fitCenter"
             android:clickable="true"
-            android:onClick="selectContacts"/>
+            android:onClick="selectContacts" />
 
-        <!--<TextClock-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/textClock"-->
-        <!-- -->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:text="3:30" />-->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3:30"
-            android:id="@+id/time2"
-            android:layout_alignTop="@+id/radioButton2"
-            android:layout_alignLeft="@+id/imageButton2"
-            android:layout_alignStart="@+id/imageButton2" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/radioButton2"
-            android:layout_toRightOf="@id/name2"
-            android:checked="false"
-            android:layout_above="@+id/status2"
-            android:textSize="50dp"
-            android:layout_alignTop="@+id/name2"
-            android:layout_toLeftOf="@+id/imageButton2"
-            android:layout_toStartOf="@+id/imageButton2" />
-        <ImageView
-            android:id="@+id/horizontal2"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="10px"
-            android:paddingBottom="5px"
-            android:layout_height="1dp"
-            android:layout_width="fill_parent"
-            android:src="@android:drawable/divider_horizontal_bright"
-            android:layout_below="@id/profile2"
-            android:visibility="visible"
-            android:background="#25050404"
-            android:scaleType="fitXY"
-            android:nestedScrollingEnabled="true"
-            android:outlineProvider="paddedBounds"
-            android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
-        <!--<view-->
     </RelativeLayout>
 
     <RelativeLayout
@@ -229,7 +433,7 @@
             android:padding="8dp">
 
             <ImageView
-                android:id="@+id/avatar"
+                android:id="@+id/personal_profile_picture"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/default_profile_picture"
@@ -241,7 +445,7 @@
                 android:layout_height="42dp"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="15dp"
-                android:layout_toRightOf="@+id/avatar"
+                android:layout_toRightOf="@+id/personal_profile_picture"
                 android:orientation="vertical" >
 
                 <TextView

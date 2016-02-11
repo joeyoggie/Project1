@@ -27,6 +27,8 @@ import java.util.List;
 
 public class ChatPageWithListView extends ListActivity {
 
+    //final String SERVER_IP = "197.45.183.87";
+    final String SERVER_IP = "192.168.1.44";
     EditText enteredRecepient;
 
     MessageAdapter adapter;
@@ -67,7 +69,7 @@ public class ChatPageWithListView extends ListActivity {
             //Send the message info to the server in a background thread
             downloadThread download = new downloadThread();
             //download.execute("http://192.168.1.44:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
-            download.execute("http://197.45.183.87:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
+            download.execute("http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
 
         }
     }

@@ -28,6 +28,9 @@ import java.util.Date;
 
 public class PopupMessageDialog extends DialogFragment implements CustomTimePickerDialog.OnTimeSetListener {
 
+    //final String SERVER_IP = "197.45.183.87";
+    final String SERVER_IP = "192.168.1.44";
+
     int count;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,7 +85,7 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
                 //Send the message info to the server in a background thread
                 downloadThread download = new downloadThread();
                 //download.execute("http://192.168.1.44:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
-                download.execute("http://197.45.183.87:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(message)+"&timestamp="+URLEncoder.encode(timestamp));
+                download.execute("http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(message)+"&timestamp="+URLEncoder.encode(timestamp));
             }
             count++;
         }

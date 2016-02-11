@@ -36,12 +36,17 @@ import java.util.List;
  */
 public class ChatPage extends ActionBarActivity {
 
+    //final String SERVER_IP = "197.45.183.87";
+    final String SERVER_IP = "192.168.1.44";
     EditText enteredRecepient;
 
     MessageAdapter listAdapter;
     List msgs = new ArrayList();
 
     ListView listView;
+
+    String recepientName;
+    String recepientUserName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +72,6 @@ public class ChatPage extends ActionBarActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("newMessageIntent"));
 
         onNewIntent(getIntent());
-
     }
 
     @Override
@@ -75,8 +79,8 @@ public class ChatPage extends ActionBarActivity {
         super.onNewIntent(intent);
         setIntent(intent);
         Bundle extras = intent.getExtras();
-        if (extras != null) {
-            if (extras.containsKey("message")) {
+        if(extras != null) {
+            if(extras.containsKey("message")) {
                 //setContentView(R.layout.activity_chat_page);
                 // extract the extra-data in the Notification
                 String msg = extras.getString("message");
@@ -87,6 +91,15 @@ public class ChatPage extends ActionBarActivity {
 
                 msgs.add(new MessageData(msg));
                 listAdapter.notifyDataSetChanged();
+            }
+            if(extras.containsKey("recepientName"))
+            {
+                recepientName = extras.getString("recepientName");
+                //setTitle(recepientName);
+            }
+            if(extras.containsKey("recepientUserName"))
+            {
+                recepientUserName = extras.getString("recepientUserName");
             }
         }
     }
@@ -110,7 +123,8 @@ public class ChatPage extends ActionBarActivity {
         //If there's an internet connection
         if (netInfo != null && netInfo.isConnected()) {
             //Get the value of the textfields from the UI
-            String recepientUserName = enteredRecepient.getText().toString();
+            recepientUserName = enteredRecepient.getText().toString();
+
             Date date = new Date();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
             String timestamp = simpleDateFormat.format(date);
@@ -119,7 +133,7 @@ public class ChatPage extends ActionBarActivity {
             //Send the message info to the server in a background thread
             downloadThread download = new downloadThread();
             //download.execute("http://192.168.1.44:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
-            download.execute("http://197.45.183.87:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText)+"&timestamp="+URLEncoder.encode(timestamp));
+            download.execute("http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText)+"&timestamp="+URLEncoder.encode(timestamp));
         }
     }
 

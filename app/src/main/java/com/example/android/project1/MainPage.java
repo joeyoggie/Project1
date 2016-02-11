@@ -1,6 +1,7 @@
 package com.example.android.project1;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -10,40 +11,21 @@ import android.view.View;
 
 public class MainPage extends ActionBarActivity {
 
+    String recepientUserName;
+    String recepientName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
-/*
-        //POPUP
-        final Button btnOpenPopup = (Button)findViewById(R.id.openpopup);
 
-        btnOpenPopup.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                LayoutInflater layoutInflater
-                        = (LayoutInflater) getBaseContext()
-                        .getSystemService(LAYOUT_INFLATER_SERVICE);
-                View popupView = layoutInflater.inflate(R.layout.popup_scheduling, null);
-                final PopupWindow popupWindow = new PopupWindow(
-                        popupView,
-                        LayoutParams.MATCH_PARENT,
-                        LayoutParams.WRAP_CONTENT);
-
-                Button btnDismiss = (Button) popupView.findViewById(R.id.dismiss);
-                btnDismiss.setOnClickListener(new Button.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        popupWindow.dismiss();
-                    }
-                });
-                popupWindow.showAsDropDown(btnOpenPopup, 0, -30);
-                popupWindow.setFocusable(true);
-                popupWindow.update();
-            }
-        });
-        //POPUP
-*/
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+        boolean registered = prefs.getBoolean("isRegistered",false);
+        if(!registered)
+        {
+            Intent reg = new Intent(this, Registration.class);
+            startActivity(reg);
+        }
     }
 
     public void goToPrivacySettings(View view)
@@ -53,7 +35,11 @@ public class MainPage extends ActionBarActivity {
     }
 
     public void goToChatPage(View view) {
+        recepientName = "Youssef Wagieh"; //get the name of the clicked contact
+        recepientUserName = "JoeyOggiePC"; //get the username of the clicked contact
         Intent intent = new Intent(this, ChatPage.class);
+        intent.putExtra("recepientName",recepientName);
+        intent.putExtra("recepientUserName",recepientUserName);
         startActivity(intent);
     }
 

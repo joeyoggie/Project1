@@ -14,47 +14,59 @@
         android:onClick="getInfo"/>
 
     <TextView
-        android:id="@+id/status_text_view_static"
+        android:id="@+id/userName_error_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Status code: "
-        android:layout_toRightOf="@id/get_info_button"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="16dp"/>
-
-    <TextView
-        android:id="@+id/status_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_toRightOf="@id/status_text_view_static" />
+        android:layout_below="@id/get_info_button"
+        android:text="Please enter a valid username"
+        android:textColor="@android:color/holo_red_light"/>
 
     <EditText
         android:id="@+id/entered_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/get_info_button"
-        android:hint="Username"/>
+        android:layout_below="@id/userName_error_message"
+        android:hint="Username (This is how people will be able to message you)"/>
+
+    <TextView
+        android:id="@+id/name_error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/entered_username"
+        android:text="Please enter a name!"
+        android:textColor="@android:color/holo_red_light"/>
 
     <EditText
         android:id="@+id/entered_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/entered_username"
+        android:layout_below="@id/name_error_message"
         android:hint="Name"/>
+
+    <TextView
+        android:id="@+id/phone_number_error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/entered_name"
+        android:text="Please enter a valid phone number"
+        android:textColor="@android:color/holo_red_light"/>
 
     <EditText
         android:id="@+id/entered_phone_number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/entered_name"
-        android:hint="Phone number"/>
+        android:layout_below="@id/phone_number_error_message"
+        android:hint="Phone number (01xxxxxxxxx)"
+        android:digits="0123456789."
+        android:inputType="numberDecimal" />
 
     <Button
         android:id="@+id/submit_info_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:layout_below="@id/entered_phone_number"
+        android:layout_centerHorizontal="true"
         android:text="Submit info"
         android:onClick="submitInfo"/>
 
@@ -72,5 +84,16 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:layout_below="@id/content_text_view_static"/>
+
+    <Button
+        android:id="@+id/finish_registration_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Finish!"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:onClick="goToMainPage"
+        android:background="@android:color/holo_green_dark"
+        android:visibility="gone"/>
 
 </RelativeLayout>

@@ -31,6 +31,8 @@ import java.net.URLEncoder;
  */
 public class MyInstanceIDListenerService extends IntentService {
 
+    //final String SERVER_IP = "197.45.183.87";
+    final String SERVER_IP = "192.168.1.44";
     private static final String TAG = "MyInstanceIDListenerService";
     private static final String[] TOPICS = {"global"};
 
@@ -77,7 +79,7 @@ public class MyInstanceIDListenerService extends IntentService {
             // You should store a boolean that indicates whether the generated token has been
             // sent to your server. If the boolean is false, send the token to your server,
             // otherwise your server should have already received the token.
-            //sharedPreferences.edit().putBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, true).apply();
+            //sharedPreferences.edit().putBoolean("isRegistered", true).apply();
             // [END register_for_gcm]
         } catch (Exception e) {
             Log.d("ERROR!!", "Failed to complete token refresh", e);
@@ -98,7 +100,7 @@ public class MyInstanceIDListenerService extends IntentService {
 
         //Send the info in a background thread
         //d.execute("http://192.168.1.44:8080/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token));
-        d.execute("http://197.45.183.87:8080/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token));
+        d.execute("http://"+SERVER_IP+":8080/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token));
     }
 
     /**
@@ -117,9 +119,15 @@ public class MyInstanceIDListenerService extends IntentService {
     // [END subscribe_topics]
 
 
-
     //AsyncTask that will handle the HTTP connections in a background thread
     public class downloadThread extends AsyncTask<String,Void,String> {
+
+        protected void onPreExecute()
+        {
+            Intent intent = new Intent("broadcastIntent");
+            intent.putExtra("response", "Sending registration info to server, please wait...");
+            LocalBroadcastManager.getInstance(MyInstanceIDListenerService.this).sendBroadcast(intent);
+        }
 
         protected String doInBackground(String... urls)
         {
@@ -136,9 +144,9 @@ public class MyInstanceIDListenerService extends IntentService {
 
         protected void onPostExecute(String result)
         {
-            //Send the server response to MainActivity to display it to the user in contentTextView textbox
-
-            Intent intent = new Intent("broadcastIntent");
+            //Send the server response to Registration activity to dismiss the progress indicator and
+            //display the response to the user in contentTextView textbox
+            Intent intent = new Intent("registrationCompleteIntent");
             intent.putExtra("response", result);
             LocalBroadcastManager.getInstance(MyInstanceIDListenerService.this).sendBroadcast(intent);
         }
