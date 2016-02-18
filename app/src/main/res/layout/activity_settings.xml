@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.android.project1.Settings">
+
+    <TextView
+        android:id="@+id/choose_ip_address_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose the server IP address:"/>
+
+    <Spinner
+        android:id="@+id/ip_addresses_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/choose_ip_address_text_view"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown">
+    </Spinner>
+
+</RelativeLayout>

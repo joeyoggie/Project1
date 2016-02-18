@@ -418,9 +418,9 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/drawerPane"
         android:layout_width="280dp"
         android:layout_height="match_parent"
-        android:id="@+id/drawerPane"
         android:layout_gravity="start"
         android:background="@android:color/white">
 
@@ -575,7 +575,8 @@
                 android:paddingLeft="8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:text="Settings"
-                android:textAllCaps="false">
+                android:textAllCaps="false"
+                android:onClick="goToSettings">
             </Button>
 
             <View

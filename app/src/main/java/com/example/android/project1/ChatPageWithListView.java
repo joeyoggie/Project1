@@ -2,12 +2,12 @@ package com.example.android.project1;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,8 +27,8 @@ import java.util.List;
 
 public class ChatPageWithListView extends ListActivity {
 
-    //final String SERVER_IP = "197.45.183.87";
-    final String SERVER_IP = "192.168.1.44";
+    //String SERVER_IP = "197.45.183.87";
+    String SERVER_IP = "192.168.1.44";
     EditText enteredRecepient;
 
     MessageAdapter adapter;
@@ -42,6 +42,9 @@ public class ChatPageWithListView extends ListActivity {
         adapter = new MessageAdapter(this, msgs);
         setListAdapter(adapter);
 
+        SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
+        SERVER_IP = tempPrefs.getString("SERVER_IP","192.168.1.44");
+
         enteredRecepient = (EditText) findViewById(R.id.entered_recepient);
     }
 
@@ -54,8 +57,8 @@ public class ChatPageWithListView extends ListActivity {
         message.setText("");
 
         //Get the unique device ID that will be stored in the database to uniquely identify this device
-        TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceID = tm.getSimSerialNumber().toString();
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
+        String deviceID = prefs.getString("deviceUUID", "0");
 
         //Check if there's an internet connection
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -70,7 +73,6 @@ public class ChatPageWithListView extends ListActivity {
             downloadThread download = new downloadThread();
             //download.execute("http://192.168.1.44:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
             download.execute("http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
-
         }
     }
 

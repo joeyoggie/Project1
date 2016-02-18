@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -11,7 +12,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,8 +36,9 @@ import java.util.List;
  */
 public class ChatPage extends ActionBarActivity {
 
-    //final String SERVER_IP = "197.45.183.87";
-    final String SERVER_IP = "192.168.1.44";
+    //String SERVER_IP = "197.45.183.87";
+    String SERVER_IP = "192.168.1.44";
+
     EditText enteredRecepient;
 
     MessageAdapter listAdapter;
@@ -52,9 +53,16 @@ public class ChatPage extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_page);
-        setTitle("RecepientNameHere");
+        getSupportActionBar().setTitle("RecepientNameHere");
+        getSupportActionBar().setDisplayUseLogoEnabled(true); //Enable the Logo to be shown
+        getSupportActionBar().setDisplayShowHomeEnabled(true); //Show the Logo
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show the Up/Back arrow
+        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
 
         enteredRecepient = (EditText) findViewById(R.id.entered_recepient);
+
+        SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
+        SERVER_IP = tempPrefs.getString("SERVER_IP","192.168.1.44");
 
         listView = (ListView) findViewById(R.id.list);
         listAdapter = new MessageAdapter(this, msgs);
@@ -101,6 +109,7 @@ public class ChatPage extends ActionBarActivity {
             {
                 recepientUserName = extras.getString("recepientUserName");
             }
+            //check for the received recepientProfilePicture as well and display it in the acionbar
         }
     }
 
@@ -113,8 +122,8 @@ public class ChatPage extends ActionBarActivity {
         message.setText("");
 
         //Get the unique device ID that will be stored in the database to uniquely identify this device
-        TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceID = tm.getSimSerialNumber().toString();
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
+        String deviceID = prefs.getString("deviceUUID","0");
 
         //Check if there's an internet connection
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -135,6 +144,11 @@ public class ChatPage extends ActionBarActivity {
             //download.execute("http://192.168.1.44:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
             download.execute("http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText)+"&timestamp="+URLEncoder.encode(timestamp));
         }
+    }
+    public void sendScheduledMessage(View view)
+    {
+        DialogFragment newFragment = new PopupMessageDialog();
+        newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
     @Override

@@ -2,12 +2,12 @@ package com.example.android.project1;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.telephony.TelephonyManager;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.MenuItem;
@@ -28,8 +28,8 @@ import java.util.Date;
 
 public class PopupMessageDialog extends DialogFragment implements CustomTimePickerDialog.OnTimeSetListener {
 
-    //final String SERVER_IP = "197.45.183.87";
-    final String SERVER_IP = "192.168.1.44";
+    //String SERVER_IP = "197.45.183.87";
+    String SERVER_IP = "192.168.1.44";
 
     int count;
     @Override
@@ -71,9 +71,12 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             String timestamp = simpleDateFormat.format(date);
             Log.d("TIMESTAMP:", timestamp);
 
+            SharedPreferences tempPrefs = getActivity().getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
+            SERVER_IP = tempPrefs.getString("SERVER_IP","192.168.1.44");
+
             //Get the unique device ID that will be stored in the database to uniquely identify this device
-            TelephonyManager tm = (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-            String deviceID = tm.getSimSerialNumber().toString();
+            SharedPreferences prefs = getActivity().getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
+            String deviceID = prefs.getString("deviceUUID", "0");
 
             //Check if there's an internet connection
             ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -89,7 +92,6 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             }
             count++;
         }
-
     }
 
 

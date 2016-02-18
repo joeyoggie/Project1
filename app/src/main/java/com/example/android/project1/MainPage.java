@@ -3,6 +3,7 @@ package com.example.android.project1;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,18 +15,31 @@ public class MainPage extends ActionBarActivity {
     String recepientUserName;
     String recepientName;
 
+    DrawerLayout mDrawerLayout;
+    View myCustomView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
 
         SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
-        boolean registered = prefs.getBoolean("isRegistered",false);
+        boolean registered = prefs.getBoolean("isRegistered", false);
         if(!registered)
         {
             Intent reg = new Intent(this, Registration.class);
             startActivity(reg);
         }
+
+        //Drawlayout
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        myCustomView = findViewById(R.id.drawerPane);
+
+        getSupportActionBar().setDisplayUseLogoEnabled(true); //Enable the Logo to be shown
+        getSupportActionBar().setDisplayShowHomeEnabled(true); //Show the Logo
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show the Up/Back arrow
+        getSupportActionBar().setLogo(R.mipmap.ic_launcher); //Specify the logo image
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer); //Specify the Up/Back arrow image
     }
 
     public void goToPrivacySettings(View view)
@@ -55,6 +69,12 @@ public class MainPage extends ActionBarActivity {
         startActivity(intent);
     }
 
+    public void goToSettings(View view)
+    {
+        Intent intent = new Intent(this, Settings.class);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -71,6 +91,8 @@ public class MainPage extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, Settings.class);
+            startActivity(intent);
             return true;
         }
 
@@ -87,6 +109,17 @@ public class MainPage extends ActionBarActivity {
             startActivity(intent);
             return true;
         }
+
+        if(id == android.R.id.home)
+        {
+            //when clicked
+            if (mDrawerLayout.isDrawerOpen(myCustomView)) {
+                mDrawerLayout.closeDrawer(myCustomView);
+            } else {
+                mDrawerLayout.openDrawer(myCustomView);
+            }
+        }
+
         return super.onOptionsItemSelected(item);
     }
 }

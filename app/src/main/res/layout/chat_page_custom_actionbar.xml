@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageButton
+        android:id="@+id/recepient_profile_picture"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:src="@mipmap/ic_launcher"
+        android:layout_marginRight="8dp"/>
+
+    <TextView
+        android:id="@+id/recepient_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/recepient_profile_picture"
+        android:text="RecepientNameHere"
+        android:layout_marginTop="22dp"
+        android:layout_marginLeft="8dp"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+    <Button
+        android:id="@+id/schedule_message_button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="4dp"
+        android:text="LATER"
+        android:onClick="sendScheduledMessage" />
+
+</RelativeLayout>

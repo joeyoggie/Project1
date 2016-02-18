@@ -11,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
@@ -28,12 +29,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.UUID;
 
 
 public class Registration extends ActionBarActivity {
 
-    //final String SERVER_IP = "197.45.183.87";
-    final String SERVER_IP = "192.168.1.44";
+    //String SERVER_IP = "197.45.183.87";
+    String SERVER_IP = "192.168.1.44";
     TextView contentTextView;
 
     EditText enteredUserName;
@@ -64,9 +66,42 @@ public class Registration extends ActionBarActivity {
         nameErrorTextView.setVisibility(View.GONE);
         phoneNumberErrorTextView.setVisibility(View.GONE);
 
-        //Get the unique device ID that will be stored in the server database to uniquely identify this device
-        TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-        deviceID = tm.getSimSerialNumber().toString();
+        SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
+        SERVER_IP = tempPrefs.getString("SERVER_IP","192.168.1.44");
+
+        //Get a unique device ID (IMEI, Secure.ANDROID_ID or a randomly-generated UUID) that will be stored
+        //in the server database to uniquely identify this device
+        if(!(Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID).equals("9774d56d682e549c"))) {
+            //Use the 64-bit Android_ID (changed on factory resets)
+            deviceID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+            SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+            SharedPreferences.Editor prefsEditor = prefs.edit();
+            prefsEditor.putString("deviceUUID", deviceID);
+            prefsEditor.apply();
+            Log.d("Registration","Device ID: "+deviceID);
+        }
+        else {
+            TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+            if(tm.getDeviceId() != null && !tm.getDeviceId().equals("000000000000000")) {
+                //Use the IMEI number (persistent through factory resets)
+                deviceID = tm.getDeviceId();
+                SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+                SharedPreferences.Editor prefsEditor = prefs.edit();
+                prefsEditor.putString("deviceUUID", deviceID);
+                prefsEditor.apply();
+                Log.d("Registration","Device ID: "+deviceID);
+            }
+            else {
+                //Use a randomly-generated UUID and save it on the device for later usage (changed on app re-installation)
+                deviceID = UUID.randomUUID().toString();
+                SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+                SharedPreferences.Editor prefsEditor = prefs.edit();
+                prefsEditor.putString("deviceUUID", deviceID);
+                prefsEditor.apply();
+                Log.d("Registration", "Device ID: " + deviceID);
+            }
+        }
+
 
         //BroadcastReceiver that will be waiting for calls from the onPostExecute() method in MyInstanceIDListenerService.java
         //to dismiss the progress indicator and update the contentTextView textbox with the response
@@ -83,7 +118,7 @@ public class Registration extends ActionBarActivity {
                     //from being re-launched at app launch again
                     SharedPreferences.Editor prefsEditor = prefs.edit();
                     prefsEditor.putBoolean("isRegistered", true);
-                    prefsEditor.commit();
+                    prefsEditor.apply();
                     contentTextView.setText(response);
                     contentTextView.setTextColor(Color.GREEN);
                     Button finishRegistration = (Button) findViewById(R.id.finish_registration_button);
@@ -107,6 +142,34 @@ public class Registration extends ActionBarActivity {
             }
         };
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("registrationCompleteIntent"));
+    }
+
+    public void getDeviceID(View view)
+    {
+        //Get a unique device ID (IMEI or Secure.ANDROID_ID) that will be stored in the server database to uniquely identify this device
+        TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+        deviceID = tm.getDeviceId();
+        contentTextView.setText(deviceID);
+    }
+    public void getSecureAndroidID(View view)
+    {
+        //Get a unique device ID (IMEI or Secure.ANDROID_ID) that will be stored in the server database to uniquely identify this device
+        deviceID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        contentTextView.setText(deviceID);
+    }
+    public void getSimSerialNumber(View view)
+    {
+        //Get a unique device ID (IMEI or Secure.ANDROID_ID) that will be stored in the server database to uniquely identify this device
+        TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+        if(tm.getSimSerialNumber() != null)
+        {
+            deviceID = tm.getSimSerialNumber().toString();
+        }
+        else
+        {
+            deviceID = "NULL. PLease insert a SIM card!";
+        }
+        contentTextView.setText(deviceID);
     }
 
     //Submit the info to the server (register a new device)
@@ -176,6 +239,9 @@ public class Registration extends ActionBarActivity {
                 return;
             }
 
+            SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
+            deviceID = prefs.getString("deviceUUID","0");
+
             //Display a progress circle indicator
             dialog = new ProgressDialog(Registration.this);
             dialog.setMessage("Sending registration info to server...");
@@ -204,9 +270,13 @@ public class Registration extends ActionBarActivity {
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
 
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
+        deviceID = prefs.getString("deviceUUID","0");
+
         //If there's an internet connection
         if (netInfo != null && netInfo.isConnected()) {
             downloadThread download = new downloadThread();
+            Log.d("Registration", "IP Address: "+SERVER_IP);
 
             //Get the info from the server in a background thread
             //download.execute("http://192.168.1.44:8080/MyFirstServlet/GetInfo?deviceID=" + deviceID);

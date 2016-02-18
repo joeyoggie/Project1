@@ -6,6 +6,7 @@ package com.example.android.project1;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -31,8 +32,9 @@ import java.net.URLEncoder;
  */
 public class MyInstanceIDListenerService extends IntentService {
 
-    //final String SERVER_IP = "197.45.183.87";
-    final String SERVER_IP = "192.168.1.44";
+    //String SERVER_IP = "197.45.183.87";
+    String SERVER_IP = "192.168.1.44";
+
     private static final String TAG = "MyInstanceIDListenerService";
     private static final String[] TOPICS = {"global"};
 
@@ -95,6 +97,9 @@ public class MyInstanceIDListenerService extends IntentService {
 
     //Send the registration info to our server
     private void sendRegistrationToServer(String token) {
+
+        SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
+        SERVER_IP = tempPrefs.getString("SERVER_IP","192.168.1.44");
 
         downloadThread d = new downloadThread();
 
