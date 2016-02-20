@@ -18,6 +18,7 @@ public class MainPage extends ActionBarActivity {
     DrawerLayout mDrawerLayout;
     View myCustomView;
 
+    //MARK WAS HERE
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
