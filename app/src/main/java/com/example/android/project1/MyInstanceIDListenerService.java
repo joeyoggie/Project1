@@ -153,6 +153,10 @@ public class MyInstanceIDListenerService extends IntentService {
             //display the response to the user in contentTextView textbox
             Intent intent = new Intent("registrationCompleteIntent");
             intent.putExtra("response", result);
+            intent.putExtra("userName",userName);
+            intent.putExtra("name",name);
+            intent.putExtra("phoneNumber",phoneNumber);
+            intent.putExtra("deviceID",deviceID);
             LocalBroadcastManager.getInstance(MyInstanceIDListenerService.this).sendBroadcast(intent);
         }
 

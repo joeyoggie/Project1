@@ -1,3 +1,5 @@
+package com.example.android.project1;
+
 import android.provider.BaseColumns;
 
 /**

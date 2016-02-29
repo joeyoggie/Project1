@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context="com.example.android.project1.MainPage">
 
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -403,6 +405,32 @@
 
         </RelativeLayout>
 
+        <EditText
+            android:id="@+id/custom_recepient_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/contact_5"
+            android:layout_marginTop="8dp"
+            android:layout_centerHorizontal="true"
+            android:hint="Enter the receient username here"/>
+
+        <EditText
+            android:id="@+id/custom_recepient_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/custom_recepient_username"
+            android:layout_marginTop="8dp"
+            android:layout_centerHorizontal="true"
+            android:hint="Enter the recepient name here"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Go"
+            android:layout_below="@id/custom_recepient_name"
+            android:layout_centerHorizontal="true"
+            android:onClick="goToChatPage"/>
+
 
         <ImageButton
             android:id="@+id/new_message_image_button"
@@ -424,187 +452,193 @@
         android:layout_gravity="start"
         android:background="@android:color/white">
 
-        <!-- Profile Box -->
-        <RelativeLayout
-            android:id="@+id/profileBox"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:background="@color/material_blue_grey_800"
-            android:padding="8dp">
-
-            <ImageView
-                android:id="@+id/personal_profile_picture"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/default_profile_picture"
-                android:layout_marginTop="15dp"
-                android:onClick="goToRegistration"/>
+            android:layout_height="match_parent">
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="15dp"
-                android:layout_toRightOf="@+id/personal_profile_picture"
-                android:orientation="vertical" >
+                android:layout_width="280dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/userName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Jon Doe"
-                    android:textColor="#fff"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                <!-- Profile Box -->
+                <RelativeLayout
+                    android:id="@+id/profileBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:background="@color/material_blue_grey_800"
+                    android:padding="8dp">
 
-                <TextView
-                    android:id="@+id/desc"
-                    android:layout_width="wrap_content"
+                    <ImageView
+                        android:id="@+id/personal_profile_picture"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/default_profile_picture"
+                        android:layout_marginTop="15dp"
+                        android:onClick="goToRegistration"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="15dp"
+                        android:layout_toRightOf="@+id/personal_profile_picture"
+                        android:orientation="vertical" >
+
+                        <TextView
+                            android:id="@+id/userName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Jon Doe"
+                            android:textColor="#fff"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom"
+                            android:layout_marginTop="4dp"
+                            android:text="+20 xx xxxxxxxx"
+                            android:textColor="#fff"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:background="?android:attr/dividerVertical"/>
+
+                <Button
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:layout_marginTop="4dp"
-                    android:text="+20 xx xxxxxxxx"
-                    android:textColor="#fff"
-                    android:textSize="12sp" />
+                    android:gravity="left|center_vertical"
+                    android:paddingLeft="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="Status"
+                    android:textAllCaps="false">
+                </Button>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:background="?android:attr/dividerVertical"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:gravity="left|center_vertical"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="New broadcast"
+                    android:textAllCaps="false">
+                </Button>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:background="?android:attr/dividerVertical"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:gravity="left|center_vertical"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="Update job &amp; location"
+                    android:textAllCaps="false">
+                </Button>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:background="?android:attr/dividerVertical"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:gravity="left|center_vertical"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="Close Friends list"
+                    android:textAllCaps="false">
+                </Button>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:background="?android:attr/dividerVertical"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:paddingLeft="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="Privacy settings"
+                    android:textAllCaps="false"
+                    android:onClick="goToPrivacySettings">
+                </Button>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:background="?android:attr/dividerVertical"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:paddingLeft="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="Settings"
+                    android:textAllCaps="false"
+                    android:onClick="goToSettings">
+                </Button>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:background="?android:attr/dividerVertical"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:gravity="left|center_vertical"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="Registration"
+                    android:textAllCaps="false"
+                    android:onClick="goToRegistration">
+                </Button>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:background="?android:attr/dividerVertical"/>
+
             </LinearLayout>
-        </RelativeLayout>
 
-        <LinearLayout
-            android:layout_width="280dp"
-            android:layout_height="match_parent"
-            android:layout_below="@id/profileBox"
-            android:orientation="vertical">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="?android:attr/dividerVertical"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_vertical"
-                android:paddingLeft="8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="Status"
-                android:textAllCaps="false">
-            </Button>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="?android:attr/dividerVertical"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="8dp"
-                android:gravity="left|center_vertical"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="New broadcast"
-                android:textAllCaps="false">
-            </Button>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="?android:attr/dividerVertical"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="8dp"
-                android:gravity="left|center_vertical"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="Update job &amp; location"
-                android:textAllCaps="false">
-            </Button>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="?android:attr/dividerVertical"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="8dp"
-                android:gravity="left|center_vertical"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="Close Friends list"
-                android:textAllCaps="false">
-            </Button>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="?android:attr/dividerVertical"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_vertical"
-                android:paddingLeft="8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="Privacy settings"
-                android:textAllCaps="false"
-                android:onClick="goToPrivacySettings">
-            </Button>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="?android:attr/dividerVertical"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_vertical"
-                android:paddingLeft="8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="Settings"
-                android:textAllCaps="false"
-                android:onClick="goToSettings">
-            </Button>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="?android:attr/dividerVertical"/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="8dp"
-                android:gravity="left|center_vertical"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="Registration"
-                android:textAllCaps="false"
-                android:onClick="goToRegistration">
-            </Button>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:background="?android:attr/dividerVertical"/>
-
-        </LinearLayout>
+        </ScrollView>
 
     </RelativeLayout>
 

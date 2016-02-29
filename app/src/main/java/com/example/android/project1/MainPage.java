@@ -5,9 +5,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 
 public class MainPage extends ActionBarActivity {
@@ -40,17 +42,25 @@ public class MainPage extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show the Up/Back arrow
         getSupportActionBar().setLogo(R.mipmap.ic_launcher); //Specify the logo image
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer); //Specify the Up/Back arrow image
+
+        Log.d("MainPage",DBMessagesHelper.SQL_CREATE_QUERY);
     }
 
     public void goToPrivacySettings(View view)
     {
         Intent intent = new Intent(this, PrivacySettings.class);
         startActivity(intent);
+        if (mDrawerLayout.isDrawerOpen(myCustomView)) {
+            mDrawerLayout.closeDrawer(myCustomView);
+        }
     }
 
     public void goToChatPage(View view) {
-        recepientName = "Youssef Wagieh"; //get the name of the clicked contact
-        recepientUserName = "JoeyOggiePC"; //get the username of the clicked contact
+        EditText customRecepientUserName = (EditText) findViewById(R.id.custom_recepient_username);
+        EditText customRecepientName = (EditText) findViewById(R.id.custom_recepient_name);
+
+        recepientName = customRecepientName.getText().toString(); //get the name of the clicked contact
+        recepientUserName = customRecepientUserName.getText().toString(); //get the username of the clicked contact
         Intent intent = new Intent(this, ChatPage.class);
         intent.putExtra("recepientName",recepientName);
         intent.putExtra("recepientUserName",recepientUserName);
@@ -67,12 +77,18 @@ public class MainPage extends ActionBarActivity {
     {
         Intent intent = new Intent(this, Registration.class);
         startActivity(intent);
+        if (mDrawerLayout.isDrawerOpen(myCustomView)) {
+            mDrawerLayout.closeDrawer(myCustomView);
+        }
     }
 
     public void goToSettings(View view)
     {
         Intent intent = new Intent(this, Settings.class);
         startActivity(intent);
+        if (mDrawerLayout.isDrawerOpen(myCustomView)) {
+            mDrawerLayout.closeDrawer(myCustomView);
+        }
     }
 
     @Override

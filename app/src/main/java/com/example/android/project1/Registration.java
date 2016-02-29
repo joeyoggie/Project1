@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -66,9 +67,60 @@ public class Registration extends ActionBarActivity {
         nameErrorTextView.setVisibility(View.GONE);
         phoneNumberErrorTextView.setVisibility(View.GONE);
 
-        SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
-        SERVER_IP = tempPrefs.getString("SERVER_IP","192.168.1.44");
+        SERVER_IP = getServerIP();
+        getDeviceID();
 
+        //BroadcastReceiver that will be waiting for calls from the onPostExecute() method in MyInstanceIDListenerService.java
+        //to dismiss the progress indicator and update the contentTextView textbox with the response
+        //from the server after sending the registration info to the server
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+                String response = intent.getStringExtra("response");
+                if(dialog != null) {dialog.dismiss();}
+                if(response!=null && response.contains("successfully"))
+                {
+                    //Save a boolean file indicating that the registration was successful, to prevent the Registration.java activity
+                    //from being re-launched at app launch again
+                    SharedPreferences.Editor prefsEditor = prefs.edit();
+                    prefsEditor.putBoolean("isRegistered", true);
+                    //Save the registered info as well
+                    prefsEditor.putString("userName",intent.getStringExtra("userName"));
+                    prefsEditor.putString("name",intent.getStringExtra("name"));
+                    prefsEditor.putString("phoneNumber", intent.getStringExtra("phoneNumber"));
+                    prefsEditor.apply();
+                    contentTextView.setText(response);
+                    contentTextView.setTextColor(Color.GREEN);
+                    Button finishRegistration = (Button) findViewById(R.id.finish_registration_button);
+                    finishRegistration.setVisibility(View.VISIBLE);
+                }
+                else if(response!=null && response.contains("already"))
+                {
+                    //Save a boolean file indicating that the registration was unsuccessful, so that the Registration.java activity
+                    //is re-launched at next app-launch
+                    SharedPreferences.Editor prefsEditor = prefs.edit();
+                    prefsEditor.putBoolean("isRegistered", false);
+                    prefsEditor.commit();
+                    contentTextView.setText(response);
+                    contentTextView.setTextColor(Color.RED);
+                }
+                else
+                {
+                    contentTextView.setText("Couldn't connect to server. Please try again later.");
+                    contentTextView.setTextColor(Color.RED);
+                }
+            }
+        };
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("registrationCompleteIntent"));
+    }
+
+    public String getServerIP(){
+        SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
+        return tempPrefs.getString("SERVER_IP","192.168.1.44");
+    }
+
+    private void getDeviceID(){
         //Get a unique device ID (IMEI, Secure.ANDROID_ID or a randomly-generated UUID) that will be stored
         //in the server database to uniquely identify this device
         if(!(Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID).equals("9774d56d682e549c"))) {
@@ -101,79 +153,14 @@ public class Registration extends ActionBarActivity {
                 Log.d("Registration", "Device ID: " + deviceID);
             }
         }
-
-
-        //BroadcastReceiver that will be waiting for calls from the onPostExecute() method in MyInstanceIDListenerService.java
-        //to dismiss the progress indicator and update the contentTextView textbox with the response
-        //from the server after sending the registration info to the server
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
-                String response = intent.getStringExtra("response");
-                if(dialog != null) {dialog.dismiss();}
-                if(response!=null && response.contains("successfully"))
-                {
-                    //Save a boolean file indicating that the registration was successful, to prevent the Registration.java activity
-                    //from being re-launched at app launch again
-                    SharedPreferences.Editor prefsEditor = prefs.edit();
-                    prefsEditor.putBoolean("isRegistered", true);
-                    prefsEditor.apply();
-                    contentTextView.setText(response);
-                    contentTextView.setTextColor(Color.GREEN);
-                    Button finishRegistration = (Button) findViewById(R.id.finish_registration_button);
-                    finishRegistration.setVisibility(View.VISIBLE);
-                }
-                else if(response!=null && response.contains("already"))
-                {
-                    //Save a boolean file indicating that the registration was unsuccessful, so that the Registration.java activity
-                    //is re-launched at next app-launch
-                    SharedPreferences.Editor prefsEditor = prefs.edit();
-                    prefsEditor.putBoolean("isRegistered", false);
-                    prefsEditor.commit();
-                    contentTextView.setText(response);
-                    contentTextView.setTextColor(Color.RED);
-                }
-                else
-                {
-                    contentTextView.setText("Couldn't connect to server. Please try again later.");
-                    contentTextView.setTextColor(Color.RED);
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter("registrationCompleteIntent"));
-    }
-
-    public void getDeviceID(View view)
-    {
-        //Get a unique device ID (IMEI or Secure.ANDROID_ID) that will be stored in the server database to uniquely identify this device
-        TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-        deviceID = tm.getDeviceId();
-        contentTextView.setText(deviceID);
-    }
-    public void getSecureAndroidID(View view)
-    {
-        //Get a unique device ID (IMEI or Secure.ANDROID_ID) that will be stored in the server database to uniquely identify this device
-        deviceID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        contentTextView.setText(deviceID);
-    }
-    public void getSimSerialNumber(View view)
-    {
-        //Get a unique device ID (IMEI or Secure.ANDROID_ID) that will be stored in the server database to uniquely identify this device
-        TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-        if(tm.getSimSerialNumber() != null)
-        {
-            deviceID = tm.getSimSerialNumber().toString();
-        }
-        else
-        {
-            deviceID = "NULL. PLease insert a SIM card!";
-        }
-        contentTextView.setText(deviceID);
     }
 
     //Submit the info to the server (register a new device)
     public void submitInfo(View view) {
+        //Hide the keyboard
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
         //Check for internet connectivity first
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
