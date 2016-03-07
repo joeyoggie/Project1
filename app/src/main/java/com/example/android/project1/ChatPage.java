@@ -38,8 +38,7 @@ import java.util.Date;
  */
 public class ChatPage extends ActionBarActivity {
 
-    //String SERVER_IP = "197.45.183.87";
-    String SERVER_IP = "192.168.1.44";
+    String SERVER_IP;
 
     String userName;
     String name;
@@ -47,7 +46,7 @@ public class ChatPage extends ActionBarActivity {
 
     EditText enteredRecepient;
     String recepientName;
-    String recepientUserName;
+    static String recepientUserName;
     Button sendButton;
 
     ChatPageAdapter listAdapter;
@@ -160,7 +159,7 @@ public class ChatPage extends ActionBarActivity {
 
     private String getServerIP() {
         SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
-        return tempPrefs.getString("SERVER_IP","192.168.1.44");
+        return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
     @Override
@@ -220,7 +219,7 @@ public class ChatPage extends ActionBarActivity {
             //recepientUserName = enteredRecepient.getText().toString();
 
             Date date = new Date();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
             String timestamp = simpleDateFormat.format(date);
             Log.d("TIMESTAMP:", timestamp);
 

@@ -33,7 +33,8 @@
         android:paddingLeft="8dp"
         android:background="?android:attr/selectableItemBackground"
         android:text="Emergencies"
-        android:textAllCaps="false">
+        android:textAllCaps="false"
+        android:onClick="goToResultsPage">
     </Button>
 
     <View

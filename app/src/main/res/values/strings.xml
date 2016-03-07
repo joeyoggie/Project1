@@ -21,8 +21,10 @@
     <string name="title_activity_registration">Registration</string>
     <string name="title_activity_settings">Settings</string>
     <string-array name="ip_addresses_array">
-        <item>Localhost IP (192.168.1.44)</item>
         <item>Static IP (197.45.183.87)</item>
+        <item>Localhost IP (192.168.1.44)</item>
         <item>Custom IP</item>
     </string-array>
+    <string name="server_ip_address">197.45.183.87</string>
+    <string name="server_ip_address_local">192.168.1.44</string>
 </resources>

@@ -35,8 +35,7 @@ import java.util.UUID;
 
 public class Registration extends ActionBarActivity {
 
-    //String SERVER_IP = "197.45.183.87";
-    String SERVER_IP = "192.168.1.44";
+    String SERVER_IP;
     TextView contentTextView;
 
     EditText enteredUserName;
@@ -117,7 +116,7 @@ public class Registration extends ActionBarActivity {
 
     public String getServerIP(){
         SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
-        return tempPrefs.getString("SERVER_IP","192.168.1.44");
+        return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
     private void getDeviceID(){
@@ -298,6 +297,8 @@ public class Registration extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, com.example.android.project1.Settings.class);
+            startActivity(intent);
             return true;
         }
 

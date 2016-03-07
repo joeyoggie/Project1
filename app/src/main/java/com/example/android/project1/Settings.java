@@ -36,27 +36,25 @@ public class Settings extends ActionBarActivity implements AdapterView.OnItemSel
         // parent.getItemAtPosition(pos)
         if(pos == 0)
         {
-            //Localhost IP (192.168.1.44)
-            SharedPreferences prefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
-            SharedPreferences.Editor prefsEditor = prefs.edit();
-            prefsEditor.putString("SERVER_IP","192.168.1.44");
-            prefsEditor.apply();
-            Log.d("Settings", "IP set to: " + "192.168.1.44");
-        }
-        else if(pos == 1)
-        {
             //Static IP (197.45.183.87)
             SharedPreferences prefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
             SharedPreferences.Editor prefsEditor = prefs.edit();
-            prefsEditor.putString("SERVER_IP","197.45.183.87");
+            prefsEditor.putString("SERVER_IP", getResources().getString(R.string.server_ip_address));
             prefsEditor.apply();
-            Log.d("Settings", "IP set to: " + "197.45.183.87");
-
+            Log.d("Settings", "IP set to: " + getResources().getString(R.string.server_ip_address));
+        }
+        else if(pos == 1)
+        {
+            //Localhost IP (192.168.1.44)
+            SharedPreferences prefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
+            SharedPreferences.Editor prefsEditor = prefs.edit();
+            prefsEditor.putString("SERVER_IP",getResources().getString(R.string.server_ip_address_local));
+            prefsEditor.apply();
+            Log.d("Settings", "IP set to: " + getResources().getString(R.string.server_ip_address_local));
         }
         else if(pos == 2)
         {
             //Custom IP
-
         }
     }
 

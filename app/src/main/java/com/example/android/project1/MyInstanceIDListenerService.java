@@ -32,8 +32,7 @@ import java.net.URLEncoder;
  */
 public class MyInstanceIDListenerService extends IntentService {
 
-    //String SERVER_IP = "197.45.183.87";
-    String SERVER_IP = "192.168.1.44";
+    String SERVER_IP;
 
     private static final String TAG = "MyInstanceIDListenerService";
     private static final String[] TOPICS = {"global"};
@@ -99,7 +98,7 @@ public class MyInstanceIDListenerService extends IntentService {
     private void sendRegistrationToServer(String token) {
 
         SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
-        SERVER_IP = tempPrefs.getString("SERVER_IP","192.168.1.44");
+        SERVER_IP = tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
 
         downloadThread d = new downloadThread();
 

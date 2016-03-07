@@ -12,10 +12,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <EditText
+            android:id="@+id/custom_recepient_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_centerHorizontal="true"
+            android:hint="Enter the receient username here"/>
+
+        <EditText
+            android:id="@+id/custom_recepient_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/custom_recepient_username"
+            android:layout_marginTop="8dp"
+            android:layout_centerHorizontal="true"
+            android:hint="Enter the recepient name here"/>
+
+        <Button
+            android:id="@+id/custom_recepient_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Go"
+            android:layout_below="@id/custom_recepient_name"
+            android:layout_centerHorizontal="true"
+            android:onClick="goToChatPage"/>
+
         <RelativeLayout
             android:id="@+id/contact_1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@id/custom_recepient_button">
 
             <ImageButton
                 android:id="@+id/profile_picture"
@@ -404,32 +431,6 @@
                 android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
 
         </RelativeLayout>
-
-        <EditText
-            android:id="@+id/custom_recepient_username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/contact_5"
-            android:layout_marginTop="8dp"
-            android:layout_centerHorizontal="true"
-            android:hint="Enter the receient username here"/>
-
-        <EditText
-            android:id="@+id/custom_recepient_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/custom_recepient_username"
-            android:layout_marginTop="8dp"
-            android:layout_centerHorizontal="true"
-            android:hint="Enter the recepient name here"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Go"
-            android:layout_below="@id/custom_recepient_name"
-            android:layout_centerHorizontal="true"
-            android:onClick="goToChatPage"/>
 
 
         <ImageButton

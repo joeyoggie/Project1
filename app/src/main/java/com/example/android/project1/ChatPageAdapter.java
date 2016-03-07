@@ -3,7 +3,6 @@ package com.example.android.project1;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,12 +50,12 @@ public class ChatPageAdapter extends CursorAdapter {
         if(userName.equals(sender))
         {
             messageText.setGravity(Gravity.START);
-            messageText.setTextColor(Color.GREEN); //use colors temporarily, should be aligned only
+            //messageText.setTextColor(Color.GREEN); //use colors temporarily, should be aligned only
         }
         else
         {
             messageText.setGravity(Gravity.END);
-            messageText.setTextColor(Color.RED); //use colors temporarily, should be aligned only
+            //messageText.setTextColor(Color.RED); //use colors temporarily, should be aligned only
         }
         SimpleDateFormat simpleDateFormatToDisplay = new SimpleDateFormat("h:mm a");
         SimpleDateFormat simpleDateFormatInDB = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");

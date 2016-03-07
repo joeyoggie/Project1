@@ -30,8 +30,7 @@ import java.util.Date;
 
 public class PopupMessageDialog extends DialogFragment implements CustomTimePickerDialog.OnTimeSetListener {
 
-    //String SERVER_IP = "197.45.183.87";
-    String SERVER_IP = "192.168.1.44";
+    String SERVER_IP;
     DBMessagesHelper dbHelper;
     SQLiteDatabase readableMessagesDB;
     SQLiteDatabase writableMessagesDB;
@@ -56,6 +55,7 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
         int minute = c.get(Calendar.MINUTE);
 
         getLocalUserInfo();
+        SERVER_IP = getServerIP();
         dbHelper = DBMessagesHelper.getInstance(getActivity());
         //new backgroundDBHelper().execute();
         count = 0;
@@ -71,8 +71,9 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             // Do something with the time chosen by the user
             EditText enteredScheduledMessage = (EditText) getDialog().findViewById(R.id.entered_scheduled_message);
             String message = enteredScheduledMessage.getText().toString();
-            EditText enteredRecepientUserName = (EditText) getActivity().findViewById(R.id.entered_recepient);
-            String recepientUserName = enteredRecepientUserName.getText().toString();
+            //EditText enteredRecepientUserName = (EditText) getActivity().findViewById(R.id.entered_recepient);
+            //String recepientUserName = enteredRecepientUserName.getText().toString();
+            String recepientUserName = ChatPage.recepientUserName;
             if(message.trim().length() == 0)
             {
                 return;
@@ -83,12 +84,9 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             Log.d("CALENDAR TIME: ", calendar.toString());
             Date date = calendar.getTime();
             Log.d("DATE: ", date.toString());
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
             String timestamp = simpleDateFormat.format(date);
             Log.d("TIMESTAMP:", timestamp);
-
-            SharedPreferences tempPrefs = getActivity().getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
-            SERVER_IP = tempPrefs.getString("SERVER_IP","192.168.1.44");
 
             //Get the unique device ID that will be stored in the database to uniquely identify this device
             SharedPreferences prefs = getActivity().getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
@@ -114,11 +112,18 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             count++;
         }
     }
+
     private void getLocalUserInfo(){
         SharedPreferences prefs = getActivity().getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
         userName = prefs.getString("userName","Me");
         name = prefs.getString("name","Jon Doe");
         phoneNumber = prefs.getString("phoneNumber", "0000000000");
+    }
+
+    private String getServerIP()
+    {
+        SharedPreferences tempPrefs = getActivity().getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
+        return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
 //    private void insertMessageIntoDB(String[] data){

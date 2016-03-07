@@ -1,9 +1,11 @@
 package com.example.android.project1;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 
 public class LocationServices extends ActionBarActivity {
@@ -13,6 +15,12 @@ public class LocationServices extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_services);
         setTitle("Location Services");
+    }
+
+    public void goToResultsPage(View view)
+    {
+        Intent intent = new Intent(this, LocationServicesResultsList.class);
+        startActivity(intent);
     }
 
     @Override

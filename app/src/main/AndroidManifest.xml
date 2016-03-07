@@ -100,9 +100,9 @@
         <activity
             android:name=".Registration"
             android:label="@string/title_activity_registration"
-            android:windowSoftInputMode="stateHidden"/>
-        <activity
-            android:name=".Settings" />
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".Settings" />
+        <activity android:name=".LocationServicesResultsList"></activity>
     </application>
 
 </manifest>
