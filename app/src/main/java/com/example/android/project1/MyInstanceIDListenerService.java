@@ -7,20 +7,18 @@ package com.example.android.project1;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 
 /**
@@ -100,11 +98,39 @@ public class MyInstanceIDListenerService extends IntentService {
         SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences",0);
         SERVER_IP = tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
 
-        downloadThread d = new downloadThread();
-
         //Send the info in a background thread
-        //d.execute("http://192.168.1.44:8080/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token));
-        d.execute("http://"+SERVER_IP+":8080/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token));
+        //Instantiate the RequestQueue.
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token);
+        //Request a string response from the provided URL.
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
+            @Override
+            public void onResponse(String response) {
+                //Send the server response to Registration activity to dismiss the progress indicator and
+                //display the response to the user in contentTextView textbox
+                Intent intent = new Intent("registrationCompleteIntent");
+                intent.putExtra("response", response);
+                intent.putExtra("userName",userName);
+                intent.putExtra("name",name);
+                intent.putExtra("phoneNumber", phoneNumber);
+                intent.putExtra("deviceID", deviceID);
+                LocalBroadcastManager.getInstance(MyInstanceIDListenerService.this).sendBroadcast(intent);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Send the server response to Registration activity to dismiss the progress indicator and
+                //display the response to the user in contentTextView textbox
+                Intent intent = new Intent("registrationCompleteIntent");
+                intent.putExtra("response", "Volley ERROR");
+                intent.putExtra("userName",userName);
+                intent.putExtra("name",name);
+                intent.putExtra("phoneNumber", phoneNumber);
+                intent.putExtra("deviceID", deviceID);
+                LocalBroadcastManager.getInstance(MyInstanceIDListenerService.this).sendBroadcast(intent);
+            }
+        });
+        //Add the request to the RequestQueue.
+        HttpConnector.getInstance(this).addToRequestQueue(request);
     }
 
     /**
@@ -121,77 +147,5 @@ public class MyInstanceIDListenerService extends IntentService {
         }
     }
     // [END subscribe_topics]
-
-
-    //AsyncTask that will handle the HTTP connections in a background thread
-    public class downloadThread extends AsyncTask<String,Void,String> {
-
-        protected void onPreExecute()
-        {
-            Intent intent = new Intent("broadcastIntent");
-            intent.putExtra("response", "Sending registration info to server, please wait...");
-            LocalBroadcastManager.getInstance(MyInstanceIDListenerService.this).sendBroadcast(intent);
-        }
-
-        protected String doInBackground(String... urls)
-        {
-            String result = null;
-            try {
-                result = downloadUrl(urls[0]);
-            }
-            catch (IOException e)
-            {
-
-            }
-            return result;
-        }
-
-        protected void onPostExecute(String result)
-        {
-            //Send the server response to Registration activity to dismiss the progress indicator and
-            //display the response to the user in contentTextView textbox
-            Intent intent = new Intent("registrationCompleteIntent");
-            intent.putExtra("response", result);
-            intent.putExtra("userName",userName);
-            intent.putExtra("name",name);
-            intent.putExtra("phoneNumber",phoneNumber);
-            intent.putExtra("deviceID",deviceID);
-            LocalBroadcastManager.getInstance(MyInstanceIDListenerService.this).sendBroadcast(intent);
-        }
-
-        private String downloadUrl(String myurl) throws IOException {
-            InputStream is = null;
-            try {
-                URL url = new URL(myurl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000);
-                conn.setConnectTimeout(15000);
-                conn.setRequestMethod("GET");
-                conn.setDoInput(true);
-
-                conn.connect();
-                int response = conn.getResponseCode();
-                Log.d("REGTOKEN", "The response is: " + response);
-
-                is = conn.getInputStream();
-
-                int len = 500;
-                String result = null;
-
-                Reader reader = new InputStreamReader(is, "UTF-8");
-                char[] buffer = new char[len];
-                reader.read(buffer);
-                result = new String(buffer);
-
-                return result;
-
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
-            }
-        }
-    }
-
 }
 

@@ -19,6 +19,7 @@ public class LocationServices extends ActionBarActivity {
 
     public void goToResultsPage(View view)
     {
+        //RequestQueue queue = Volley.newRequestQueue(this);
         Intent intent = new Intent(this, LocationServicesResultsList.class);
         startActivity(intent);
     }

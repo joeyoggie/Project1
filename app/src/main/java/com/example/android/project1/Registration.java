@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
@@ -24,12 +23,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
 import java.util.UUID;
 
 
@@ -67,7 +65,7 @@ public class Registration extends ActionBarActivity {
         phoneNumberErrorTextView.setVisibility(View.GONE);
 
         SERVER_IP = getServerIP();
-        getDeviceID();
+        deviceID = getDeviceID();
 
         //BroadcastReceiver that will be waiting for calls from the onPostExecute() method in MyInstanceIDListenerService.java
         //to dismiss the progress indicator and update the contentTextView textbox with the response
@@ -119,7 +117,7 @@ public class Registration extends ActionBarActivity {
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
-    private void getDeviceID(){
+    private String getDeviceID(){
         //Get a unique device ID (IMEI, Secure.ANDROID_ID or a randomly-generated UUID) that will be stored
         //in the server database to uniquely identify this device
         if(!(Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID).equals("9774d56d682e549c"))) {
@@ -130,6 +128,7 @@ public class Registration extends ActionBarActivity {
             prefsEditor.putString("deviceUUID", deviceID);
             prefsEditor.apply();
             Log.d("Registration","Device ID: "+deviceID);
+            return deviceID;
         }
         else {
             TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
@@ -141,6 +140,7 @@ public class Registration extends ActionBarActivity {
                 prefsEditor.putString("deviceUUID", deviceID);
                 prefsEditor.apply();
                 Log.d("Registration","Device ID: "+deviceID);
+                return deviceID;
             }
             else {
                 //Use a randomly-generated UUID and save it on the device for later usage (changed on app re-installation)
@@ -150,6 +150,7 @@ public class Registration extends ActionBarActivity {
                 prefsEditor.putString("deviceUUID", deviceID);
                 prefsEditor.apply();
                 Log.d("Registration", "Device ID: " + deviceID);
+                return deviceID;
             }
         }
     }
@@ -261,12 +262,40 @@ public class Registration extends ActionBarActivity {
 
         //If there's an internet connection
         if (netInfo != null && netInfo.isConnected()) {
-            downloadThread download = new downloadThread();
             Log.d("Registration", "IP Address: "+SERVER_IP);
 
+            //Display a progress circle indicator
+            final ProgressDialog dialog;
+            dialog = new ProgressDialog(Registration.this);
+            dialog.setMessage("Getting user info from server...");
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+
             //Get the info from the server in a background thread
-            //download.execute("http://192.168.1.44:8080/MyFirstServlet/GetInfo?deviceID=" + deviceID);
-            download.execute("http://" + SERVER_IP + ":8080/MyFirstServlet/GetInfo?deviceID=" + deviceID);
+            //Instantiate the RequestQueue.
+            //RequestQueue queue = HttpConnector.getInstance(this.getApplicationContext()).getRequestQueue();
+            String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/GetInfo?deviceID=" + deviceID;
+            //Request a string response from the provided URL.
+            StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
+                @Override
+                public void onResponse(String response) {
+                    //Update the contentTextView with the response from the server
+                    contentTextView.setText("Server response is: "+ response);
+                    contentTextView.setTextColor(Color.BLACK);
+                    dialog.dismiss();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //Update the contentTextView, indicating a failure in connection
+                    contentTextView.setText("Couldn't connect to server. Please try again later.");
+                    contentTextView.setTextColor(Color.RED);
+                    dialog.dismiss();
+                }
+            });
+            //Add the request to the RequestQueue.
+            HttpConnector.getInstance(this).addToRequestQueue(request);
+            //queue.add(request);
         }
         //If there's no internet connection
         else {
@@ -303,75 +332,5 @@ public class Registration extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    //AsyncTask that will handle the HTTP connections in a background thread
-    public class downloadThread extends AsyncTask<String, Void, String> {
-
-        ProgressDialog dialog;
-
-        protected String doInBackground(String... urls) {
-            String result = null;
-            try {
-                result = downloadUrl(urls[0]);
-            } catch (IOException e) {
-
-            }
-            return result;
-        }
-
-        protected void onPreExecute() {
-            //Display a progress circle indicator
-            dialog = new ProgressDialog(Registration.this);
-            dialog.setMessage("Getting user info from server...");
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.show();
-        }
-
-        protected void onPostExecute(String result) {
-            if (result == null || result.trim().length() == 0) {
-                contentTextView.setText("Couldn't connect to server. Please try again later.");
-                contentTextView.setTextColor(Color.RED);
-            }
-            else
-            {
-                contentTextView.setText(result);
-                contentTextView.setTextColor(Color.BLACK);
-            }
-            dialog.dismiss();
-        }
-
-        private String downloadUrl(String myurl) throws IOException {
-            InputStream is = null;
-            try {
-                URL url = new URL(myurl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000);
-                conn.setConnectTimeout(15000);
-                conn.setRequestMethod("GET");
-                conn.setDoInput(true);
-
-                conn.connect();
-                int response = conn.getResponseCode();
-                Log.d("Registration", "The response is: " + response);
-
-                is = conn.getInputStream();
-
-                int len = 500;
-                String result = null;
-
-                Reader reader = new InputStreamReader(is, "UTF-8");
-                char[] buffer = new char[len];
-                reader.read(buffer);
-                result = new String(buffer);
-
-                return result;
-
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
-            }
-        }//End of downloadUrl method
     }
 }

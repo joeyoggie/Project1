@@ -117,5 +117,4 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
             return null;
         }
     }
-
 }

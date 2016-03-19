@@ -30,7 +30,7 @@ public class MyGcmListenerService extends GcmListenerService {
      */
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        //Get the data  that was sent from the GCM server
+        //Get the data that was sent from the GCM server
         String message = data.getString("message");
         String sender = data.getString("sender");
         String timestamp = data.getString("timestamp");
@@ -48,29 +48,20 @@ public class MyGcmListenerService extends GcmListenerService {
             //normal downstream message.
         }
 
-        //Pass the message that was received to the ListView
-        //refreshListView(message);
         //Store the message that was received in a local SQLite database
-        //new backgroundDBHelperInsertMessages().execute(new String[]{sender, recepient, message, timestamp});
         DBMessagesHelper.getInstance(getApplicationContext());
         DBMessagesHelper.insertMessageIntoDB(sender, recepient, message,timestamp);
-        notifyListView();
+        //Refresh the ChatPage's listview, in case it was already visible
+        refreshListView();
         //Show a notification
         sendNotification(sender, message);
     }
 
-    private void notifyListView()
+    private void refreshListView()
     {
         Intent intent = new Intent("newMessageIntent");
         LocalBroadcastManager.getInstance(MyGcmListenerService.this).sendBroadcast(intent);
     }
-
-//    private void refreshListView(String message)
-//    {
-//        Intent intent = new Intent("newMessageIntent");
-//        intent.putExtra("message", message);
-//        LocalBroadcastManager.getInstance(MyGcmListenerService.this).sendBroadcast(intent);
-//    }
 
     /**
      * Create and show a simple notification containing the received GCM message.
@@ -102,28 +93,4 @@ public class MyGcmListenerService extends GcmListenerService {
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
-
-//    //AsyncTask that will perform DB operations in a background thread
-//    public class backgroundDBHelperInsertMessages extends AsyncTask<String[], Void, Void> {
-//        DBMessagesHelper dbHelper;
-//        SQLiteDatabase messagesDB;
-//
-//        protected Void doInBackground(String[]... params) {
-//            dbHelper = DBMessagesHelper.getInstance(getApplicationContext());
-//            messagesDB = dbHelper.getWritableDatabase();
-//            ContentValues values = new ContentValues();
-//            values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_ID,1);
-//            values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER,params[0][0]);
-//            values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_RECEPIENT,params[0][1]);
-//            values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_CONTENT, params[0][2]);
-//            values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME,params[0][3]);
-//            long newRowId;
-//            newRowId = messagesDB.insert(DBMessagesContract.MessageEntry.TABLE_NAME,null,values);
-//            return null;
-//        }
-//        protected void onPostExecute(Void v)
-//        {
-//            refreshListView("message");
-//        }
-//    }
 }
