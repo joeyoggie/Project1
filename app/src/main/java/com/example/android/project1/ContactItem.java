@@ -21,8 +21,6 @@ public class ContactItem extends BaseAdapter implements ListAdapter {
     private ArrayList<String> list = new ArrayList<String>();
     private Context context;
 
-
-
     public ContactItem(ArrayList<String> list, Context context) {
         this.list = list;
         this.context = context;

@@ -11,6 +11,8 @@ import android.util.Log;
 /**
  * Created by Joey on 2/20/2016.
  */
+//TODO: Get the readable/writable databases in a background thread
+//TODO: Add an image column to the database
 public final class DBMessagesHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
@@ -71,8 +73,7 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_RECEPIENT, recepientUserName);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_CONTENT, message);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME, timestamp);
-        long newRowId;
-        newRowId = writableMessagesDB.insert(DBMessagesContract.MessageEntry.TABLE_NAME,null,values);
+        long newRowId = writableMessagesDB.insert(DBMessagesContract.MessageEntry.TABLE_NAME,null,values);
     }
 
     public static Cursor readMessages(String userName, String recepientUserName)

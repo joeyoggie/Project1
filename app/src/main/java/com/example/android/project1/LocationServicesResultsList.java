@@ -9,5 +9,8 @@ public class LocationServicesResultsList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_services_results_list);
+
+        //RequestQueue queue = Volley.newRequestQueue(this);
+
     }
 }

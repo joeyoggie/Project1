@@ -73,6 +73,12 @@ public class MainPage extends ActionBarActivity {
         startActivity(intent);
     }
 
+    public void newMessageContactListView(View view){
+        Intent intent = new Intent(this, NewMessageContactsListView.class);
+        startActivity(intent);
+    }
+
+
     public void goToRegistration(View view)
     {
         Intent intent = new Intent(this, Registration.class);
@@ -121,7 +127,7 @@ public class MainPage extends ActionBarActivity {
 
         if(id == R.id.location_services)
         {
-            Intent intent = new Intent(this, LocationServices.class);
+            Intent intent = new Intent(this, TestingVolleyJsonRequest.class);
             startActivity(intent);
             return true;
         }

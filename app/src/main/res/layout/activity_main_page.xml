@@ -442,7 +442,7 @@
             android:src="@drawable/new_message_plus_sign"
             android:scaleType="fitCenter"
             android:clickable="true"
-            android:onClick="selectContacts" />
+            android:onClick="newMessageContactListView" />
 
     </RelativeLayout>
 
