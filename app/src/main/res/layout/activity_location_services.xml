@@ -26,6 +26,18 @@
         android:layout_marginRight="4dp"
         android:background="?android:attr/dividerVertical"/>
 
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/listview">
+    </ListView>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/filter"
+        android:visibility="gone" />
+    <!--
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -111,5 +123,5 @@
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
         android:background="?android:attr/dividerVertical"/>
-
+    -->
 </LinearLayout>

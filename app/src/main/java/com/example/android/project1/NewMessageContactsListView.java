@@ -98,11 +98,12 @@ public class NewMessageContactsListView extends AppCompatActivity {
     private void sendNumbersToServer(ArrayList<String> phoneNumbers)
     {
         //Send the data to the server in a background thread
-        String url = "http://192.168.1.44:8080/MyFirstServlet/TestingVolley";
+        String url = "http://192.168.1.44:8080/MyFirstServlet/CheckRegisteredContacts";
         JSONArray jsonArray = new JSONArray(phoneNumbers);
         //Request a response from the provided URL.
         JsonArrayRequest requestArray = new JsonArrayRequest(Request.Method.POST, url, jsonArray, new Response.Listener<JSONArray>(){
             Gson gson = new Gson();
+
             @Override
             public void onResponse(JSONArray response) {
                 if(response.length() > 0) {

@@ -127,7 +127,7 @@ public class MainPage extends ActionBarActivity {
 
         if(id == R.id.location_services)
         {
-            Intent intent = new Intent(this, TestingVolleyJsonRequest.class);
+            Intent intent = new Intent(this, LocationServices.class);
             startActivity(intent);
             return true;
         }

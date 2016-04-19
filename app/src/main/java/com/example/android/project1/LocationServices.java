@@ -8,6 +8,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -20,12 +23,23 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class LocationServices extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     LocationRequest mLocationRequest;
+
+    ListView job_list_view;
+    JobsAdapter adapter;
+    List<JobContent> list_jobs;
+    EditText filter_edit_box;
+    String longiude;
+    String latitude;
+    JobContent jobContent0, jobContent1, jobContent2, jobContent3, jobContent4, jobContent5, jobContent6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +54,53 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
                     .addApi(com.google.android.gms.location.LocationServices.API)
                     .build();
         }
+        addJobs();
+
+    }
+    private void addJobs()
+    {
+        job_list_view=(ListView)findViewById(R.id.listview);
+        filter_edit_box= (EditText)findViewById(R.id.filter);
+        list_jobs= new ArrayList<>();
+        adapter= new JobsAdapter(this,list_jobs);
+        job_list_view.setAdapter(adapter);
+
+        jobContent0 = new JobContent("Mechanic");
+        list_jobs.add(jobContent0);
+
+        jobContent1 = new JobContent("Doctor");
+        list_jobs.add(jobContent1);
+
+        jobContent2 = new JobContent("Electrician");
+        list_jobs.add(jobContent2);
+
+        jobContent3 = new JobContent("Pharmacy");
+        list_jobs.add(jobContent3);
+
+        jobContent4 = new JobContent("Police");
+        list_jobs.add(jobContent4);
+
+        jobContent5 = new JobContent("Coiffure");
+        list_jobs.add(jobContent5);
+
+        //jobContent6 = new JobContent("");
+        //list_jobs.add(jobContent6);
+
+        adapter.notifyDataSetChanged();
+
+        job_list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Intent intent = new Intent(LocationServices.this, LocationServicesResultsList.class);
+                String clickeditem = list_jobs.get(position).getJob_name();
+                intent.putExtra("key_clicked_item",clickeditem);
+                intent.putExtra("key_longitude",longiude);
+                intent.putExtra("key_latitude",latitude);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -80,6 +141,8 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
                         if (mLastLocation != null) {
                             //Save the long/lat in a string and send them to the LocationServicesResultsList activity
                             Toast.makeText(LocationServices.this, mLastLocation.getLongitude() + "," + mLastLocation.getLatitude(), Toast.LENGTH_LONG).show();
+                            longiude= String.valueOf(mLastLocation.getLongitude());
+                            latitude=String.valueOf(mLastLocation.getLatitude());
                         }
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
