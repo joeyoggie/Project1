@@ -1,6 +1,7 @@
 package com.example.android.project1;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +23,7 @@ import java.util.List;
 
 public class LocationServicesResultsList extends AppCompatActivity {
 
+    String SERVER_IP;
     ProgressDialog progressDialog;
     String latitude, longtitude, job;
     List<String> list_of_first_requests;
@@ -35,6 +37,8 @@ public class LocationServicesResultsList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_services_results_list);
+
+        SERVER_IP = getServerIP();
 
         numberOfResponses = (TextView) findViewById(R.id.number_of_results);
 
@@ -57,9 +61,14 @@ public class LocationServicesResultsList extends AppCompatActivity {
         send_request_to_server(list_of_first_requests);
     }
 
+    private String getServerIP() {
+        SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
+        return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
+    }
+
     public void send_request_to_server(List<String> list_of_requests) {
 
-        String url = "http://192.168.1.44:8080/MyFirstServlet/GetLocalServices?serviceCategory="+list_of_requests.get(2)+"&userLongitude="+list_of_requests.get(1)+"&userLatitude="+list_of_requests.get(0);
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetLocalServices?serviceCategory="+list_of_requests.get(2)+"&userLongitude="+list_of_requests.get(1)+"&userLatitude="+list_of_requests.get(0);
 
         JSONArray jsonArray = new JSONArray(list_of_requests);
         //Request a response from the provided URL.
