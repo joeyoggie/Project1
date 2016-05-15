@@ -14,8 +14,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import github.ankushsachdeva.emojicon.EmojiconTextView;
-
 /**
  * Created by Joey on 2/21/2016.
  */
@@ -43,7 +41,7 @@ public class ChatPageAdapter extends CursorAdapter {
         sender = cursor.getString(cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER));
         timestamp = cursor.getString(cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME));
 
-        EmojiconTextView messageText = (EmojiconTextView) view.findViewById(R.id.message_text);
+        TextView messageText = (TextView) view.findViewById(R.id.message_text);
         TextView senderText = (TextView) view.findViewById(R.id.sender_username_box);
         TextView timeBox = (TextView) view.findViewById(R.id.time_box);
 

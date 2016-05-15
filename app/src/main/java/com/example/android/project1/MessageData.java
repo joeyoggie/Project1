@@ -11,8 +11,6 @@ public class MessageData {
     //Determine whether message is sent or received (to align it left or right accordingly)
     private boolean sent;
 
-
-
     public MessageData(String message) {
         this.message = message;
     }

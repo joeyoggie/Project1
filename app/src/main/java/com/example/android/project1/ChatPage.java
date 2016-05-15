@@ -319,6 +319,7 @@ public class ChatPage extends ActionBarActivity {
         inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         //Disable the sendButton temporarily
 
+
         mText = message.getText().toString();
         if(mText.trim().length() == 0)
         {
@@ -347,7 +348,7 @@ public class ChatPage extends ActionBarActivity {
 
             //Send the message info to the server in a background thread
             //Instantiate the RequestQueue.
-            String url = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText)+"&timestamp="+URLEncoder.encode(timestamp);
+            String url = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText) +"&timestamp="+URLEncoder.encode(timestamp);
             //Request a string response from the provided URL.
             StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
                 @Override
@@ -366,6 +367,39 @@ public class ChatPage extends ActionBarActivity {
             });
             //Add the request to the RequestQueue.
             HttpConnector.getInstance(this).addToRequestQueue(request);
+
+
+            /*String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
+            Message messageObject = new Message();
+            messageObject.setMessageSenderDeviceID(deviceID);
+            messageObject.setMessageRecepientUserName(recepientUserName);
+            messageObject.setMessageContent(mText);
+            messageObject.setTimestamp(timestamp);
+            Log.d("ChatPage", mText);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("senderDeviceID", deviceID);
+            params.put("recepientUserName", recepientUserName);
+            params.put("messageContent", mText);
+            params.put("timestamp", timestamp);
+            JSONObject jsonObject = new JSONObject(params);
+            Log.d("ChatPage", "JSON: "+jsonObject.toString());
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    //TODO: Add a flag marking the message as sent successfully
+                    DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp);
+                    refreshCursor();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //TODO: Add a flag marking the message as not sent
+                    DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp);
+                    refreshCursor();
+                }
+            });
+            HttpConnector.getInstance(this).addToRequestQueue(jsonObjectRequest);*/
+
         }
     }
 
