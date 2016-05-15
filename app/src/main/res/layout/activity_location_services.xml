@@ -26,9 +26,18 @@
         android:layout_marginRight="4dp"
         android:background="?android:attr/dividerVertical"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:text="I'm looking for a:"/>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
         android:id="@+id/listview">
     </ListView>
 

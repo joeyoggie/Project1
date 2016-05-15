@@ -29,7 +29,7 @@
             android:text="x:xxPM"
             android:layout_marginLeft="8dp"
             android:textStyle="bold" />
-        <TextView
+        <github.ankushsachdeva.emojicon.EmojiconTextView
             android:id="@+id/message_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

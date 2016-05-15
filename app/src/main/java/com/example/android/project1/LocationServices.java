@@ -33,11 +33,11 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
     Location mLastLocation;
     LocationRequest mLocationRequest;
 
-    ListView job_list_view;
+    ListView jobsListView;
     JobsAdapter adapter;
-    List<JobContent> list_jobs;
+    List<JobContent> jobsList;
     EditText filter_edit_box;
-    String longiude;
+    String longitude;
     String latitude;
     JobContent jobContent0, jobContent1, jobContent2, jobContent3, jobContent4, jobContent5, jobContent6;
 
@@ -47,6 +47,8 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
         setContentView(R.layout.activity_location_services);
         setTitle("Location Services");
 
+        filter_edit_box= (EditText)findViewById(R.id.filter);
+
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -54,50 +56,51 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
                     .addApi(com.google.android.gms.location.LocationServices.API)
                     .build();
         }
+
         addJobs();
 
     }
     private void addJobs()
     {
-        job_list_view=(ListView)findViewById(R.id.listview);
-        filter_edit_box= (EditText)findViewById(R.id.filter);
-        list_jobs= new ArrayList<>();
-        adapter= new JobsAdapter(this,list_jobs);
-        job_list_view.setAdapter(adapter);
+        jobsListView = (ListView) findViewById(R.id.listview);
+        jobsList = new ArrayList<>();
+        adapter = new  JobsAdapter(this, jobsList);
+        jobsListView.setAdapter(adapter);
+
 
         jobContent0 = new JobContent("Mechanic");
-        list_jobs.add(jobContent0);
+        jobsList.add(jobContent0);
 
-        jobContent1 = new JobContent("Doctor");
-        list_jobs.add(jobContent1);
+        jobContent1 = new JobContent("Electrician");
+        jobsList.add(jobContent1);
 
-        jobContent2 = new JobContent("Electrician");
-        list_jobs.add(jobContent2);
+        jobContent2 = new JobContent("Plumber");
+        jobsList.add(jobContent2);
 
-        jobContent3 = new JobContent("Pharmacy");
-        list_jobs.add(jobContent3);
+        jobContent3 = new JobContent("Doctor");
+        jobsList.add(jobContent3);
 
-        jobContent4 = new JobContent("Police");
-        list_jobs.add(jobContent4);
+        jobContent4 = new JobContent("Pharmacy");
+        jobsList.add(jobContent4);
 
-        jobContent5 = new JobContent("Coiffure");
-        list_jobs.add(jobContent5);
+        jobContent5 = new JobContent("Police");
+        jobsList.add(jobContent5);
 
-        //jobContent6 = new JobContent("");
-        //list_jobs.add(jobContent6);
+        jobContent6 = new JobContent("Coiffure");
+        //jobsList.add(jobContent6);
 
         adapter.notifyDataSetChanged();
 
-        job_list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        jobsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 Intent intent = new Intent(LocationServices.this, LocationServicesResultsList.class);
-                String clickeditem = list_jobs.get(position).getJob_name();
-                intent.putExtra("key_clicked_item",clickeditem);
-                intent.putExtra("key_longitude",longiude);
-                intent.putExtra("key_latitude",latitude);
+                String clickedCategory = jobsList.get(position).getJobName();
+                intent.putExtra("clickedCategory", clickedCategory);
+                intent.putExtra("userLongitude", longitude);
+                intent.putExtra("userLatitude", latitude);
                 startActivity(intent);
             }
         });
@@ -141,7 +144,7 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
                         if (mLastLocation != null) {
                             //Save the long/lat in a string and send them to the LocationServicesResultsList activity
                             Toast.makeText(LocationServices.this, mLastLocation.getLongitude() + "," + mLastLocation.getLatitude(), Toast.LENGTH_LONG).show();
-                            longiude= String.valueOf(mLastLocation.getLongitude());
+                            longitude= String.valueOf(mLastLocation.getLongitude());
                             latitude=String.valueOf(mLastLocation.getLatitude());
                         }
                         break;
@@ -165,12 +168,6 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
                 }
             }
         });
-    }
-
-    public void goToResultsPage(View view) {
-        //Get the clicked service, and send it along with the location to the server
-        Intent intent = new Intent(this, LocationServicesResultsList.class);
-        startActivity(intent);
     }
 
     @Override

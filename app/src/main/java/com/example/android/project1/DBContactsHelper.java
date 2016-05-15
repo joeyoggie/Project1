@@ -40,7 +40,7 @@ public final class DBContactsHelper extends SQLiteOpenHelper{
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    public static synchronized DBContactsHelper getInstance (Context context){
+    public static synchronized DBContactsHelper getInstance(Context context){
 
         if (dbHelper == null){
             dbHelper = new DBContactsHelper(context.getApplicationContext());

@@ -2,8 +2,8 @@ package com.example.android.project1;
 
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -25,11 +25,10 @@ public class LocationServicesResultsList extends AppCompatActivity {
 
     String SERVER_IP;
     ProgressDialog progressDialog;
-    String latitude, longtitude, job;
-    List<String> list_of_first_requests;
-    List <ServiceProvider> recieved_list ;
-    LocationServiceResultsAdapter locationServiceResultsAdapter ;
-    ListView list_result;
+    String latitude, longitude, serviceCategory;
+    List<ServiceProvider> receivedServiceProviders;
+    LocationServiceResultsAdapter locationServiceResultsAdapter;
+    ListView resultListView;
 
     TextView numberOfResponses;
 
@@ -47,18 +46,15 @@ public class LocationServicesResultsList extends AppCompatActivity {
         progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
-        list_of_first_requests = new ArrayList<>();
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            latitude = bundle.getString("key_latitude");
-            longtitude = bundle.getString("key_longitude");
-            job = bundle.getString("key_clicked_item");
-
-            list_of_first_requests.add(latitude);
-            list_of_first_requests.add(longtitude);
-            list_of_first_requests.add(job);
+            latitude = bundle.getString("userLatitude");
+            longitude = bundle.getString("userLongitude");
+            serviceCategory = bundle.getString("clickedCategory");
         }
-        send_request_to_server(list_of_first_requests);
+
+        getServiceProviders(latitude, longitude, serviceCategory);
     }
 
     private String getServerIP() {
@@ -66,27 +62,68 @@ public class LocationServicesResultsList extends AppCompatActivity {
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
-    public void send_request_to_server(List<String> list_of_requests) {
+    public void getServiceProviders(String latitude, String longitude, String serviceCategory) {
 
-        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetLocalServices?serviceCategory="+list_of_requests.get(2)+"&userLongitude="+list_of_requests.get(1)+"&userLatitude="+list_of_requests.get(0);
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetLocalServices?serviceCategory="+serviceCategory+"&userLongitude="+longitude+"&userLatitude="+latitude;
 
-        JSONArray jsonArray = new JSONArray(list_of_requests);
+        JSONArray jsonArray = new JSONArray();
         //Request a response from the provided URL.
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST,url,jsonArray, new Response.Listener<JSONArray>() {
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
+            Gson gson = new Gson();
+            @Override
+            public void onResponse(String response) {
+                if (response.length()>0){
+                    receivedServiceProviders= new ArrayList<>();
+                    resultListView = (ListView) findViewById(R.id.results_list);
+                    Type type = new TypeToken<List<ServiceProvider>>(){}.getType();
+                    receivedServiceProviders= gson.fromJson(response.toString(), type);
+                    if(receivedServiceProviders.isEmpty() == false){
+                        locationServiceResultsAdapter = new LocationServiceResultsAdapter(LocationServicesResultsList.this, receivedServiceProviders);
+                        resultListView.setAdapter(locationServiceResultsAdapter);
+                        //locationServiceResultsAdapter.notifyDataSetChanged();
+                        Log.d("RECEIVED DATA", String.valueOf(receivedServiceProviders.size()));
+                        numberOfResponses.setText("Found " + receivedServiceProviders.size() + " results.");
+                        progressDialog.dismiss();
+                    }
+                    else{
+                        Log.d("RECEIVED DATA", response.toString());
+                        numberOfResponses.setText("Found " + 0 + " results.");
+                        progressDialog.dismiss();
+                    }
+                }
+                else {
+                    Log.d("RECEIVED DATA", "Received an empty response from server.");
+                    numberOfResponses.setText("Found " + 0 + " results.");
+                    progressDialog.dismiss();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ContactsListView", "Volley error!");
+                numberOfResponses.setText("Internet connection error.");
+                progressDialog.dismiss();
+            }
+        });
+        //Add the request to the RequestQueue.
+        HttpConnector.getInstance(this).addToRequestQueue(request);
+
+        /*
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, url, jsonArray, new Response.Listener<JSONArray>() {
             Gson gson = new Gson();
             @Override
             public void onResponse(JSONArray response) {
                 if (response.length()>0){
-                    recieved_list= new ArrayList<>();
-                    list_result = (ListView)findViewById(R.id.list_result);
+                    receivedServiceProviders= new ArrayList<>();
+                    resultListView = (ListView) findViewById(R.id.results_list);
                     Type type = new TypeToken<List<ServiceProvider>>(){}.getType();
-                    recieved_list= gson.fromJson(response.toString(), type);
-                    if(recieved_list.isEmpty() == false){
-                        locationServiceResultsAdapter = new LocationServiceResultsAdapter(LocationServicesResultsList.this,recieved_list);
-                        list_result.setAdapter(locationServiceResultsAdapter);
+                    receivedServiceProviders= gson.fromJson(response.toString(), type);
+                    if(receivedServiceProviders.isEmpty() == false){
+                        locationServiceResultsAdapter = new LocationServiceResultsAdapter(LocationServicesResultsList.this, receivedServiceProviders);
+                        resultListView.setAdapter(locationServiceResultsAdapter);
                         //locationServiceResultsAdapter.notifyDataSetChanged();
-                        Log.d("RECEIVED DATA", String.valueOf(recieved_list.size()));
-                        numberOfResponses.setText("Found " + recieved_list.size() + " results.");
+                        Log.d("RECEIVED DATA", String.valueOf(receivedServiceProviders.size()));
+                        numberOfResponses.setText("Found " + receivedServiceProviders.size() + " results.");
                         progressDialog.dismiss();
                     }
                     else{
@@ -110,5 +147,6 @@ public class LocationServicesResultsList extends AppCompatActivity {
             }
         });
         HttpConnector.getInstance(this).addToRequestQueue(jsonArrayRequest);
+*/
     }
 }

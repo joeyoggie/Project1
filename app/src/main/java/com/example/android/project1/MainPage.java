@@ -1,15 +1,17 @@
 package com.example.android.project1;
 
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 
 public class MainPage extends ActionBarActivity {
@@ -17,13 +19,20 @@ public class MainPage extends ActionBarActivity {
     String recepientUserName;
     String recepientName;
 
+    String userName;
+    String name;
+    String phoneNumber;
+
     DrawerLayout mDrawerLayout;
-    View myCustomView;
+    View navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
+
+        setupActionBar();
+        getLocalUserInfo();
 
         SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
         boolean registered = prefs.getBoolean("isRegistered", false);
@@ -35,23 +44,39 @@ public class MainPage extends ActionBarActivity {
 
         //Drawlayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        myCustomView = findViewById(R.id.drawerPane);
+        navigationView = findViewById(R.id.drawerPane);
 
+        TextView nameTextView = (TextView) findViewById(R.id.name);
+        TextView userNameTextView = (TextView) findViewById(R.id.user_name);
+        TextView phoneNumberTextView = (TextView) findViewById(R.id.phone_number);
+        ImageView profilePictureImageView = (ImageView) findViewById(R.id.personal_profile_picture);
+        nameTextView.setText(name);
+        userNameTextView.setText("@"+userName);
+        phoneNumberTextView.setText(phoneNumber);
+        //profilePictureImageView.setImageBitmap(bitmap);
+    }
+
+    private void setupActionBar() {
         getSupportActionBar().setDisplayUseLogoEnabled(true); //Enable the Logo to be shown
         getSupportActionBar().setDisplayShowHomeEnabled(true); //Show the Logo
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show the Up/Back arrow
         getSupportActionBar().setLogo(R.mipmap.ic_launcher); //Specify the logo image
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer); //Specify the Up/Back arrow image
+    }
 
-        Log.d("MainPage",DBMessagesHelper.SQL_CREATE_QUERY);
+    private void getLocalUserInfo(){
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+        userName = prefs.getString("userName","Me");
+        name = prefs.getString("name", "Jon Doe");
+        phoneNumber = prefs.getString("phoneNumber","0000000000");
     }
 
     public void goToPrivacySettings(View view)
     {
         Intent intent = new Intent(this, PrivacySettings.class);
         startActivity(intent);
-        if (mDrawerLayout.isDrawerOpen(myCustomView)) {
-            mDrawerLayout.closeDrawer(myCustomView);
+        if (mDrawerLayout.isDrawerOpen(navigationView)) {
+            mDrawerLayout.closeDrawer(navigationView);
         }
     }
 
@@ -67,12 +92,6 @@ public class MainPage extends ActionBarActivity {
         startActivity(intent);
     }
 
-    public void selectContacts(View view)
-    {
-        Intent intent = new Intent(this, ContactsListView.class);
-        startActivity(intent);
-    }
-
     public void newMessageContactListView(View view){
         Intent intent = new Intent(this, NewMessageContactsListView.class);
         startActivity(intent);
@@ -83,8 +102,8 @@ public class MainPage extends ActionBarActivity {
     {
         Intent intent = new Intent(this, Registration.class);
         startActivity(intent);
-        if (mDrawerLayout.isDrawerOpen(myCustomView)) {
-            mDrawerLayout.closeDrawer(myCustomView);
+        if (mDrawerLayout.isDrawerOpen(navigationView)) {
+            mDrawerLayout.closeDrawer(navigationView);
         }
     }
 
@@ -92,8 +111,23 @@ public class MainPage extends ActionBarActivity {
     {
         Intent intent = new Intent(this, Settings.class);
         startActivity(intent);
-        if (mDrawerLayout.isDrawerOpen(myCustomView)) {
-            mDrawerLayout.closeDrawer(myCustomView);
+        if (mDrawerLayout.isDrawerOpen(navigationView)) {
+            mDrawerLayout.closeDrawer(navigationView);
+        }
+    }
+
+    public void navigateToStatusFragment(View view){
+        DialogFragment newFragment = new StatusFragment();
+        newFragment.show(getFragmentManager(),"statusFragment");
+    }
+
+    @Override
+    public void onBackPressed(){
+        if (mDrawerLayout.isDrawerOpen(navigationView)) {
+            mDrawerLayout.closeDrawer(navigationView);
+        }
+        else{
+            MainPage.super.onBackPressed();
         }
     }
 
@@ -135,10 +169,10 @@ public class MainPage extends ActionBarActivity {
         if(id == android.R.id.home)
         {
             //when clicked
-            if (mDrawerLayout.isDrawerOpen(myCustomView)) {
-                mDrawerLayout.closeDrawer(myCustomView);
+            if (mDrawerLayout.isDrawerOpen(navigationView)) {
+                mDrawerLayout.closeDrawer(navigationView);
             } else {
-                mDrawerLayout.openDrawer(myCustomView);
+                mDrawerLayout.openDrawer(navigationView);
             }
         }
 

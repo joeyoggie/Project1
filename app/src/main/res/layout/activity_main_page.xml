@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.example.android.project1.MainPage">
 
-
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -27,6 +25,7 @@
             android:layout_below="@id/custom_recepient_username"
             android:layout_marginTop="8dp"
             android:layout_centerHorizontal="true"
+            android:visibility="gone"
             android:hint="Enter the recepient name here"/>
 
         <Button
@@ -37,7 +36,13 @@
             android:layout_below="@id/custom_recepient_name"
             android:layout_centerHorizontal="true"
             android:onClick="goToChatPage"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/custom_recepient_button"
+            android:text="Or use the '+' at the bottom to select a contact from your contact list"/>
 
+<!--
         <RelativeLayout
             android:id="@+id/contact_1"
             android:layout_width="match_parent"
@@ -431,7 +436,7 @@
                 android:theme="@style/Base.Widget.AppCompat.ActionBar.Solid" />
 
         </RelativeLayout>
-
+-->
 
         <ImageButton
             android:id="@+id/new_message_image_button"
@@ -446,7 +451,7 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
+    <android.support.design.widget.NavigationView
         android:id="@+id/drawerPane"
         android:layout_width="280dp"
         android:layout_height="match_parent"
@@ -480,14 +485,14 @@
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="42dp"
+                        android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="15dp"
                         android:layout_toRightOf="@+id/personal_profile_picture"
                         android:orientation="vertical" >
 
                         <TextView
-                            android:id="@+id/userName"
+                            android:id="@+id/name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Jon Doe"
@@ -496,17 +501,26 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/desc"
+                            android:id="@+id/user_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="bottom"
-                            android:layout_marginTop="4dp"
+                            android:text="JonDoe"
+                            android:textColor="#fff"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/phone_number"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="+20 xx xxxxxxxx"
                             android:textColor="#fff"
                             android:textSize="12sp" />
+
                     </LinearLayout>
 
                 </RelativeLayout>
+
 
                 <View
                     android:layout_width="match_parent"
@@ -522,6 +536,7 @@
                     android:paddingLeft="8dp"
                     android:background="?android:attr/selectableItemBackground"
                     android:text="Status"
+                    android:onClick="navigateToStatusFragment"
                     android:textAllCaps="false">
                 </Button>
 
@@ -538,7 +553,7 @@
                     android:paddingLeft="8dp"
                     android:gravity="left|center_vertical"
                     android:background="?android:attr/selectableItemBackground"
-                    android:text="New broadcast"
+                    android:text="Don't disturb mode"
                     android:textAllCaps="false">
                 </Button>
 
@@ -641,6 +656,6 @@
 
         </ScrollView>
 
-    </RelativeLayout>
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

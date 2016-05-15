@@ -66,19 +66,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/rating_static_text_view"
-        android:text="Contact"/>
+        android:text="Contact"
+        android:textAllCaps="false"/>
     <Button
+        android:id="@+id/map_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/contact_button"
-        android:text="Show on map"/>
+        android:text="Show on map"
+        android:textAllCaps="false"/>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="5dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
+        android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
+        android:layout_below="@id/map_button"
         android:background="?android:attr/dividerVertical"/>
 
 </RelativeLayout>

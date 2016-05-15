@@ -30,36 +30,54 @@ public class MyGcmListenerService extends GcmListenerService {
      */
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        //Get the data that was sent from the GCM server
-        String message = data.getString("message");
-        String sender = data.getString("sender");
-        String timestamp = data.getString("timestamp");
-        String recepient = data.getString("recepient");
 
-        Log.d("MyGcmListenerService", "From: " + from);
-        Log.d("MyGcmListenerService", "Sender: " + sender);
-        Log.d("MyGcmListenerService", "Recepient: " + recepient);
-        Log.d("MyGcmListenerService", "Message: " + message);
-        Log.d("MyGcmListenerService", "Timestamp: " + timestamp);
+        if(data.containsKey("message")) {
+            //Get the message data that was sent from the GCM server
+            String message = data.getString("message");
+            String sender = data.getString("sender");
+            String timestamp = data.getString("timestamp");
+            String recepient = data.getString("recepient");
 
-        if (from.startsWith("/topics/")) {
-            //message received from some topic.
-        } else {
-            //normal downstream message.
+            Log.d("MyGcmListenerService", "From: " + from);
+            Log.d("MyGcmListenerService", "Sender: " + sender);
+            Log.d("MyGcmListenerService", "Recepient: " + recepient);
+            Log.d("MyGcmListenerService", "Message: " + message);
+            Log.d("MyGcmListenerService", "Timestamp: " + timestamp);
+
+            if (from.startsWith("/topics/")) {
+                //message received from some topic.
+            } else {
+                //normal downstream message.
+            }
+
+            //Store the message that was received in a local SQLite database
+            DBMessagesHelper.getInstance(getApplicationContext());
+            DBMessagesHelper.insertMessageIntoDB(sender, recepient, message,timestamp);
+            //Refresh the ChatPage's listview, in case it was already visible
+            refreshListView();
+            //Show a notification
+            sendNotification(sender, message);
+        }
+        else if (data.containsKey("typingStatus")){
+            String receivedTypingStatusFromServer = data.getString("typingStatus");
+            String senderUserName = data.getString("senderUserName");
+            Log.d("MyGcmListenerService", senderUserName);
+            Log.d("MyGcmListenerService", receivedTypingStatusFromServer);
+            forwardTypingStatus(senderUserName, receivedTypingStatusFromServer);
         }
 
-        //Store the message that was received in a local SQLite database
-        DBMessagesHelper.getInstance(getApplicationContext());
-        DBMessagesHelper.insertMessageIntoDB(sender, recepient, message,timestamp);
-        //Refresh the ChatPage's listview, in case it was already visible
-        refreshListView();
-        //Show a notification
-        sendNotification(sender, message);
     }
 
     private void refreshListView()
     {
         Intent intent = new Intent("newMessageIntent");
+        LocalBroadcastManager.getInstance(MyGcmListenerService.this).sendBroadcast(intent);
+    }
+
+    private void forwardTypingStatus(String sender, String typingStatus){
+        Intent intent = new Intent("newTypingIntent");
+        intent.putExtra("receivedTypingStatusFromServer_key", typingStatus);
+        intent.putExtra("senderUserName",sender);
         LocalBroadcastManager.getInstance(MyGcmListenerService.this).sendBroadcast(intent);
     }
 

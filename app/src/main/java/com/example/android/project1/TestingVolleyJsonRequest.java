@@ -29,8 +29,6 @@ public class TestingVolleyJsonRequest extends AppCompatActivity {
         setContentView(R.layout.activity_testing_volley_json_request);
 
         responseTextView = (TextView) findViewById(R.id.response_dynamic_text_view);
-
-
     }
 
     public void sendToServer(View view) {

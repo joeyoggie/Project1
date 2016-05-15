@@ -16,9 +16,10 @@ public class JobsAdapter extends ArrayAdapter {
     List <JobContent> jobContentList;
     Activity activity;
     TextView job_name_text_view;
+
     public JobsAdapter (Activity activity,List jobContentList){
         super(activity,R.layout.job_items, jobContentList);
-        this.jobContentList=jobContentList;
+        this.jobContentList = jobContentList;
         this.activity=activity;
     }
 
@@ -40,7 +41,7 @@ public class JobsAdapter extends ArrayAdapter {
             rowView = inflater.inflate(R.layout.job_items, null);
             job_name_text_view= (TextView) rowView.findViewById(R.id.job_name);
         }
-        job_name_text_view.setText(jobContentList.get(position).getJob_name().toString());
+        job_name_text_view.setText(jobContentList.get(position).getJobName().toString());
         return rowView;
     }
 

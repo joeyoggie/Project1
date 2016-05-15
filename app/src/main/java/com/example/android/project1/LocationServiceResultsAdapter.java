@@ -14,15 +14,17 @@ import java.util.List;
  * Created by fady on 4/1/2016.
  */
 public class LocationServiceResultsAdapter extends ArrayAdapter {
+
     Activity activity ;
-    List <ServiceProvider> objs;
+    List <ServiceProvider> serviceProviders;
     String phone_no, longitude, latitude, service_category, user_name;
-    TextView person_name,rating,address;
-    ImageView user_pp;
-    public LocationServiceResultsAdapter(Activity activity,List objs){
-        super(activity,R.layout.locationservicesitems,objs);
-        this.activity=activity;
-        this.objs=objs;
+    TextView nameTextView, ratingTextVew, addressTextView;
+    ImageView profilePictureImageView;
+
+    public LocationServiceResultsAdapter(Activity activity, List sProviders){
+        super(activity,R.layout.locationservicesitems, sProviders);
+        this.activity = activity;
+        this.serviceProviders = sProviders;
     }
     @Override
     public Object getItem(int position) {
@@ -40,15 +42,16 @@ public class LocationServiceResultsAdapter extends ArrayAdapter {
         if(rowView == null){
             LayoutInflater inflater = activity.getLayoutInflater();
             rowView = inflater.inflate(R.layout.locationservicesitems, null);
-            person_name = (TextView)rowView.findViewById(R.id.name_text_view);
-            rating = (TextView)rowView.findViewById(R.id.rating_text_view);
-            address = (TextView)rowView.findViewById(R.id.location_text_view);
-            user_pp = (ImageView)rowView.findViewById(R.id.profile_picture);
+            nameTextView = (TextView)rowView.findViewById(R.id.name_text_view);
+            ratingTextVew = (TextView)rowView.findViewById(R.id.rating_text_view);
+            addressTextView = (TextView)rowView.findViewById(R.id.location_text_view);
+            profilePictureImageView = (ImageView)rowView.findViewById(R.id.profile_picture);
         }
 
-        person_name.setText(objs.get(position).getUserName());
-        address.setText(objs.get(position).getAddress());
-        rating.setText(String.valueOf(objs.get(position).getRating()) + "/5");
+        nameTextView.setText(serviceProviders.get(position).getUserName());
+        addressTextView.setText(serviceProviders.get(position).getAddress());
+        ratingTextVew.setText(String.valueOf(serviceProviders.get(position).getRating()) + "/5");
+        //profilePictureImageView.setImageBitmap(bitmap);
         return rowView;
     }
 }

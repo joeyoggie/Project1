@@ -3,6 +3,7 @@ package com.example.android.project1;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -27,7 +28,8 @@ import java.util.List;
 
 public class NewMessageContactsListView extends AppCompatActivity {
 
-    ListView contacts_list;
+    String SERVER_IP;
+    ListView contacts_list_view;
     ContactsAdapter contactsAdapter;
     Cursor cursor;
     ArrayList<String> receivedNumbers = new ArrayList<>();
@@ -40,16 +42,19 @@ public class NewMessageContactsListView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_message_contacts_list_view);
 
-        contacts_list = (ListView) findViewById(R.id.list);
-        DBContactsHelper dbContactsHelper = DBContactsHelper.getInstance(getApplicationContext());
+        SERVER_IP = getServerIP();
+
+        contacts_list_view = (ListView) findViewById(R.id.list);
+
+        DBContactsHelper dbContactsHelper = DBContactsHelper.getInstance(this);
         cursor = DBContactsHelper.readContacts();
         contactsAdapter = new ContactsAdapter(this, cursor);
-        contacts_list.setAdapter(contactsAdapter);
+        contacts_list_view.setAdapter(contactsAdapter);
         contactsAdapter.changeCursor(cursor);
-        contacts_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        contacts_list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 cursor.moveToPosition(position);
                 String readable_phone_no = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER));
                 String userName = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_USERNAME));
@@ -60,22 +65,48 @@ public class NewMessageContactsListView extends AppCompatActivity {
                 //intent.putExtra("recepientName", recepientName);
                 //intent.putExtra("recepientProfilePicture", profilePicture);
                 startActivity(intent);
+                /*if(view.getId() == R.id.profile_picture) {
+                    Log.d("NewMessageCon","PROFILE PICTURE");
+                    Intent intent = new Intent(NewMessageContactsListView.this, UserProfile.class);
+                    intent.putExtra("username_key",userName);
+                    startActivity(intent);
+                }
+                else{
+                    Log.d("NewMessageCon","NOT PROFILE PICTURE");
+                    Intent intent = new Intent(NewMessageContactsListView.this, ChatPage.class);
+                    intent.putExtra("phoneNumber", readable_phone_no);
+                    intent.putExtra("recepientUserName", userName);
+                    //intent.putExtra("recepientName", recepientName);
+                    //intent.putExtra("recepientProfilePicture", profilePicture);
+                    startActivity(intent);
+                }*/
             }
         });
+        refreshContactsFromServer();
     }
 
-    public void refreshContactsFromServe(View view){
+    private String getServerIP() {
+        SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
+        return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
+    }
+
+    public void refreshContactsFromServer() {
         dialog = new ProgressDialog(this);
         dialog.setMessage("Refreshing local contacts...");
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        read_from_content_providers();
+        ArrayList<String> localPhoneNumbers = read_from_content_providers();
+        sendNumbersToServer(localPhoneNumbers);
         cursor = DBContactsHelper.readContacts();
         contactsAdapter.changeCursor(cursor);
     }
 
-    public void read_from_content_providers (){
+    public void refreshContacts(View view){
+        refreshContactsFromServer();
+    }
+
+    public ArrayList<String> read_from_content_providers (){
         String[] columns_array = new String[]{ ContactsContract.CommonDataKinds.Phone.NUMBER}; //this array contains no of returned columns
         //  selection_criteria= new String[]{ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?"};//selection clause
         //  selection_arguments=new String[]{""};
@@ -92,18 +123,17 @@ public class NewMessageContactsListView extends AppCompatActivity {
         }
         cursor.close();
 
-        sendNumbersToServer(values_of_phone_numbers);
+        return values_of_phone_numbers;
     }
 
     private void sendNumbersToServer(ArrayList<String> phoneNumbers)
     {
         //Send the data to the server in a background thread
-        String url = "http://192.168.1.44:8080/MyFirstServlet/CheckRegisteredContacts";
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/CheckRegisteredContacts";
         JSONArray jsonArray = new JSONArray(phoneNumbers);
         //Request a response from the provided URL.
         JsonArrayRequest requestArray = new JsonArrayRequest(Request.Method.POST, url, jsonArray, new Response.Listener<JSONArray>(){
             Gson gson = new Gson();
-
             @Override
             public void onResponse(JSONArray response) {
                 if(response.length() > 0) {

@@ -106,7 +106,8 @@
         <activity android:name=".Settings" />
         <activity android:name=".LocationServicesResultsList" />
         <activity android:name=".TestingVolleyJsonRequest" />
-        <activity android:name=".NewMessageContactsListView"></activity>
+        <activity android:name=".NewMessageContactsListView" />
+        <activity android:name=".UserProfile"></activity>
     </application>
 
 </manifest>
