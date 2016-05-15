@@ -216,7 +216,7 @@ public class ChatPage extends ActionBarActivity {
             if(extras.containsKey("recepientUserName"))
             {
                 recepientUserName = extras.getString("recepientUserName");
-                if(recepientName != null && recepientName.trim().length() != 0)
+                if(recepientName == null || recepientName.trim().length() == 0)
                 {
                     getSupportActionBar().setTitle(recepientUserName);
                 }
