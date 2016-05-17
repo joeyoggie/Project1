@@ -33,7 +33,6 @@ public class NewMessageContactsListView extends AppCompatActivity {
     ContactsAdapter contactsAdapter;
     Cursor cursor;
     ArrayList<String> receivedNumbers = new ArrayList<>();
-    ArrayList<Contact> receivedContacts = new ArrayList<>();
 
     ProgressDialog dialog;
 
@@ -91,11 +90,6 @@ public class NewMessageContactsListView extends AppCompatActivity {
     }
 
     public void refreshContactsFromServer() {
-        dialog = new ProgressDialog(this);
-        dialog.setMessage("Refreshing local contacts...");
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-
         ArrayList<String> localPhoneNumbers = read_from_content_providers();
         sendNumbersToServer(localPhoneNumbers);
         cursor = DBContactsHelper.readContacts();
@@ -103,6 +97,11 @@ public class NewMessageContactsListView extends AppCompatActivity {
     }
 
     public void refreshContacts(View view){
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Refreshing local contacts...");
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
         refreshContactsFromServer();
     }
 
@@ -112,16 +111,16 @@ public class NewMessageContactsListView extends AppCompatActivity {
         //  selection_arguments=new String[]{""};
         // selection_arguments[0]=user_input;
         ContentResolver contentResolver = getApplication().getContentResolver(); //content resolver is used to determine which content provider that we want to access
-        cursor = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, columns_array, null, null, null);
-        int column_index = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+        Cursor c = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, columns_array, null, null, null);
+        int column_index = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
         //String column_name = cursor.getColumnName(column_index);
         ArrayList<String> values_of_phone_numbers = new ArrayList<>();
-        if (cursor.moveToFirst()) {
+        if (c.moveToFirst()) {
             do {
-                values_of_phone_numbers.add(cursor.getString(column_index));
-            }while (cursor.moveToNext());
+                values_of_phone_numbers.add(c.getString(column_index));
+            }while (c.moveToNext());
         }
-        cursor.close();
+        c.close();
 
         return values_of_phone_numbers;
     }
@@ -134,6 +133,7 @@ public class NewMessageContactsListView extends AppCompatActivity {
         //Request a response from the provided URL.
         JsonArrayRequest requestArray = new JsonArrayRequest(Request.Method.POST, url, jsonArray, new Response.Listener<JSONArray>(){
             Gson gson = new Gson();
+            ArrayList<Contact> receivedContacts = new ArrayList<>();
             @Override
             public void onResponse(JSONArray response) {
                 if(response.length() > 0) {
@@ -148,18 +148,24 @@ public class NewMessageContactsListView extends AppCompatActivity {
                     }
                     else
                         Log.d("ContactsListView", "No numbers returned.");
-                    dialog.dismiss();
+                    if(dialog != null && dialog.isShowing()){
+                        dialog.dismiss();
+                    }
                 }
                 else {
                     Log.d("ContactsListView", "Receieved an emtpy JSON string");
-                    dialog.dismiss();
+                    if(dialog != null && dialog.isShowing()){
+                        dialog.dismiss();
+                    }
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("ContactsListView", "Volley error!");
-                dialog.dismiss();
+                if(dialog != null && dialog.isShowing()){
+                    dialog.dismiss();
+                }
             }
         });
         //Add the request to the RequestQueue.
