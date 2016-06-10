@@ -13,6 +13,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.instabug.library.IBGInvocationEvent;
+import com.instabug.library.Instabug;
+
 
 public class MainPage extends ActionBarActivity {
 
@@ -54,6 +57,11 @@ public class MainPage extends ActionBarActivity {
         userNameTextView.setText("@"+userName);
         phoneNumberTextView.setText(phoneNumber);
         //profilePictureImageView.setImageBitmap(bitmap);
+
+        //Initialize Instabug
+        new Instabug.Builder(getApplication(), "2cf1f7a67f638f61eb13b0fc6e619bca")
+                .setInvocationEvent(IBGInvocationEvent.IBGInvocationEventShake)
+                .build();
     }
 
     private void setupActionBar() {

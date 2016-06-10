@@ -16,4 +16,10 @@
         android:orderInCategory="100"
         app:showAsAction="always" />
 
+    <item android:id="@+id/image_upload"
+        android:title="Image"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        />
+
 </menu>

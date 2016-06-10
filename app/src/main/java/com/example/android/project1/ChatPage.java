@@ -1,5 +1,7 @@
 package com.example.android.project1;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,9 +9,13 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
@@ -26,15 +32,23 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+
+import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 import github.ankushsachdeva.emojicon.EmojiconEditText;
 import github.ankushsachdeva.emojicon.EmojiconGridView;
@@ -76,6 +90,9 @@ public class ChatPage extends ActionBarActivity {
     Cursor cursor;
 
     EmojiconsPopup popup;
+
+    int SELECT_FILE = 1;
+    private String KEY_IMAGE = "image";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -346,7 +363,7 @@ public class ChatPage extends ActionBarActivity {
             timestamp = simpleDateFormat.format(date);
             Log.d("TIMESTAMP:", timestamp);
 
-            //Send the message info to the server in a background thread
+            /*//Send the message info to the server in a background thread
             //Instantiate the RequestQueue.
             String url = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText) +"&timestamp="+URLEncoder.encode(timestamp);
             //Request a string response from the provided URL.
@@ -366,16 +383,16 @@ public class ChatPage extends ActionBarActivity {
                 }
             });
             //Add the request to the RequestQueue.
-            HttpConnector.getInstance(this).addToRequestQueue(request);
+            HttpConnector.getInstance(this).addToRequestQueue(request);*/
 
-
-            /*String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
+            //Send the message info to the server in a background thread
+            String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
             Message messageObject = new Message();
             messageObject.setMessageSenderDeviceID(deviceID);
             messageObject.setMessageRecepientUserName(recepientUserName);
             messageObject.setMessageContent(mText);
             messageObject.setTimestamp(timestamp);
-            Log.d("ChatPage", mText);
+
             HashMap<String, String> params = new HashMap<>();
             params.put("senderDeviceID", deviceID);
             params.put("recepientUserName", recepientUserName);
@@ -398,8 +415,8 @@ public class ChatPage extends ActionBarActivity {
                     refreshCursor();
                 }
             });
-            HttpConnector.getInstance(this).addToRequestQueue(jsonObjectRequest);*/
-
+            //Add the request to the RequestQueue.
+            HttpConnector.getInstance(this).addToRequestQueue(jsonObjectRequest);
         }
     }
 
@@ -411,6 +428,152 @@ public class ChatPage extends ActionBarActivity {
     {
         DialogFragment newFragment = new PopupMessageDialog();
         newFragment.show(getSupportFragmentManager(), "timePicker");
+    }
+
+    public void loadImagefromGallery() {
+//        // Create intent to Open Image applications like Gallery, Google Photos
+//        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        // Start the Intent
+//        startActivityForResult(galleryIntent,RESULT_LOAD_IMG);
+        //  Intent intent = new Intent();
+//        intent.setType("image/*");
+//        intent.setAction(Intent.ACTION_GET_CONTENT);
+//        startActivityForResult(Intent.createChooser(intent, "Select Picture"), RESULT_LOAD_IMG);
+        Intent intent = new Intent(
+                Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(
+                Intent.createChooser(intent, "Select File"),
+                SELECT_FILE);
+    }
+
+    public void sendImage(Bitmap bitmap){
+        final Bitmap bm = bitmap;
+        final ProgressDialog loading = ProgressDialog.show(this,"Uploading...","Please wait...",false,false);
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
+        String deviceID = prefs.getString("deviceUUID","0");
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
+        timestamp = simpleDateFormat.format(date);
+        String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/AddNewImage?senderDeviceID="+deviceID+"receptientUserName"+ recepientUserName+"&timestamp="+timestamp;
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        //Disimissing the progress dialog
+                        loading.dismiss();
+                        //Showing toast message of the response
+                        Toast.makeText(ChatPage.this, s, Toast.LENGTH_LONG).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        //Dismissing the progress dialog
+                        loading.dismiss();
+                        //Showing toast
+                        //Toast.makeText(ChatPage.this, volleyError.getMessage().toString(), Toast.LENGTH_LONG).
+                          //      show();
+                    }
+                }) {
+            protected Map<String, String> getParams() throws AuthFailureError
+            {
+                //Converting Bitmap to String
+                String Image = bm.toString();
+                //Getting Image Name
+
+                //Creating parameters
+                Map<String, String> params = new Hashtable<String, String>();
+
+                //Adding parameters
+                params.put(KEY_IMAGE, Image);
+                //  params.put(KEY_NAME, name);
+
+                //returning parameters
+                return params;
+            }
+        };
+        //Adding request to the queue
+        HttpConnector.getInstance(this).addToRequestQueue(stringRequest);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+//        try {
+//            // When an Image is picked
+//            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
+//                    && null != data) {
+//                // Get the Image from data
+//
+//                Uri selectedImage = data.getData();
+//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+//
+//                // Get the cursor
+//                Cursor cursor = getContentResolver().query(selectedImage,
+//                        filePathColumn, null, null, null);
+//                // Move to first row
+//                cursor.moveToFirst();
+//
+//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//                imgDecodableString = cursor.getString(columnIndex);
+//                cursor.close();
+////                ImageView imgView = (ImageView) findViewById(R.id.imgView);
+////                // Set the Image in ImageView after decoding the String
+////                imgView.setImageBitmap(BitmapFactory
+////                        .decodeFile(imgDecodableString));
+//                PopUp_Window pop=new PopUp_Window();
+//                pop.init();
+//                //    pop.popupInit();
+//                pop.setImage(BitmapFactory.decodeFile(imgDecodableString));
+        //  if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == SELECT_FILE){
+                Uri selectedImageUri = data.getData();
+                String[] projection = { MediaStore.MediaColumns.DATA };
+                Cursor cursor = managedQuery(selectedImageUri, projection, null, null,
+                        null);
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                cursor.moveToFirst();
+
+                String selectedImagePath = cursor.getString(column_index);
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(selectedImagePath, options);
+                final int REQUIRED_SIZE = 200;
+                int scale = 1;
+                while (options.outWidth / scale / 2 >= REQUIRED_SIZE
+                        && options.outHeight / scale / 2 >= REQUIRED_SIZE)
+                    scale *= 2;
+                options.inSampleSize = scale;
+                options.inJustDecodeBounds = false;
+                Bitmap bm = BitmapFactory.decodeFile(selectedImagePath, options);
+                sendImage(bm);
+            }
+        }
+
+
+//            Uri filePath = data.getData();
+//            try {
+//                //Getting the Bitmap from Gallery
+//                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+//                //Setting the Bitmap to ImageView
+//             //   imageView.setImageBitmap(bitmap);
+//                PopUp_Window pop=new PopUp_Window();
+//                pop.init();
+//                pop.setImage(bitmap);
+
+//            }else{
+//                Toast.makeText(this, "You haven't picked Image",
+//                        Toast.LENGTH_LONG).show();
+//            }
+//        } catch (Exception ex) {
+//            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+//                    .show();
+
     }
 
     @Override
@@ -441,6 +604,13 @@ public class ChatPage extends ActionBarActivity {
         {
             DialogFragment newFragment = new PopupMessageDialog();
             newFragment.show(getSupportFragmentManager(), "timePicker");
+        }
+        if(id==R.id.image_upload)
+        {
+            //  DialogFragment newFragment = new PopupMessageDialog();
+            //  ViewGroup group = (ViewGroup) findViewById(R.id.imageLayout);
+            // loadImagefromGallery(group);
+            loadImagefromGallery();
         }
         return super.onOptionsItemSelected(item);
     }

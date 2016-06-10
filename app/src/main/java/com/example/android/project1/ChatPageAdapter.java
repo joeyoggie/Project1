@@ -3,6 +3,7 @@ package com.example.android.project1;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ public class ChatPageAdapter extends CursorAdapter {
     String message;
     String timestamp;
     String userName;
+    Bitmap image;
 
     public ChatPageAdapter(Context context, Cursor cursor) {
         super(context, cursor);
