@@ -16,8 +16,10 @@ import android.widget.TextView;
 public class ContactsAdapter extends CursorAdapter{
 
     TextView phoneNumberTextView;
+    TextView nameTextView;
     TextView userNameTextView;
     String phoneNo;
+    String name;
     String userName;
     ImageView userProfilePictureImageView;
     Context context;
@@ -29,18 +31,23 @@ public class ContactsAdapter extends CursorAdapter{
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.layout_contact_entry,parent,false);
+        return LayoutInflater.from(context).inflate(R.layout.layout_contact_entry, parent, false);
     }
 
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
-        phoneNumberTextView = (TextView) view.findViewById(R.id.phone_number);
-        userNameTextView = (TextView) view.findViewById(R.id.user_name);
-        userProfilePictureImageView = (ImageView)view.findViewById(R.id.profile_picture);
+        phoneNumberTextView = (TextView) view.findViewById(R.id.contact_phone_number);
+        nameTextView = (TextView) view.findViewById(R.id.contact_name);
+        userNameTextView = (TextView) view.findViewById(R.id.contact_username);
+        userProfilePictureImageView = (ImageView)view.findViewById(R.id.contact_profile_picture);
+
         phoneNo = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER));
+        name = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_NAME));
         userName = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_USERNAME));
+        //get image as well from the cursor
         phoneNumberTextView.setText(phoneNo);
-        userNameTextView.setText(userName);
+        nameTextView.setText(name);
+        userNameTextView.setText("(@"+userName+")");
         //userProfilePictureImageView.setImageBitmap(bitmap);
 
         //TODO Needs fixing as it always returns the last entry in the list view, regarldess of the clicked item

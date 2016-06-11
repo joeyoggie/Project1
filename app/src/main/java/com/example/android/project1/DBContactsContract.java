@@ -13,6 +13,7 @@ public final class DBContactsContract {
         public static final String COLUMN_NAME_ID = "_ID";
         public static final String COLUMN_NAME_PHONE_NUMBER = "phoneNumber";
         public static final String COLUMN_NAME_USERNAME = "userName";
+        public static final String COLUMN_NAME_NAME = "name";
     }
 
 }

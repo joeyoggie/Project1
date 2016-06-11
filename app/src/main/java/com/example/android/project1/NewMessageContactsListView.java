@@ -7,11 +7,16 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FilterQueryProvider;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -26,15 +31,16 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewMessageContactsListView extends AppCompatActivity {
+public class NewMessageContactsListView extends ActionBarActivity implements SearchView.OnQueryTextListener{
 
     String SERVER_IP;
     ListView contacts_list_view;
     ContactsAdapter contactsAdapter;
     Cursor cursor;
-    ArrayList<String> receivedNumbers = new ArrayList<>();
 
     ProgressDialog dialog;
+
+    private SearchView mSearchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,23 +51,37 @@ public class NewMessageContactsListView extends AppCompatActivity {
 
         contacts_list_view = (ListView) findViewById(R.id.list);
 
+        //Initialize the contacts database helper
         DBContactsHelper dbContactsHelper = DBContactsHelper.getInstance(this);
+        //Read the local contacts stored in the local database
         cursor = DBContactsHelper.readContacts();
         contactsAdapter = new ContactsAdapter(this, cursor);
         contacts_list_view.setAdapter(contactsAdapter);
         contactsAdapter.changeCursor(cursor);
+        contacts_list_view.setTextFilterEnabled(true);
 
+        //Set the adapter's FilterQueryProvider which will allow filtering the list
+        contactsAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence constraint) {
+                String s = constraint.toString();
+                return DBContactsHelper.readFilteredContacts(s);
+            }
+        });
+
+        //Set the onItemClickListener to open the ChatPage or UserProfile for the clicked contact
         contacts_list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 cursor.moveToPosition(position);
                 String readable_phone_no = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER));
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_NAME));
                 String userName = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_USERNAME));
 
                 Intent intent = new Intent(NewMessageContactsListView.this, ChatPage.class);
                 intent.putExtra("phoneNumber", readable_phone_no);
+                intent.putExtra("recepientName", name);
                 intent.putExtra("recepientUserName", userName);
-                //intent.putExtra("recepientName", recepientName);
                 //intent.putExtra("recepientProfilePicture", profilePicture);
                 startActivity(intent);
                 /*if(view.getId() == R.id.profile_picture) {
@@ -89,14 +109,41 @@ public class NewMessageContactsListView extends AppCompatActivity {
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
+    private void setupSearchView()
+    {
+        mSearchView.setIconifiedByDefault(false);
+        mSearchView.setOnQueryTextListener(this);
+        mSearchView.setSubmitButtonEnabled(true);
+        mSearchView.setQueryHint("Search here");
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText)
+    {
+        Log.d("CONTACTS QUERY STRING", newText);
+        if (TextUtils.isEmpty(newText.toLowerCase())) {
+            contacts_list_view.clearTextFilter();
+        } else {
+            Log.d("CONTACTS","onQueryTextChange not empty");
+            contacts_list_view.setFilterText(newText.toLowerCase());
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query)
+    {
+        Log.d("CONTACTS","onQueryTextSubmit YES");
+        contacts_list_view.clearTextFilter();
+        return false;
+    }
+
     public void refreshContactsFromServer() {
         ArrayList<String> localPhoneNumbers = read_from_content_providers();
         sendNumbersToServer(localPhoneNumbers);
-        cursor = DBContactsHelper.readContacts();
-        contactsAdapter.changeCursor(cursor);
     }
 
-    public void refreshContacts(View view){
+    public void refreshContacts(){
         dialog = new ProgressDialog(this);
         dialog.setMessage("Refreshing local contacts...");
         dialog.setCanceledOnTouchOutside(false);
@@ -170,5 +217,30 @@ public class NewMessageContactsListView extends AppCompatActivity {
         });
         //Add the request to the RequestQueue.
         HttpConnector.getInstance(this).addToRequestQueue(requestArray);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_new_message_contacts_list_view, menu);
+        mSearchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        setupSearchView();
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_refresh) {
+            refreshContacts();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

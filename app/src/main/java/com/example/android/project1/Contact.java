@@ -6,16 +6,19 @@ package com.example.android.project1;
 public class Contact {
     private String phoneNumber;
     private String userName;
+    private String name;
 
     public Contact()
     {
         this.phoneNumber = null;
         this.userName = null;
+        this.name = null;
     }
-    public Contact(String phoneNumber, String userName)
+    public Contact(String phoneNumber, String userName, String name)
     {
         this.phoneNumber = phoneNumber;
         this.userName = userName;
+        this.name = name;
     }
 
     public void setPhoneNumber(String phoneNumber)
@@ -26,6 +29,9 @@ public class Contact {
     {
         this.userName = userName;
     }
+    public void setName(String name){
+        this.name = name;
+    }
 
     public String getPhoneNumber()
     {
@@ -34,6 +40,9 @@ public class Contact {
     public String getUserName()
     {
         return this.userName;
+    }
+    public String getName(){
+        return this.name;
     }
 
 }

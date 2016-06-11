@@ -5,26 +5,36 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/profile_picture"
+        android:id="@+id/contact_profile_picture"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:src="@mipmap/ic_launcher"/>
 
     <TextView
-        android:id="@+id/user_name"
+        android:id="@+id/contact_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/profile_picture"
+        android:layout_toRightOf="@id/contact_profile_picture"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="ContactUserName"
+        android:text="ContactName"
         android:layout_marginLeft="8dp"/>
+    
+    <TextView
+        android:id="@+id/contact_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/contact_name"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="(@ContactUserName)"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"/>
 
     <TextView
-        android:id="@+id/phone_number"
+        android:id="@+id/contact_phone_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/profile_picture"
-        android:layout_below="@id/user_name"
+        android:layout_toRightOf="@id/contact_profile_picture"
+        android:layout_below="@id/contact_name"
         android:text="ContactPhoneNumber"
         android:layout_marginTop="8dp"
         android:layout_marginLeft="8dp" />

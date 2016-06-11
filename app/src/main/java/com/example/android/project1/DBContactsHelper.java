@@ -17,7 +17,7 @@ import java.util.List;
 public final class DBContactsHelper extends SQLiteOpenHelper{
 
     public static final String DATABASE_NAME = "Contacts.db";
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 14;
     private static DBContactsHelper dbHelper;
     private static SQLiteDatabase readableContactsDB;
     private static SQLiteDatabase writableContactsDB;
@@ -25,6 +25,7 @@ public final class DBContactsHelper extends SQLiteOpenHelper{
 
     public static final String SQL_CREATE_QUERY = "CREATE TABLE " + DBContactsContract.ContactsEntry.TABLE_NAME + " ( " +
             DBContactsContract.ContactsEntry._ID + " INTEGER PRIMARY KEY," +
+            DBContactsContract.ContactsEntry.COLUMN_NAME_NAME + " TEXT," +
             DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER + " TEXT," +
             DBContactsContract.ContactsEntry.COLUMN_NAME_USERNAME + " TEXT" + ")";
 
@@ -68,18 +69,16 @@ public final class DBContactsHelper extends SQLiteOpenHelper{
     }
 
     public static void insertContactIntoDataBase(List<Contact> list_of_recieved_contacts){
-        ContentValues contentValues = new ContentValues();
+        ContentValues contentValues;
         Contact tempContact;
         writableContactsDB.beginTransaction();
         for(int i = 0; i < list_of_recieved_contacts.size(); i++)
         {
-            tempContact = new Contact();
-            String phoneNumber;
             contentValues = new ContentValues();
             tempContact = list_of_recieved_contacts.get(i);
-            phoneNumber = tempContact.getPhoneNumber();
             contentValues.put(DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER, tempContact.getPhoneNumber());
             contentValues.put(DBContactsContract.ContactsEntry.COLUMN_NAME_USERNAME, tempContact.getUserName());
+            contentValues.put(DBContactsContract.ContactsEntry.COLUMN_NAME_NAME, tempContact.getName());
             /*if( readableContactsDB.query(DBContactsContract.ContactsEntry.TABLE_NAME,
                     new String[] {DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER},
                     DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER + "=?",
@@ -114,20 +113,44 @@ public final class DBContactsHelper extends SQLiteOpenHelper{
         //Define a projection string that specifies which columns from the database you will actually use after this query.
         String[] projection = {DBContactsContract.ContactsEntry._ID,
                 DBContactsContract.ContactsEntry .COLUMN_NAME_USERNAME,
-                DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER};
+                DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER,
+                DBContactsContract.ContactsEntry.COLUMN_NAME_NAME};
         //How you want the results to be sorted in the resulting Cursor
         String sortOrder = DBContactsContract.ContactsEntry.COLUMN_NAME_ID + " ASC";
         //The columns for the WHERE clause
-        //String selection = DBMessagesContract.MessageEntry.COLUMN_NAME_RECEPIENT + "=?";
         String selection = DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER;
 
         //The values of the WHERE clause
-        //String[] selectionArgs = {"JoeyOggie"};
         String[] selectionArgs = {};
         //The cursor object will contain the result of the query
         cursor = readableContactsDB.query(DBContactsContract.ContactsEntry.TABLE_NAME,
                 projection,
                 null, /*selection*/
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
+        return cursor;
+    }
+
+    public static Cursor readFilteredContacts(String constraint)
+    {
+        //Define a projection string that specifies which columns from the database you will actually use after this query.
+        String[] projection = {DBContactsContract.ContactsEntry._ID,
+                DBContactsContract.ContactsEntry .COLUMN_NAME_USERNAME,
+                DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER,
+                DBContactsContract.ContactsEntry.COLUMN_NAME_NAME};
+        //How you want the results to be sorted in the resulting Cursor
+        String sortOrder = DBContactsContract.ContactsEntry.COLUMN_NAME_ID + " ASC";
+        //The columns for the WHERE clause
+        String selection = DBContactsContract.ContactsEntry.COLUMN_NAME_NAME + " LIKE ?";
+
+        //The values of the WHERE clause
+        String[] selectionArgs = {"%"+constraint+"%"};
+        //The cursor object will contain the result of the query
+        cursor = readableContactsDB.query(DBContactsContract.ContactsEntry.TABLE_NAME,
+                projection,
+                selection,
                 selectionArgs,
                 null,
                 null,
