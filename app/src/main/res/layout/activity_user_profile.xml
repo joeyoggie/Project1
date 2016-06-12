@@ -8,6 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.android.project1.UserProfile">
+
     <ImageView
         android:id="@+id/userpp"
         android:layout_width="wrap_content"
@@ -20,12 +21,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/userpp"
+        android:textStyle="bold"
         android:text="Phone number: "/>
     <TextView
         android:id="@+id/profilePhoneNo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/userpp"
+        android:layout_below="@id/userpp"
         android:layout_toRightOf="@id/phone_number_static"/>
 
     <TextView
@@ -33,12 +35,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/phone_number_static"
+        android:textStyle="bold"
         android:text="Username: " />
     <TextView
         android:id="@+id/profileusername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/profile_name_static"
+        android:layout_toRightOf="@id/profile_name_static"
         android:layout_below="@id/phone_number_static"/>
 
 
@@ -47,6 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/profile_name_static"
+        android:textStyle="bold"
         android:text="Status: "/>
     <TextView
         android:id="@+id/profieStatus"
@@ -55,5 +59,11 @@
         android:layout_below="@id/profile_name_static"
         android:layout_toRightOf="@id/status_static" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/status_static"
+        android:text="Send message"
+        android:onClick="goToChatPage"/>
 
 </RelativeLayout>

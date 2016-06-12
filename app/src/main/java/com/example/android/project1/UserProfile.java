@@ -1,9 +1,13 @@
 package com.example.android.project1;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -19,9 +23,10 @@ import java.net.URLEncoder;
 public class UserProfile extends ActionBarActivity {
 
     String SERVER_IP;
-    TextView profileUserName,profileStatus1,profilePhoneNo1;
-    String recievedUserName;
-    String recievedPhoneNo,recievedStatus;
+    TextView userNameTextView, statusTextView, phoneNumberTextView;
+    ImageView profilePictureImageView;
+    String recievedUserName, recievedPhoneNo, recievedStatus, receivedName;
+    Bitmap receivedProfilePicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +35,14 @@ public class UserProfile extends ActionBarActivity {
 
         SERVER_IP = getServerIP();
 
-        profileUserName=(TextView)findViewById(R.id.profileusername);
-        profileStatus1=(TextView)findViewById(R.id.profieStatus);
-        profilePhoneNo1=(TextView)findViewById(R.id.profilePhoneNo);
-
+        userNameTextView = (TextView) findViewById(R.id.profileusername);
+        statusTextView = (TextView) findViewById(R.id.profieStatus);
+        phoneNumberTextView = (TextView) findViewById(R.id.profilePhoneNo);
+        profilePictureImageView = (ImageView) findViewById(R.id.userpp);
 
         Bundle bundle = getIntent().getExtras();
         if(bundle!=null){
-            recievedUserName= bundle.getString("username_key");
+            recievedUserName = bundle.getString("username_key");
             setupActionBar();
             send_username_to_Server();
         }
@@ -57,7 +62,6 @@ public class UserProfile extends ActionBarActivity {
     }
 
     public void send_username_to_Server() {
-
         String URL = "http://"+SERVER_IP+":8080/MyFirstServlet/GetUserInfo?userName=" + URLEncoder.encode(recievedUserName);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
             @Override
@@ -68,10 +72,13 @@ public class UserProfile extends ActionBarActivity {
                 User user = gson.fromJson(response, type);
                 recievedStatus = user.getStatus();
                 recievedPhoneNo = user.getPhoneNumber();
-                profileUserName.setText(recievedUserName);
-                profileStatus1.setText(recievedStatus);
-                profilePhoneNo1.setText(recievedPhoneNo);
-                getSupportActionBar().setTitle(user.getName());
+                recievedUserName = user.getUserName();
+                receivedName = user.getName();
+                //get image from received user object
+                userNameTextView.setText("@"+recievedUserName);
+                statusTextView.setText(recievedStatus);
+                phoneNumberTextView.setText(recievedPhoneNo);
+                getSupportActionBar().setTitle(receivedName);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -80,5 +87,12 @@ public class UserProfile extends ActionBarActivity {
             }
         });
         HttpConnector.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
+    }
+
+    public void goToChatPage(View view) {
+        Intent intent = new Intent(this, ChatPage.class);
+        intent.putExtra("recepientName",receivedName);
+        intent.putExtra("recepientUserName",recievedUserName);
+        startActivity(intent);
     }
 }
