@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,11 +14,23 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.instabug.library.IBGInvocationEvent;
 import com.instabug.library.Instabug;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class MainPage extends ActionBarActivity {
+
+    String SERVER_IP;
 
     String recepientUserName;
     String recepientName;
@@ -25,6 +38,7 @@ public class MainPage extends ActionBarActivity {
     String userName;
     String name;
     String phoneNumber;
+    String deviceID;
 
     DrawerLayout mDrawerLayout;
     View navigationView;
@@ -36,6 +50,8 @@ public class MainPage extends ActionBarActivity {
 
         setupActionBar();
         getLocalUserInfo();
+
+        SERVER_IP = getServerIP();
 
         SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
         boolean registered = prefs.getBoolean("isRegistered", false);
@@ -64,6 +80,11 @@ public class MainPage extends ActionBarActivity {
                 .build();
     }
 
+    private String getServerIP() {
+        SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
+        return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
+    }
+
     private void setupActionBar() {
         getSupportActionBar().setDisplayUseLogoEnabled(true); //Enable the Logo to be shown
         getSupportActionBar().setDisplayShowHomeEnabled(true); //Show the Logo
@@ -77,6 +98,8 @@ public class MainPage extends ActionBarActivity {
         userName = prefs.getString("userName","Me");
         name = prefs.getString("name", "Jon Doe");
         phoneNumber = prefs.getString("phoneNumber","0000000000");
+        //Get the unique device ID that will be stored in the database to uniquely identify this device
+        deviceID = prefs.getString("deviceUUID","0");
     }
 
     public void goToPrivacySettings(View view)
@@ -129,6 +152,49 @@ public class MainPage extends ActionBarActivity {
         newFragment.show(getFragmentManager(),"statusFragment");
     }
 
+    private void sendOnlineStateToServer(final String state){
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
+        final String timestamp = simpleDateFormat.format(date);
+
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/State_change";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                if(response!=null && response.length() >= 0) {
+                    Log.d("VolleyResponse", response);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(error!=null && error.toString().length() >= 0) {
+                    Log.d("VolleyError", error.toString());
+                }
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("userName", userName);
+                params.put("state", state);
+                params.put("timestamp", timestamp);
+
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("Content-Type","application/x-www-form-urlencoded");
+                return params;
+            }
+        };
+        //Add the request to the RequestQueue.
+        HttpConnector.getInstance(this).addToRequestQueue(stringRequest);
+    }
+
     @Override
     public void onBackPressed(){
         if (mDrawerLayout.isDrawerOpen(navigationView)) {
@@ -138,6 +204,41 @@ public class MainPage extends ActionBarActivity {
             MainPage.super.onBackPressed();
         }
     }
+
+    @Override
+    public void onStop()
+    {
+        sendOnlineStateToServer("offline");
+        super.onStop();
+    }
+
+    /*@Override
+    public void onPause()
+    {
+        sendOnlineStateToServer("offline");
+        super.onPause();
+    }*/
+
+    /*@Override
+    public void onResume()
+    {
+        super.onResume();
+        sendOnlineStateToServer("online");
+    }*/
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        sendOnlineStateToServer("online");
+    }
+
+    @Override
+    protected void onDestroy() {
+        sendOnlineStateToServer("offline");
+        super.onDestroy();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

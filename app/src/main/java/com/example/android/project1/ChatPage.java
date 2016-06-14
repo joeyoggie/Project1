@@ -65,6 +65,7 @@ public class ChatPage extends ActionBarActivity {
     String userName;
     String name;
     String phoneNumber;
+    String deviceID;
 
     String typingStatusSender;
     String receivedTypingStatus;
@@ -247,6 +248,8 @@ public class ChatPage extends ActionBarActivity {
         userName = prefs.getString("userName","Me");
         name = prefs.getString("name", "Jon Doe");
         phoneNumber = prefs.getString("phoneNumber","0000000000");
+        //Get the unique device ID that will be stored in the database to uniquely identify this device
+        deviceID = prefs.getString("deviceUUID","0");
     }
 
     private void refreshCursor(){
@@ -345,10 +348,6 @@ public class ChatPage extends ActionBarActivity {
         message.setText("");
         isTyping = false;
 
-        //Get the unique device ID that will be stored in the database to uniquely identify this device
-        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
-        String deviceID = prefs.getString("deviceUUID","0");
-
         //Check if there's an internet connection
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
@@ -428,6 +427,49 @@ public class ChatPage extends ActionBarActivity {
     {
         DialogFragment newFragment = new PopupMessageDialog();
         newFragment.show(getSupportFragmentManager(), "timePicker");
+    }
+
+    private void sendOnlineStateToServer(final String state){
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
+        final String timestamp2 = simpleDateFormat.format(date);
+
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/State_change";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                if(response!=null && response.length() >= 0) {
+                    Log.d("VolleyResponse", response);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(error!=null && error.toString().length() >= 0) {
+                    Log.d("VolleyError", error.toString());
+                }
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("userName", userName);
+                params.put("state", state);
+                params.put("timestamp", timestamp2);
+
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("Content-Type","application/x-www-form-urlencoded");
+                return params;
+            }
+        };
+        //Add the request to the RequestQueue.
+        HttpConnector.getInstance(this).addToRequestQueue(stringRequest);
     }
 
     public void loadImagefromGallery() {
@@ -578,9 +620,40 @@ public class ChatPage extends ActionBarActivity {
 
     @Override
     protected void onDestroy() {
+        sendOnlineStateToServer("offline");
         super.onDestroy();
         //dbHelper.close();
     }
+
+    @Override
+    public void onStop()
+    {
+        sendOnlineStateToServer("offline");
+        super.onStop();
+    }
+
+    /*@Override
+    public void onPause()
+    {
+        sendOnlineStateToServer("offline");
+        super.onPause();
+    }*/
+
+    /*@Override
+    public void onResume()
+    {
+        super.onResume();
+        sendOnlineStateToServer("online");
+    }*/
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        sendOnlineStateToServer("online");
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

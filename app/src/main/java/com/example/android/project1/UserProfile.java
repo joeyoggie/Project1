@@ -67,18 +67,20 @@ public class UserProfile extends ActionBarActivity {
             @Override
             public void onResponse(String response) {
                 Log.d("UserProfile", response);
-                Gson gson = new Gson();
-                Type type = new TypeToken<User>(){}.getType();
-                User user = gson.fromJson(response, type);
-                recievedStatus = user.getStatus();
-                recievedPhoneNo = user.getPhoneNumber();
-                recievedUserName = user.getUserName();
-                receivedName = user.getName();
-                //get image from received user object
-                userNameTextView.setText("@"+recievedUserName);
-                statusTextView.setText(recievedStatus);
-                phoneNumberTextView.setText(recievedPhoneNo);
-                getSupportActionBar().setTitle(receivedName);
+                if(response.length() >= 3){ //empty response contains just 2 empty json brackets, so we check for more than 2 chars
+                    Gson gson = new Gson();
+                    Type type = new TypeToken<User>(){}.getType();
+                    User user = gson.fromJson(response, type);
+                    recievedStatus = user.getStatus();
+                    recievedPhoneNo = user.getPhoneNumber();
+                    recievedUserName = user.getUserName();
+                    receivedName = user.getName();
+                    //get image from received user object
+                    userNameTextView.setText("@"+recievedUserName);
+                    statusTextView.setText(recievedStatus);
+                    phoneNumberTextView.setText(recievedPhoneNo);
+                    getSupportActionBar().setTitle(receivedName);
+                }
             }
         }, new Response.ErrorListener() {
             @Override
