@@ -17,7 +17,6 @@ public class LocationServiceResultsAdapter extends ArrayAdapter {
 
     Activity activity ;
     List <ServiceProvider> serviceProviders;
-    String phone_no, longitude, latitude, service_category, user_name;
     TextView nameTextView, ratingTextVew, addressTextView;
     ImageView profilePictureImageView;
 
@@ -48,7 +47,7 @@ public class LocationServiceResultsAdapter extends ArrayAdapter {
             profilePictureImageView = (ImageView)rowView.findViewById(R.id.profile_picture);
         }
 
-        nameTextView.setText(serviceProviders.get(position).getUserName());
+        nameTextView.setText(serviceProviders.get(position).getName());
         addressTextView.setText(serviceProviders.get(position).getAddress());
         ratingTextVew.setText(String.valueOf(serviceProviders.get(position).getRating()) + "/5");
         //profilePictureImageView.setImageBitmap(bitmap);

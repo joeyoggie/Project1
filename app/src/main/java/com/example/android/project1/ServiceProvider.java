@@ -5,6 +5,7 @@ package com.example.android.project1;
  */
 public class ServiceProvider {
 
+    private String name;
     private String phoneNumber;
     private String userName;
     private String serviceCategory;
@@ -15,6 +16,7 @@ public class ServiceProvider {
 
     public ServiceProvider()
     {
+        this.name = null;
         this.phoneNumber = null;
         this.userName = null;
         this.serviceCategory = null;
@@ -22,7 +24,8 @@ public class ServiceProvider {
         this.latitude = null;
     }
 
-    public ServiceProvider(String phoneNumber, String userName, Double longitude, Double latitude, String serviceCategory) {
+    public ServiceProvider(String name, String phoneNumber, String userName, Double longitude, Double latitude, String serviceCategory) {
+        this.name = name;
         this.phoneNumber = phoneNumber;
         this.userName = userName;
         this.longitude = longitude;
@@ -31,6 +34,9 @@ public class ServiceProvider {
     }
 
 
+    public String getName(){
+        return this.name;
+    }
     public String getPhoneNumber()
     {
         return this.phoneNumber;
@@ -51,7 +57,6 @@ public class ServiceProvider {
     {
         return this.serviceCategory;
     }
-
     public int getRating()
     {
         return this.rating;
@@ -61,6 +66,9 @@ public class ServiceProvider {
         return this.address;
     }
 
+    public void setName(String name){
+        this.name = name;
+    }
     public void setPhoneNumber(String phoneNumber)
     {
         this.phoneNumber = phoneNumber;

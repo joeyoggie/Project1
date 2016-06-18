@@ -304,9 +304,9 @@ public class Registration extends ActionBarActivity {
         }
     }
 
-    public void goToMainPage(View view)
+    public void goToLocationServicesRegistrationPrompt(View view)
     {
-        Intent intent = new Intent(this,MainPage.class);
+        Intent intent = new Intent(this, LocationServicesRegistrationPrompt.class);
         startActivity(intent);
     }
 

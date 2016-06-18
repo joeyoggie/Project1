@@ -115,10 +115,10 @@
         android:id="@+id/finish_registration_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Finish!"
+        android:text="Next"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:onClick="goToMainPage"
+        android:onClick="goToLocationServicesRegistrationPrompt"
         android:background="@android:color/holo_green_dark"
         android:visibility="gone"/>
 
