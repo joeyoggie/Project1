@@ -111,6 +111,12 @@ public class MainPage extends ActionBarActivity {
         }
     }
 
+    public void goToLocationServicesRegistrationPrompt(View view)
+    {
+        Intent intent = new Intent(this, LocationServicesRegistrationPrompt.class);
+        startActivity(intent);
+    }
+
     public void goToChatPage(View view) {
         EditText customRecepientUserName = (EditText) findViewById(R.id.custom_recepient_username);
         EditText customRecepientName = (EditText) findViewById(R.id.custom_recepient_name);

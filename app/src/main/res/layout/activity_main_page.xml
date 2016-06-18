@@ -585,6 +585,7 @@
                     android:gravity="left|center_vertical"
                     android:background="?android:attr/selectableItemBackground"
                     android:text="Update job &amp; location"
+                    android:onClick="goToLocationServicesRegistrationPrompt"
                     android:textAllCaps="false">
                 </Button>
 
