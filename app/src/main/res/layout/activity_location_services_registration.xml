@@ -51,11 +51,11 @@
 
     <Button
         android:id="@+id/job_location_map_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:layout_below="@id/job_location_text_view"
-        android:text="Select location from map"
+        android:text="Select work location from map"
         android:onClick="openMapFragment"/>
 
     <!--<Spinner
@@ -79,18 +79,95 @@
         android:visibility="gone" />-->
 
     <TextView
-        android:id="@+id/address_text_view"
-        android:layout_width="match_parent"
+        android:id="@+id/name_text_view_static"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="start"
-        android:layout_below="@id/job_location_map_button" />
+        android:layout_below="@id/job_location_map_button"
+        android:layout_margin="8dp"
+        android:textStyle="bold"
+        android:text="Name: "/>
 
     <TextView
-        android:id="@+id/detailed_address_text_view"
-        android:layout_width="match_parent"
+        android:id="@+id/name_text_view"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="start"
-        android:layout_below="@id/address_text_view"/>
+        android:layout_below="@id/job_location_map_button"
+        android:layout_margin="8dp"
+        android:layout_toRightOf="@id/name_text_view_static"
+        android:gravity="start" />
+
+    <TextView
+        android:id="@+id/username_text_view_static"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name_text_view_static"
+        android:layout_margin="8dp"
+        android:textStyle="bold"
+        android:text="Username: " />
+
+    <TextView
+        android:id="@+id/username_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name_text_view_static"
+        android:layout_margin="8dp"
+        android:layout_toRightOf="@id/name_text_view_static"
+        android:gravity="start" />
+
+    <TextView
+        android:id="@+id/phone_number_text_view_static"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/username_text_view_static"
+        android:layout_margin="8dp"
+        android:textStyle="bold"
+        android:text="Phone number: " />
+
+    <TextView
+        android:id="@+id/phone_number_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/username_text_view_static"
+        android:layout_margin="8dp"
+        android:layout_toRightOf="@id/phone_number_text_view_static"
+        android:gravity="start" />
+
+
+    <TextView
+        android:id="@+id/address_text_view_static"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/phone_number_text_view_static"
+        android:layout_margin="8dp"
+        android:textStyle="bold"
+        android:text="Address: " />
+
+    <TextView
+        android:id="@+id/address_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/phone_number_text_view_static"
+        android:layout_margin="8dp"
+        android:layout_toRightOf="@id/address_text_view_static"
+        android:gravity="start"/>
+
+    <TextView
+        android:id="@+id/location_text_view_static"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/address_text_view_static"
+        android:layout_margin="8dp"
+        android:textStyle="bold"
+        android:text="Location: " />
+
+    <TextView
+        android:id="@+id/location_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_below="@id/address_text_view_static"
+        android:layout_toRightOf="@id/location_text_view_static"
+        android:gravity="start"/>
 
     <Button
         android:layout_width="match_parent"
@@ -99,7 +176,5 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:onClick="submitJobInfo" />
-
-
 
 </RelativeLayout>

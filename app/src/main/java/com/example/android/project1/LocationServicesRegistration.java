@@ -2,6 +2,7 @@ package com.example.android.project1;
 
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
@@ -13,11 +14,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -35,10 +41,11 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
     String address;
 
     AutoCompleteTextView jobEditText;
+    TextView nameTextView, userNameTextView, phoneNumberTextView, addressTextView, locationTextView;
 
-    Spinner countrySpinner, citySpinner;
+    /*Spinner countrySpinner, citySpinner;
     ArrayList<String> countries, cities;
-    ArrayAdapter<String> countrySpinnerAdapter, citySpinnerAdapter;
+    ArrayAdapter<String> countrySpinnerAdapter, citySpinnerAdapter;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +57,28 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
 
         //initializeSpinners();
 
+        //initialize the views
+        nameTextView = (TextView) findViewById(R.id.name_text_view);
+        userNameTextView = (TextView) findViewById(R.id.username_text_view);
+        phoneNumberTextView = (TextView) findViewById(R.id.phone_number_text_view);
+        addressTextView = (TextView) findViewById(R.id.address_text_view);
+        locationTextView = (TextView) findViewById(R.id.location_text_view);
         jobEditText = (AutoCompleteTextView) findViewById(R.id.job_category_edit_text);
+
+        nameTextView.setText(name);
+        userNameTextView.setText("@"+userName);
+        phoneNumberTextView.setText(phoneNumber);
+
+        //Check if already registered, and if so, fill the views with the stored values
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+        if(prefs.getString("locationServicesRegistration", "notRegistered").equals("registered")) {
+            jobEditText.setText(prefs.getString("job", "No job defined"));
+            addressTextView.setText(prefs.getString("address", "No address defined"));
+            latitude = Double.longBitsToDouble(prefs.getLong("latitude", 0));
+            longitude = Double.longBitsToDouble(prefs.getLong("longitude", 0));
+            locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
+        }
+
         ArrayList<String> sugestedJobs = new ArrayList<>();
         //TODO get all the available jobs from the server
         sugestedJobs.add("Mechanic");
@@ -76,6 +104,18 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
     private String getServerIP() {
         SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
+    }
+
+    private void updateTextViews() {
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+        nameTextView.setText(name);
+        userNameTextView.setText("@"+userName);
+        phoneNumberTextView.setText(phoneNumber);
+        jobEditText.setText(prefs.getString("job", "No job defined"));
+        addressTextView.setText(prefs.getString("address", "No address defined"));
+        latitude = Double.longBitsToDouble(prefs.getLong("latitude", 0));
+        longitude = Double.longBitsToDouble(prefs.getLong("longitude", 0));
+        locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
     }
 
     /*public void initializeSpinners(){
@@ -179,7 +219,8 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
 
         latitude = receivedLatitude;
         longitude = receivedLongitude;
-
+        locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
+        
         AddressDecoder aDecoder = new AddressDecoder();
         Location loc = new Location("");
         loc.setLatitude(latitude);
@@ -190,23 +231,57 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
     public void submitJobInfo(View view){
         job = jobEditText.getText().toString();
 
-        //submit name, userName, phoneNumber, job, latitude, longitude, address to the server
-        String test = "Name: " + name + "\n"
-                + "Username: " + userName + "\n"
-                + "Phone number:" + phoneNumber + "\n"
-                + "Job: " + job + "\n"
-                + "Location: " + latitude + "," + longitude + "\n"
-                + "Address: " + address;
-        Toast.makeText(LocationServicesRegistration.this, test, Toast.LENGTH_SHORT).show();
+        //save and submit name, userName, phoneNumber, latitude, longitude, job, address
 
-        //TODO save the registered info and upload them to the server
-        //when finished
+        //Send the info to the server
+        sendInfoToServer();
+
+        //save the info locally
         //registered means it won't ask again for this info
-        /*SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
         SharedPreferences.Editor prefsEditor = prefs.edit();
         prefsEditor.putString("locationServicesRegistration", "registered");
-        //add other registered info
-        prefsEditor.apply();*/
+        prefsEditor.putString("job", job);
+        prefsEditor.putString("address", address);
+        prefsEditor.putLong("latitude", Double.doubleToRawLongBits(latitude));
+        prefsEditor.putLong("longitude", Double.doubleToRawLongBits(longitude));
+        prefsEditor.apply();
+
+        //update the textviews
+        updateTextViews();
+    }
+
+    public void sendInfoToServer(){
+        //Send the message info to the server in a background thread
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewServiceProvider?name=" + URLEncoder.encode(name)
+                + "&phoneNumber=" + URLEncoder.encode(phoneNumber)
+                + "&userName=" + URLEncoder.encode(userName)
+                + "&latitude=" + String.valueOf(latitude)
+                + "&longitude=" + String.valueOf(longitude)
+                + "&job=" + URLEncoder.encode(job)
+                + "&address=" + URLEncoder.encode(address);
+        //Request a string response from the provided URL.
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
+            @Override
+            public void onResponse(String response) {
+                Toast.makeText(LocationServicesRegistration.this, "Registered successfully", Toast.LENGTH_SHORT).show();
+                //Go to MainPage automatically if this was the first time to register
+                SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+                if(prefs.getBoolean("firstVisit", true)){
+                    SharedPreferences.Editor prefsEditor = prefs.edit();
+                    prefsEditor.putBoolean("firstVisit", false);
+                    Intent goToMainPageIntent = new Intent(LocationServicesRegistration.this, MainPage.class);
+                    startActivity(goToMainPageIntent);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(LocationServicesRegistration.this, "Registration error", Toast.LENGTH_SHORT).show();
+            }
+        });
+        //Add the request to the RequestQueue.
+        HttpConnector.getInstance(this).addToRequestQueue(request);
     }
 
     public class AddressDecoder extends AsyncTask<Location,Void,String[]> {
@@ -258,12 +333,10 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
 
         @Override
         protected void onPostExecute(String[] result) {
-            //Toast.makeText(LocationServicesRegistration.this, result, Toast.LENGTH_LONG).show();
-            TextView addressTextView = (TextView) findViewById(R.id.address_text_view);
-            addressTextView.setText("Address: " + result[0]);
-            TextView detailedAddressTextView = (TextView) findViewById(R.id.detailed_address_text_view);
-            detailedAddressTextView.setText("Detailed info:" + "\n" + result[1]);
-            address = addressString;
+            //result[0] is address string, result[1] is detailed address string
+            //Toast.makeText(LocationServicesRegistration.this, result[1], Toast.LENGTH_LONG).show();
+            address = result[0];
+            addressTextView.setText(address);
         }
 
         @Override

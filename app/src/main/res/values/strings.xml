@@ -25,6 +25,6 @@
         <item>Localhost IP (192.168.1.44)</item>
         <item>Custom IP</item>
     </string-array>
-    <string name="server_ip_address">197.45.183.87</string>
+    <string name="server_ip_address">8.35.196.66</string>
     <string name="server_ip_address_local">192.168.1.44</string>
 </resources>

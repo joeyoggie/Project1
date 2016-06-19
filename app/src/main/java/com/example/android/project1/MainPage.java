@@ -113,8 +113,17 @@ public class MainPage extends ActionBarActivity {
 
     public void goToLocationServicesRegistrationPrompt(View view)
     {
-        Intent intent = new Intent(this, LocationServicesRegistrationPrompt.class);
-        startActivity(intent);
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+
+        if(prefs.getString("locationServicesRegistration", "notRegistered").equals("registered")) {
+            Intent locationServicesRegistrationIntent = new Intent(this, LocationServicesRegistration.class);
+            startActivity(locationServicesRegistrationIntent);
+        }
+        else{
+            Intent locationServicesRegistrationPromptIntent = new Intent(this, LocationServicesRegistrationPrompt.class);
+            startActivity(locationServicesRegistrationPromptIntent);
+        }
+
     }
 
     public void goToChatPage(View view) {
