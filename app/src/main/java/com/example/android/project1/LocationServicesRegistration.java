@@ -220,7 +220,7 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
         latitude = receivedLatitude;
         longitude = receivedLongitude;
         locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
-        
+
         AddressDecoder aDecoder = new AddressDecoder();
         Location loc = new Location("");
         loc.setLatitude(latitude);

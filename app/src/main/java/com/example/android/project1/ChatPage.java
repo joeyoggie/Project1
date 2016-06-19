@@ -429,6 +429,12 @@ public class ChatPage extends ActionBarActivity {
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        refreshCursor();
+    }
+
     private void sendOnlineStateToServer(final String state){
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");

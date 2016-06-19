@@ -18,12 +18,14 @@ import android.widget.TimePicker;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 
-import java.net.URLEncoder;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 
 public class PopupMessageDialog extends DialogFragment implements CustomTimePickerDialog.OnTimeSetListener {
@@ -102,16 +104,18 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             if (netInfo != null && netInfo.isConnected())
             {
                 //Send the message info to the server in a background thread
-                //downloadThread download = new downloadThread();
-                //download.execute("http://192.168.1.44:8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText));
-                //download.execute("http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(message)+"&timestamp="+URLEncoder.encode(timestamp));
+                String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
 
-                //Instantiate the RequestQueue.
-                String url = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(message)+"&timestamp="+URLEncoder.encode(timestamp);
-                //Request a string response from the provided URL.
-                StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
+                HashMap<String, String> params = new HashMap<>();
+                params.put("senderDeviceID", deviceID);
+                params.put("recepientUserName", recepientUserName);
+                params.put("messageContent", message);
+                params.put("timestamp", timestamp);
+                JSONObject jsonObject = new JSONObject(params);
+                Log.d("ChatPage", "JSON: "+jsonObject.toString());
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response) {
                         //TODO: Add a flag marking the message as sent successfully
                         DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, message, timestamp);
                     }
@@ -123,7 +127,7 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
                     }
                 });
                 //Add the request to the RequestQueue.
-                HttpConnector.getInstance(this.getActivity()).addToRequestQueue(request);
+                HttpConnector.getInstance(this.getActivity()).addToRequestQueue(jsonObjectRequest);
             }
             count++;
         }
