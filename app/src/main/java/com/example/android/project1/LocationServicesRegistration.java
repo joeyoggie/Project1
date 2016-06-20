@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
 
     AutoCompleteTextView jobEditText;
     TextView nameTextView, userNameTextView, phoneNumberTextView, addressTextView, locationTextView;
+    Button addJobButton;
 
     /*Spinner countrySpinner, citySpinner;
     ArrayList<String> countries, cities;
@@ -64,6 +66,7 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
         addressTextView = (TextView) findViewById(R.id.address_text_view);
         locationTextView = (TextView) findViewById(R.id.location_text_view);
         jobEditText = (AutoCompleteTextView) findViewById(R.id.job_category_edit_text);
+        addJobButton = (Button) findViewById(R.id.add_job_button);
 
         nameTextView.setText(name);
         userNameTextView.setText("@"+userName);
@@ -77,6 +80,7 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
             latitude = Double.longBitsToDouble(prefs.getLong("latitude", 0));
             longitude = Double.longBitsToDouble(prefs.getLong("longitude", 0));
             locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
+            addJobButton.setText("Update job info!");
         }
 
         ArrayList<String> sugestedJobs = new ArrayList<>();
@@ -270,6 +274,7 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
                 if(prefs.getBoolean("firstVisit", true)){
                     SharedPreferences.Editor prefsEditor = prefs.edit();
                     prefsEditor.putBoolean("firstVisit", false);
+                    prefsEditor.apply();
                     Intent goToMainPageIntent = new Intent(LocationServicesRegistration.this, MainPage.class);
                     startActivity(goToMainPageIntent);
                 }

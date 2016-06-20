@@ -111,7 +111,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/name_text_view_static"
         android:layout_margin="8dp"
-        android:layout_toRightOf="@id/name_text_view_static"
+        android:layout_toRightOf="@id/username_text_view_static"
         android:gravity="start" />
 
     <TextView
@@ -149,7 +149,7 @@
         android:layout_below="@id/phone_number_text_view_static"
         android:layout_margin="8dp"
         android:layout_toRightOf="@id/address_text_view_static"
-        android:gravity="start"/>
+        android:gravity="start" />
 
     <TextView
         android:id="@+id/location_text_view_static"
@@ -167,9 +167,10 @@
         android:layout_margin="8dp"
         android:layout_below="@id/address_text_view_static"
         android:layout_toRightOf="@id/location_text_view_static"
-        android:gravity="start"/>
+        android:gravity="start" />
 
     <Button
+        android:id="@+id/add_job_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add job!"
