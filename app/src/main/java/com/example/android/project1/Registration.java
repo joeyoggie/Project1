@@ -92,13 +92,23 @@ public class Registration extends ActionBarActivity {
                     Button finishRegistration = (Button) findViewById(R.id.finish_registration_button);
                     finishRegistration.setVisibility(View.VISIBLE);
                 }
-                else if(response!=null && response.contains("already"))
+                else if(response!=null && response.contains("phoneNumber"))
                 {
                     //Save a boolean file indicating that the registration was unsuccessful, so that the Registration.java activity
                     //is re-launched at next app-launch
                     SharedPreferences.Editor prefsEditor = prefs.edit();
                     prefsEditor.putBoolean("isRegistered", false);
-                    prefsEditor.commit();
+                    prefsEditor.apply();
+                    contentTextView.setText(response);
+                    contentTextView.setTextColor(Color.RED);
+                }
+                else if(response!=null && response.contains("userName"))
+                {
+                    //Save a boolean file indicating that the registration was unsuccessful, so that the Registration.java activity
+                    //is re-launched at next app-launch
+                    SharedPreferences.Editor prefsEditor = prefs.edit();
+                    prefsEditor.putBoolean("isRegistered", false);
+                    prefsEditor.apply();
                     contentTextView.setText(response);
                     contentTextView.setTextColor(Color.RED);
                 }
