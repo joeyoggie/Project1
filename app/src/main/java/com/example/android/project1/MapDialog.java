@@ -41,8 +41,8 @@ public class MapDialog extends android.app.DialogFragment implements GoogleApiCl
     static double latitude = 30.048865;
     static double longitude = 31.235290;
 
-    static double selectedLatitude;
-    static double selectedLongitude;
+    static double selectedLatitude = 0;
+    static double selectedLongitude = 0;
 
     //mGoogleApiClient is responsible for handling connections related to Google Play Services APIs
     private GoogleApiClient mGoogleApiClient;
@@ -68,7 +68,7 @@ public class MapDialog extends android.app.DialogFragment implements GoogleApiCl
     //which must implement this interface
     OnLocationSelectedListener mCallback;
     public interface OnLocationSelectedListener {
-        void onLocationSelected(double latitude, double longitude);
+        void onLocationSelected(double latitude, double longitude, double latitude2, double longitude2);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class MapDialog extends android.app.DialogFragment implements GoogleApiCl
             @Override
             public void onClick(View v) {
                 //pass the location to the parent activity
-                mCallback.onLocationSelected(selectedLatitude, selectedLongitude);
+                mCallback.onLocationSelected(selectedLatitude, selectedLongitude, latitude, longitude);
                 getDialog().dismiss();
             }
         });

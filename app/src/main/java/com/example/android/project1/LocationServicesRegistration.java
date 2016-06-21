@@ -218,12 +218,20 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
 
     //Get the location the user selected from the mapfragment
     @Override
-    public void onLocationSelected(double receivedLatitude, double receivedLongitude){
-        Toast.makeText(LocationServicesRegistration.this, String.valueOf(receivedLatitude)+","+String.valueOf(receivedLongitude), Toast.LENGTH_LONG).show();
+    public void onLocationSelected(double receivedLatitude, double receivedLongitude, double currentLatitude, double currentLongitude){
 
-        latitude = receivedLatitude;
-        longitude = receivedLongitude;
-        locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
+        if(receivedLatitude == 0 && receivedLongitude == 0) {
+            Toast.makeText(LocationServicesRegistration.this, "No location selected, used current location instead.\n" +
+                    "Select location from map again if you want to change your work location.", Toast.LENGTH_SHORT).show();
+            latitude = currentLatitude;
+            longitude = currentLongitude;
+            locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
+        }
+        else {
+            latitude = receivedLatitude;
+            longitude = receivedLongitude;
+            locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
+        }
 
         AddressDecoder aDecoder = new AddressDecoder();
         Location loc = new Location("");
