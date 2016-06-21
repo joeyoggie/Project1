@@ -67,10 +67,13 @@ public class MyInstanceIDListenerService extends IntentService {
             String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             // [END get_token]
-            Log.i("TOKEN", "GCM Registration Token: " + token);
+            Log.i("MyInstanceIDListener", "GCM Registration Token: " + token);
 
-            //Implement this method to send the registration info to your app's servers.
-            sendRegistrationToServer(token);
+            SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+            if(!prefs.getBoolean("isRegistered", false)){
+                //Implement this method to send the registration info to your app's servers.
+                sendRegistrationToServer(token);
+            }
 
             // Subscribe to topic channels
             subscribeTopics(token);
@@ -81,7 +84,7 @@ public class MyInstanceIDListenerService extends IntentService {
             //sharedPreferences.edit().putBoolean("isRegistered", true).apply();
             // [END register_for_gcm]
         } catch (Exception e) {
-            Log.d("ERROR!!", "Failed to complete token refresh", e);
+            Log.d("MyInstanceIDListener", "Failed to complete token refresh", e);
             // If an exception happens while fetching the new token or updating our registration data
             // on a third-party server, this ensures that we'll attempt the update at a later time.
             //sharedPreferences.edit().putBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false).apply();

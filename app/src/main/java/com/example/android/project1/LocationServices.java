@@ -1,7 +1,9 @@
 package com.example.android.project1;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -15,6 +17,10 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -26,12 +32,15 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class LocationServices extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, SearchView.OnQueryTextListener{
+
+    String SERVER_IP;
 
     //mGoogleApiClient is responsible for handling connections related to Google Play Services APIs
     GoogleApiClient mGoogleApiClient;
@@ -53,11 +62,21 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
 
     private SearchView mSearchView;
 
+    ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_services);
         setTitle("Location Services");
+
+        SERVER_IP = getServerIP();
+
+        progressDialog = new ProgressDialog(LocationServices.this);
+        progressDialog.setMessage("Getting info from server...");
+        progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
 
         //Initialize the mGoogleApiClient object if it's null, and make sure to pass LocationServices API parameter
         if (mGoogleApiClient == null) {
@@ -73,6 +92,11 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
 
         addJobs();
 
+    }
+
+    private String getServerIP() {
+        SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
+        return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
     private void buildLocationSettingsRequest() {
@@ -130,16 +154,24 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
         jobsListView = (ListView) findViewById(R.id.listview);
         jobsList = new ArrayList<>();
 
-        //TODO get all the available jobs from the server
-        jobsList.add(new JobContent("Mechanic"));
-        jobsList.add(new JobContent("Electrician"));
-        jobsList.add(new JobContent("Plumber"));
-        jobsList.add(new JobContent("Doctor"));
-        jobsList.add(new JobContent("Pharmacy"));
-        jobsList.add(new JobContent("Police"));
-        jobsList.add(new JobContent("Cook/Chef"));
-        jobsList.add(new JobContent("Carpenter"));
-        jobsList.add(new JobContent("Coiffure"));
+        List<String> serverJobs = getJobsFromServer();
+        int serverJobsSize = serverJobs.size();
+        if(serverJobsSize >= 1) {
+            for(int i = 0; i < serverJobsSize; i++) {
+                jobsList.add(new JobContent(serverJobs.get(i)));
+            }
+        }
+        else {
+            jobsList.add(new JobContent("Mechanic"));
+            jobsList.add(new JobContent("Electrician"));
+            jobsList.add(new JobContent("Plumber"));
+            jobsList.add(new JobContent("Doctor"));
+            jobsList.add(new JobContent("Pharmacy"));
+            jobsList.add(new JobContent("Police"));
+            jobsList.add(new JobContent("Cook/Chef"));
+            jobsList.add(new JobContent("Carpenter"));
+        }
+
 
         adapter = new  JobsAdapter(this, jobsList);
         jobsListView.setAdapter(adapter);
@@ -147,7 +179,6 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
         jobsListView.setTextFilterEnabled(true);
 
         jobsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
 
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
@@ -159,6 +190,52 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
                 startActivity(intent);
             }
         });
+    }
+
+    private List<String> getJobsFromServer() {
+        final List<String> allJobs = new ArrayList<>();
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetAllServiceProviderCategories";
+        //Request a response from the provided URL.
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
+            Gson gson = new Gson();
+            List<String> jobs = new ArrayList<>();
+            @Override
+            public void onResponse(String response) {
+                if (response.length()>0){
+                    jobs = gson.fromJson(response.toString(), ArrayList.class);
+                    if(jobs.isEmpty() == false){
+                        Log.d("LocationServices", "Received jobs: " + jobs.toString());
+                        allJobs.addAll(jobs);
+                        if(progressDialog.isShowing()){
+                            progressDialog.dismiss();
+                        }
+                    }
+                    else{
+                        Log.d("LocationServices", response.toString());
+                        if(progressDialog.isShowing()){
+                            progressDialog.dismiss();
+                        }
+                    }
+                }
+                else {
+                    Log.d("LocationServices", "Received an empty response from server.");
+                    if(progressDialog.isShowing()){
+                        progressDialog.dismiss();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("LocationServices", "Volley error!");
+                if(progressDialog.isShowing()){
+                    progressDialog.dismiss();
+                }
+            }
+        });
+        //Add the request to the RequestQueue.
+        HttpConnector.getInstance(this).addToRequestQueue(request);
+        return allJobs;
     }
 
     private void setupSearchView()

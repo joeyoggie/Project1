@@ -2,6 +2,7 @@ package com.example.android.project1;
 
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
@@ -22,6 +23,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -32,6 +34,7 @@ import java.util.Locale;
 public class LocationServicesRegistration extends AppCompatActivity implements MapDialog.OnLocationSelectedListener {
 
     String SERVER_IP;
+    ProgressDialog progressDialog;
     //The info that will be sent to the server to add a new service provider
     double latitude;
     double longitude;
@@ -44,6 +47,9 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
     AutoCompleteTextView jobEditText;
     TextView nameTextView, userNameTextView, phoneNumberTextView, addressTextView, locationTextView;
     Button addJobButton;
+
+    //Boolean to indicate whether the user has tried to get his/her location from the map
+    Boolean userLocation = false;
 
     /*Spinner countrySpinner, citySpinner;
     ArrayList<String> countries, cities;
@@ -58,6 +64,12 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
         getLocalUserInfo();
 
         //initializeSpinners();
+
+        progressDialog = new ProgressDialog(LocationServicesRegistration.this);
+        progressDialog.setMessage("Getting info from server...");
+        progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
 
         //initialize the views
         nameTextView = (TextView) findViewById(R.id.name_text_view);
@@ -83,16 +95,24 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
             addJobButton.setText("Update job info!");
         }
 
-        ArrayList<String> sugestedJobs = new ArrayList<>();
-        //TODO get all the available jobs from the server
-        sugestedJobs.add("Mechanic");
-        sugestedJobs.add("Electrician");
-        sugestedJobs.add("Plumber");
-        sugestedJobs.add("Doctor");
-        sugestedJobs.add("Pharmacy");
-        sugestedJobs.add("Police");
-        sugestedJobs.add("Cook/Chef");
-        sugestedJobs.add("Carpenter");
+        List<String> sugestedJobs = new ArrayList<>();
+
+        List<String> serverJobs = getJobsFromServer();
+        int serverJobsSize = serverJobs.size();
+        if(serverJobsSize >= 1) {
+            sugestedJobs.addAll(serverJobs);
+        }
+        else {
+            sugestedJobs.add("Mechanic");
+            sugestedJobs.add("Electrician");
+            sugestedJobs.add("Plumber");
+            sugestedJobs.add("Doctor");
+            sugestedJobs.add("Pharmacy");
+            sugestedJobs.add("Police");
+            sugestedJobs.add("Cook/Chef");
+            sugestedJobs.add("Carpenter");
+            //probably add more here to cover more use cases
+        }
 
         ArrayAdapter<String> suggestedJobsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, sugestedJobs);
         jobEditText.setAdapter(suggestedJobsAdapter);
@@ -108,6 +128,52 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
     private String getServerIP() {
         SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
+    }
+
+    private List<String> getJobsFromServer() {
+        final List<String> allJobs = new ArrayList<>();
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetAllServiceProviderCategories";
+        //Request a response from the provided URL.
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
+            Gson gson = new Gson();
+            List<String> jobs = new ArrayList<>();
+            @Override
+            public void onResponse(String response) {
+                if (response.length()>0){
+                    jobs = gson.fromJson(response.toString(), ArrayList.class);
+                    if(jobs.isEmpty() == false){
+                        Log.d("LocationServices", "Received jobs: " + jobs.toString());
+                        allJobs.addAll(jobs);
+                        if(progressDialog.isShowing()){
+                            progressDialog.dismiss();
+                        }
+                    }
+                    else{
+                        Log.d("LocationServices", response.toString());
+                        if(progressDialog.isShowing()){
+                            progressDialog.dismiss();
+                        }
+                    }
+                }
+                else {
+                    Log.d("LocationServices", "Received an empty response from server.");
+                    if(progressDialog.isShowing()){
+                        progressDialog.dismiss();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("LocationServices", "Volley error!");
+                if(progressDialog.isShowing()){
+                    progressDialog.dismiss();
+                }
+            }
+        });
+        //Add the request to the RequestQueue.
+        HttpConnector.getInstance(this).addToRequestQueue(request);
+        return allJobs;
     }
 
     private void updateTextViews() {
@@ -233,6 +299,8 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
             locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
         }
 
+        userLocation = true;
+
         AddressDecoder aDecoder = new AddressDecoder();
         Location loc = new Location("");
         loc.setLatitude(latitude);
@@ -241,26 +309,32 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
     }
 
     public void submitJobInfo(View view){
-        job = jobEditText.getText().toString();
 
-        //save and submit name, userName, phoneNumber, latitude, longitude, job, address
+        if(userLocation){
+            job = jobEditText.getText().toString();
+            //save and submit name, userName, phoneNumber, latitude, longitude, job, address
 
-        //Send the info to the server
-        sendInfoToServer();
+            //Send the info to the server
+            sendInfoToServer();
 
-        //save the info locally
-        //registered means it won't ask again for this info
-        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
-        SharedPreferences.Editor prefsEditor = prefs.edit();
-        prefsEditor.putString("locationServicesRegistration", "registered");
-        prefsEditor.putString("job", job);
-        prefsEditor.putString("address", address);
-        prefsEditor.putLong("latitude", Double.doubleToRawLongBits(latitude));
-        prefsEditor.putLong("longitude", Double.doubleToRawLongBits(longitude));
-        prefsEditor.apply();
+            //save the info locally
+            //registered means it won't ask again for this info
+            SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+            SharedPreferences.Editor prefsEditor = prefs.edit();
+            prefsEditor.putString("locationServicesRegistration", "registered");
+            prefsEditor.putString("job", job);
+            prefsEditor.putString("address", address);
+            prefsEditor.putLong("latitude", Double.doubleToRawLongBits(latitude));
+            prefsEditor.putLong("longitude", Double.doubleToRawLongBits(longitude));
+            prefsEditor.apply();
 
-        //update the textviews
-        updateTextViews();
+            //update the textviews
+            updateTextViews();
+        }
+        else{
+            Toast.makeText(LocationServicesRegistration.this, "Please select your work location first.", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     public void sendInfoToServer(){
