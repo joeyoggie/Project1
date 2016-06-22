@@ -25,7 +25,7 @@ public class UserProfile extends ActionBarActivity {
     String SERVER_IP;
     TextView userNameTextView, statusTextView, phoneNumberTextView;
     ImageView profilePictureImageView;
-    String recievedUserName, recievedPhoneNo, recievedStatus, receivedName;
+    String receivedUserName, receivedPhoneNumber, receivedStatus, receivedName;
     Bitmap receivedProfilePicture;
 
     @Override
@@ -42,14 +42,16 @@ public class UserProfile extends ActionBarActivity {
 
         Bundle bundle = getIntent().getExtras();
         if(bundle!=null){
-            recievedUserName = bundle.getString("username_key");
+            receivedUserName = bundle.getString("userName");
+            receivedName = bundle.getString("name");
+            receivedPhoneNumber = bundle.getString("phoneNumber");
             setupActionBar();
             send_username_to_Server();
         }
     }
 
     private void setupActionBar() {
-        getSupportActionBar().setTitle(recievedUserName);
+        getSupportActionBar().setTitle(receivedName);
         getSupportActionBar().setDisplayUseLogoEnabled(true); //Enable the Logo to be shown
         getSupportActionBar().setDisplayShowHomeEnabled(true); //Show the Logo
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show the Up/Back arrow
@@ -62,7 +64,7 @@ public class UserProfile extends ActionBarActivity {
     }
 
     public void send_username_to_Server() {
-        String URL = "http://"+SERVER_IP+":8080/MyFirstServlet/GetUserInfo?userName=" + URLEncoder.encode(recievedUserName);
+        String URL = "http://"+SERVER_IP+":8080/MyFirstServlet/GetUserInfo?userName=" + URLEncoder.encode(receivedUserName);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -71,21 +73,38 @@ public class UserProfile extends ActionBarActivity {
                     Gson gson = new Gson();
                     Type type = new TypeToken<User>(){}.getType();
                     User user = gson.fromJson(response, type);
-                    recievedStatus = user.getStatus();
-                    recievedPhoneNo = user.getPhoneNumber();
-                    recievedUserName = user.getUserName();
+                    receivedStatus = user.getStatus();
+                    receivedPhoneNumber = user.getPhoneNumber();
+                    receivedUserName = user.getUserName();
                     receivedName = user.getName();
                     //get image from received user object
-                    userNameTextView.setText("@"+recievedUserName);
-                    statusTextView.setText(recievedStatus);
-                    phoneNumberTextView.setText(recievedPhoneNo);
+                    userNameTextView.setText("@"+receivedUserName);
+                    if(receivedStatus != null && receivedStatus.length() > 1) {
+                        statusTextView.setText(receivedStatus);
+                    }
+                    else{
+                        statusTextView.setText("-");
+                    }
+                    phoneNumberTextView.setText(receivedPhoneNumber);
                     getSupportActionBar().setTitle(receivedName);
+                }
+                else{
+                    userNameTextView.setText("@"+receivedUserName);
+                    statusTextView.setText("-");
+                    phoneNumberTextView.setText(receivedPhoneNumber);
+                    getSupportActionBar().setTitle(receivedName);
+                    //use local image stored in sqlite database
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("VOLLEY", error.toString());
+                userNameTextView.setText("@"+receivedUserName);
+                statusTextView.setText("-");
+                phoneNumberTextView.setText(receivedPhoneNumber);
+                getSupportActionBar().setTitle(receivedName);
+                //use local image stored in sqlite database
             }
         });
         HttpConnector.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
@@ -94,7 +113,7 @@ public class UserProfile extends ActionBarActivity {
     public void goToChatPage(View view) {
         Intent intent = new Intent(this, ChatPage.class);
         intent.putExtra("recepientName",receivedName);
-        intent.putExtra("recepientUserName",recievedUserName);
+        intent.putExtra("recepientUserName",receivedUserName);
         startActivity(intent);
     }
 }

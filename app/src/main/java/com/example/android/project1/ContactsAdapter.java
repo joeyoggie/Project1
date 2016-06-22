@@ -35,7 +35,7 @@ public class ContactsAdapter extends CursorAdapter{
     }
 
     @Override
-    public void bindView(View view, final Context context, Cursor cursor) {
+    public void bindView(final View view, final Context context, final Cursor cursor) {
         phoneNumberTextView = (TextView) view.findViewById(R.id.contact_phone_number);
         nameTextView = (TextView) view.findViewById(R.id.contact_name);
         userNameTextView = (TextView) view.findViewById(R.id.contact_username);
@@ -50,12 +50,22 @@ public class ContactsAdapter extends CursorAdapter{
         userNameTextView.setText("(@"+userName+")");
         //userProfilePictureImageView.setImageBitmap(bitmap);
 
-        //TODO Needs fixing as it always returns the last entry in the list view, regarldess of the clicked item
+        //use the tag to determine which row is selected in the onclicklistener below
+        view.setTag(cursor.getPosition());
+
         userProfilePictureImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int position = (int) view.getTag();
+                cursor.moveToPosition(position);
+                phoneNo = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER));
+                name = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_NAME));
+                userName = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_USERNAME));
+
                 Intent intent = new Intent(context.getApplicationContext(), UserProfile.class);
-                intent.putExtra("username_key",userName);
+                intent.putExtra("userName",userName);
+                intent.putExtra("name", name);
+                intent.putExtra("phoneNumber", phoneNo);
                 context.startActivity(intent);
             }
         });
