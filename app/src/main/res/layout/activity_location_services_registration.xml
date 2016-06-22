@@ -85,7 +85,8 @@
         android:layout_below="@id/job_location_map_button"
         android:layout_margin="8dp"
         android:textStyle="bold"
-        android:text="Name: "/>
+        android:text="Name: "
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/name_text_view"
@@ -94,7 +95,8 @@
         android:layout_below="@id/job_location_map_button"
         android:layout_margin="8dp"
         android:layout_toRightOf="@id/name_text_view_static"
-        android:gravity="start" />
+        android:gravity="start"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/username_text_view_static"
@@ -103,7 +105,8 @@
         android:layout_below="@id/name_text_view_static"
         android:layout_margin="8dp"
         android:textStyle="bold"
-        android:text="Username: " />
+        android:text="Username: "
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/username_text_view"
@@ -112,7 +115,8 @@
         android:layout_below="@id/name_text_view_static"
         android:layout_margin="8dp"
         android:layout_toRightOf="@id/username_text_view_static"
-        android:gravity="start" />
+        android:gravity="start"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/phone_number_text_view_static"
@@ -121,7 +125,8 @@
         android:layout_below="@id/username_text_view_static"
         android:layout_margin="8dp"
         android:textStyle="bold"
-        android:text="Phone number: " />
+        android:text="Phone number: "
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/phone_number_text_view"
@@ -130,7 +135,8 @@
         android:layout_below="@id/username_text_view_static"
         android:layout_margin="8dp"
         android:layout_toRightOf="@id/phone_number_text_view_static"
-        android:gravity="start" />
+        android:gravity="start"
+        android:visibility="gone"/>
 
 
     <TextView
@@ -158,7 +164,8 @@
         android:layout_below="@id/address_text_view_static"
         android:layout_margin="8dp"
         android:textStyle="bold"
-        android:text="Location: " />
+        android:text="Location: "
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/location_text_view"
@@ -167,7 +174,8 @@
         android:layout_margin="8dp"
         android:layout_below="@id/address_text_view_static"
         android:layout_toRightOf="@id/location_text_view_static"
-        android:gravity="start" />
+        android:gravity="start"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/add_job_button"
