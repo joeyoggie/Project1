@@ -15,9 +15,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONArray;
-
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,9 +63,10 @@ public class LocationServicesResultsList extends AppCompatActivity {
 
     public void getServiceProviders(String latitude, String longitude, String serviceCategory) {
 
-        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetLocalServices?serviceCategory="+serviceCategory+"&userLongitude="+longitude+"&userLatitude="+latitude;
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetLocalServices?serviceCategory="+URLEncoder.encode(serviceCategory)
+                +"&userLongitude="+URLEncoder.encode(longitude)
+                +"&userLatitude="+URLEncoder.encode(latitude);
 
-        JSONArray jsonArray = new JSONArray();
         //Request a response from the provided URL.
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
             Gson gson = new Gson();
@@ -81,18 +81,18 @@ public class LocationServicesResultsList extends AppCompatActivity {
                         locationServiceResultsAdapter = new LocationServiceResultsAdapter(LocationServicesResultsList.this, receivedServiceProviders);
                         resultListView.setAdapter(locationServiceResultsAdapter);
                         //locationServiceResultsAdapter.notifyDataSetChanged();
-                        Log.d("RECEIVED DATA", String.valueOf(receivedServiceProviders.size()));
+                        Log.d("LocationServicesResults", "Received data: "+String.valueOf(receivedServiceProviders.size()));
                         numberOfResponses.setText("Found " + receivedServiceProviders.size() + " results.");
                         progressDialog.dismiss();
                     }
                     else{
-                        Log.d("RECEIVED DATA", response.toString());
+                        Log.d("LocationServicesResults", "Received data: "+response.toString());
                         numberOfResponses.setText("Found " + 0 + " results.");
                         progressDialog.dismiss();
                     }
                 }
                 else {
-                    Log.d("RECEIVED DATA", "Received an empty response from server.");
+                    Log.d("LocationServicesResults", "Received an empty response from server.");
                     numberOfResponses.setText("Found " + 0 + " results.");
                     progressDialog.dismiss();
                 }
@@ -100,7 +100,7 @@ public class LocationServicesResultsList extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d("ContactsListView", "Volley error!");
+                Log.d("LocationServicesResults", "Volley error!");
                 numberOfResponses.setText("Internet connection error.");
                 progressDialog.dismiss();
             }

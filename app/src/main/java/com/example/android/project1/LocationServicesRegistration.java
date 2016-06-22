@@ -51,6 +51,8 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
     //Boolean to indicate whether the user has tried to get his/her location from the map
     Boolean userLocation = false;
 
+    List<String> suggestedJobs;
+    ArrayAdapter<String> suggestedJobsAdapter;
     /*Spinner countrySpinner, citySpinner;
     ArrayList<String> countries, cities;
     ArrayAdapter<String> countrySpinnerAdapter, citySpinnerAdapter;*/
@@ -95,27 +97,8 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
             addJobButton.setText("Update job info!");
         }
 
-        List<String> sugestedJobs = new ArrayList<>();
-
-        List<String> serverJobs = getJobsFromServer();
-        int serverJobsSize = serverJobs.size();
-        if(serverJobsSize >= 1) {
-            sugestedJobs.addAll(serverJobs);
-        }
-        else {
-            sugestedJobs.add("Mechanic");
-            sugestedJobs.add("Electrician");
-            sugestedJobs.add("Plumber");
-            sugestedJobs.add("Doctor");
-            sugestedJobs.add("Pharmacy");
-            sugestedJobs.add("Police");
-            sugestedJobs.add("Cook/Chef");
-            sugestedJobs.add("Carpenter");
-            //probably add more here to cover more use cases
-        }
-
-        ArrayAdapter<String> suggestedJobsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, sugestedJobs);
-        jobEditText.setAdapter(suggestedJobsAdapter);
+        //Add some jobs to the autocomplete edittextview
+        addJobsToAutoCompleteEditText();
     }
 
     private void getLocalUserInfo(){
@@ -130,42 +113,42 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
-    private List<String> getJobsFromServer() {
-        final List<String> allJobs = new ArrayList<>();
+    private void addJobsToAutoCompleteEditText() {
+        suggestedJobs = new ArrayList<>();
+        suggestedJobsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, suggestedJobs);
+        jobEditText.setAdapter(suggestedJobsAdapter);
+
         String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetAllServiceProviderCategories";
         //Request a response from the provided URL.
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
             Gson gson = new Gson();
-            List<String> jobs = new ArrayList<>();
             @Override
             public void onResponse(String response) {
-                if (response.length()>0){
-                    jobs = gson.fromJson(response.toString(), ArrayList.class);
-                    if(jobs.isEmpty() == false){
-                        Log.d("LocationServices", "Received jobs: " + jobs.toString());
-                        allJobs.addAll(jobs);
-                        if(progressDialog.isShowing()){
-                            progressDialog.dismiss();
-                        }
+                if (response.length() > 0){
+                    suggestedJobs = gson.fromJson(response, ArrayList.class);
+                    if(suggestedJobs.isEmpty() == false){
+                        Log.d("LocationServicesReg", "Received jobs: " + suggestedJobs.toString());
+                        suggestedJobsAdapter = new ArrayAdapter<>(LocationServicesRegistration.this, android.R.layout.simple_list_item_1, suggestedJobs);
+                        jobEditText.setAdapter(suggestedJobsAdapter);
                     }
                     else{
-                        Log.d("LocationServices", response.toString());
-                        if(progressDialog.isShowing()){
-                            progressDialog.dismiss();
-                        }
+                        Log.d("LocationServicesReg", "Received non/empty list response: "+response.toString());
+                        useDefaultJobs();
                     }
                 }
                 else {
-                    Log.d("LocationServices", "Received an empty response from server.");
-                    if(progressDialog.isShowing()){
-                        progressDialog.dismiss();
-                    }
+                    Log.d("LocationServicesReg", "Received an empty response from server.");
+                    useDefaultJobs();
+                }
+                if(progressDialog.isShowing()){
+                    progressDialog.dismiss();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d("LocationServices", "Volley error!");
+                Log.d("LocationServicesReg", "Volley error!");
+                useDefaultJobs();
                 if(progressDialog.isShowing()){
                     progressDialog.dismiss();
                 }
@@ -173,7 +156,22 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
         });
         //Add the request to the RequestQueue.
         HttpConnector.getInstance(this).addToRequestQueue(request);
-        return allJobs;
+    }
+
+    private void useDefaultJobs(){
+        suggestedJobs.add("Mechanic");
+        suggestedJobs.add("Electrician");
+        suggestedJobs.add("Plumber");
+        suggestedJobs.add("Doctor");
+        suggestedJobs.add("Pharmacy");
+        suggestedJobs.add("Police");
+        suggestedJobs.add("Cook");
+        suggestedJobs.add("Chef");
+        suggestedJobs.add("Carpenter");
+        //probably add more here to cover more use cases,
+        //and keep this synced with the server as well if possible
+        suggestedJobsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, suggestedJobs);
+        jobEditText.setAdapter(suggestedJobsAdapter);
     }
 
     private void updateTextViews() {
@@ -350,16 +348,17 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
             @Override
             public void onResponse(String response) {
-                Toast.makeText(LocationServicesRegistration.this, "Registered successfully", Toast.LENGTH_SHORT).show();
                 //Go to MainPage automatically if this was the first time to register
                 SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
                 if(prefs.getBoolean("firstVisit", true)){
                     SharedPreferences.Editor prefsEditor = prefs.edit();
                     prefsEditor.putBoolean("firstVisit", false);
                     prefsEditor.apply();
+                    Toast.makeText(LocationServicesRegistration.this, "Registered successfully", Toast.LENGTH_SHORT).show();
                     Intent goToMainPageIntent = new Intent(LocationServicesRegistration.this, MainPage.class);
                     startActivity(goToMainPageIntent);
                 }
+                Toast.makeText(LocationServicesRegistration.this, "Updated successfully", Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override

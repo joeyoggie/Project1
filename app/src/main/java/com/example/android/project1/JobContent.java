@@ -3,7 +3,7 @@ package com.example.android.project1;
 /**
  * Created by fady on 3/31/2016.
  */
-public class JobContent {
+public class JobContent implements Comparable<JobContent> {
 
     String jobName;
     public JobContent (String job){
@@ -14,5 +14,10 @@ public class JobContent {
     }
     public String getJobName(){
         return this.jobName;
+    }
+
+    @Override
+    public int compareTo(JobContent other){
+        return this.getJobName().compareTo(other.getJobName());
     }
 }

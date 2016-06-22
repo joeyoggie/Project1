@@ -35,6 +35,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -154,34 +155,9 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
         jobsListView = (ListView) findViewById(R.id.listview);
         jobsList = new ArrayList<>();
 
-        List<String> serverJobs = getJobsFromServer();
-        int serverJobsSize = serverJobs.size();
-        if(serverJobsSize >= 1) {
-            for(int i = 0; i < serverJobsSize; i++) {
-                jobsList.add(new JobContent(serverJobs.get(i)));
-            }
-        }
-        else {
-            jobsList.add(new JobContent("Mechanic"));
-            jobsList.add(new JobContent("Electrician"));
-            jobsList.add(new JobContent("Plumber"));
-            jobsList.add(new JobContent("Doctor"));
-            jobsList.add(new JobContent("Pharmacy"));
-            jobsList.add(new JobContent("Police"));
-            jobsList.add(new JobContent("Cook/Chef"));
-            jobsList.add(new JobContent("Carpenter"));
-        }
-
-
-        adapter = new  JobsAdapter(this, jobsList);
-        jobsListView.setAdapter(adapter);
-
-        jobsListView.setTextFilterEnabled(true);
-
         jobsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(LocationServices.this, LocationServicesResultsList.class);
                 String clickedCategory = jobsList.get(position).getJobName();
                 intent.putExtra("clickedCategory", clickedCategory);
@@ -190,44 +166,45 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
                 startActivity(intent);
             }
         });
-    }
 
-    private List<String> getJobsFromServer() {
-        final List<String> allJobs = new ArrayList<>();
         String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetAllServiceProviderCategories";
         //Request a response from the provided URL.
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
             Gson gson = new Gson();
-            List<String> jobs = new ArrayList<>();
+            List<String> serverJobs = new ArrayList<>();
             @Override
             public void onResponse(String response) {
-                if (response.length()>0){
-                    jobs = gson.fromJson(response.toString(), ArrayList.class);
-                    if(jobs.isEmpty() == false){
-                        Log.d("LocationServices", "Received jobs: " + jobs.toString());
-                        allJobs.addAll(jobs);
-                        if(progressDialog.isShowing()){
-                            progressDialog.dismiss();
+                if (response.length() > 0){
+                    serverJobs = gson.fromJson(response, ArrayList.class);
+                    if(serverJobs.isEmpty() == false){
+                        Log.d("LocationServices", "Received jobs: " + serverJobs.toString());
+                        int serverJobsSize = serverJobs.size();
+                        for(int i = 0; i < serverJobsSize; i++) {
+                            jobsList.add(new JobContent(serverJobs.get(i)));
                         }
+                        Collections.sort(jobsList);
+                        adapter = new JobsAdapter(LocationServices.this, jobsList);
+                        jobsListView.setAdapter(adapter);
+                        jobsListView.setTextFilterEnabled(true);
                     }
                     else{
-                        Log.d("LocationServices", response.toString());
-                        if(progressDialog.isShowing()){
-                            progressDialog.dismiss();
-                        }
+                        Log.d("LocationServices", "Received non/empty list response: "+response.toString());
+                        useDefaultJobs();
                     }
                 }
                 else {
                     Log.d("LocationServices", "Received an empty response from server.");
-                    if(progressDialog.isShowing()){
-                        progressDialog.dismiss();
-                    }
+                    useDefaultJobs();
+                }
+                if(progressDialog.isShowing()){
+                    progressDialog.dismiss();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("LocationServices", "Volley error!");
+                useDefaultJobs();
                 if(progressDialog.isShowing()){
                     progressDialog.dismiss();
                 }
@@ -235,8 +212,24 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
         });
         //Add the request to the RequestQueue.
         HttpConnector.getInstance(this).addToRequestQueue(request);
-        return allJobs;
     }
+
+    private void useDefaultJobs() {
+        jobsList.add(new JobContent("Mechanic"));
+        jobsList.add(new JobContent("Electrician"));
+        jobsList.add(new JobContent("Plumber"));
+        jobsList.add(new JobContent("Doctor"));
+        jobsList.add(new JobContent("Pharmacy"));
+        jobsList.add(new JobContent("Police"));
+        jobsList.add(new JobContent("Cook"));
+        jobsList.add(new JobContent("Chef"));
+        jobsList.add(new JobContent("Carpenter"));
+        //probably add more here to cover more use cases,
+        //and keep this synced with the server as well if possible
+        Collections.sort(jobsList);
+        adapter = new JobsAdapter(this, jobsList);
+        jobsListView.setAdapter(adapter);
+        jobsListView.setTextFilterEnabled(true);    }
 
     private void setupSearchView()
     {
