@@ -1,12 +1,9 @@
 package com.example.android.project1;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
@@ -39,6 +36,7 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
     String userName;
     String name;
     String phoneNumber;
+    String deviceID;
 
     String recepientUserName;
     String message;
@@ -92,43 +90,31 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             timestamp = simpleDateFormat.format(date);
             Log.d("TIMESTAMP:", timestamp);
 
-            //Get the unique device ID that will be stored in the database to uniquely identify this device
-            SharedPreferences prefs = getActivity().getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
-            String deviceID = prefs.getString("deviceUUID", "0");
+            //Send the message info to the server in a background thread
+            String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
 
-            //Check if there's an internet connection
-            ConnectivityManager connMgr = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
+            HashMap<String, String> params = new HashMap<>();
+            params.put("senderDeviceID", deviceID);
+            params.put("recepientUserName", recepientUserName);
+            params.put("messageContent", message);
+            params.put("timestamp", timestamp);
+            JSONObject jsonObject = new JSONObject(params);
+            Log.d("ChatPage", "JSON: "+jsonObject.toString());
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, message, timestamp, "sent");
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, message, timestamp, "unsent");
+                }
+            });
+            //Add the request to the RequestQueue.
+            HttpConnector.getInstance(this.getActivity()).addToRequestQueue(jsonObjectRequest);
 
-            //If there's an internet connection
-            if (netInfo != null && netInfo.isConnected())
-            {
-                //Send the message info to the server in a background thread
-                String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
-
-                HashMap<String, String> params = new HashMap<>();
-                params.put("senderDeviceID", deviceID);
-                params.put("recepientUserName", recepientUserName);
-                params.put("messageContent", message);
-                params.put("timestamp", timestamp);
-                JSONObject jsonObject = new JSONObject(params);
-                Log.d("ChatPage", "JSON: "+jsonObject.toString());
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        //TODO: Add a flag marking the message as sent successfully
-                        DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, message, timestamp);
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //TODO: Add a flag marking the message as not sent
-                        DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, message, timestamp);
-                    }
-                });
-                //Add the request to the RequestQueue.
-                HttpConnector.getInstance(this.getActivity()).addToRequestQueue(jsonObjectRequest);
-            }
+            //to prevent the fragment from executing onTimeSet method 2 times
             count++;
         }
     }
@@ -138,6 +124,8 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
         userName = prefs.getString("userName","Me");
         name = prefs.getString("name","Jon Doe");
         phoneNumber = prefs.getString("phoneNumber", "0000000000");
+        //Get the unique device ID that will be stored in the database to uniquely identify this device
+        deviceID = prefs.getString("deviceUUID","0");
     }
 
     private String getServerIP()

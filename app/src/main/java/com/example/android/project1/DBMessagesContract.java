@@ -12,10 +12,11 @@ public final class DBMessagesContract {
     public static abstract class MessageEntry implements BaseColumns {
 
         public static final String TABLE_NAME = "messages";
-        public static final String COLUMN_NAME_ID = "messageID";
+        //public static final String COLUMN_NAME_ID = "messageID";
         public static final String COLUMN_NAME_SENDER = "senderUserName";
         public static final String COLUMN_NAME_RECEPIENT = "recepientUserName";
         public static final String COLUMN_NAME_CONTENT = "message";
         public static final String COLUMN_NAME_TIME = "timestamp";
+        public static final String COLUMN_NAME_MESSAGE_STATE = "messageStatus";
     }
 }

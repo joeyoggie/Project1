@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,53 +23,83 @@ public class ChatPageAdapter extends CursorAdapter {
 
     Context context;
     Cursor cursor;
+
     String sender;
     String message;
     String timestamp;
     String userName;
     Bitmap image;
+    String messageState;
+
+    int senderColumnIndex;
+    int messageColumnIndex;
+    int timestampColumnIndex;
+    int messageStateColumnIndex;
 
     public ChatPageAdapter(Context context, Cursor cursor) {
         super(context, cursor);
         this.context = context;
         this.cursor = cursor;
+        messageColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_CONTENT);
+        senderColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER);
+        timestampColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME);
+        messageStateColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE);
         SharedPreferences prefs = context.getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
         userName = prefs.getString("userName","Me");
-
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor){
-        message = cursor.getString(cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_CONTENT));
-        sender = cursor.getString(cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER));
-        timestamp = cursor.getString(cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME));
 
         TextView messageText = (TextView) view.findViewById(R.id.message_text);
         TextView senderText = (TextView) view.findViewById(R.id.sender_username_box);
         TextView timeBox = (TextView) view.findViewById(R.id.time_box);
 
-        messageText.setText(message);
+
+        message = cursor.getString(messageColumnIndex);
+        sender = cursor.getString(senderColumnIndex);
+        timestamp = cursor.getString(timestampColumnIndex);
+        messageState = cursor.getString(messageStateColumnIndex);
+
+        if(message != null){
+            messageText.setText(message);
+        }
+        else{
+            messageText.setText("null message");
+        }
+
         senderText.setText(sender);
-        if(userName.equals(sender))
-        {
+        if(userName.equals(sender)) {
             messageText.setGravity(Gravity.START);
             //messageText.setTextColor(Color.GREEN); //use colors temporarily, should be aligned only
         }
-        else
-        {
+        else {
             messageText.setGravity(Gravity.END);
             //messageText.setTextColor(Color.RED); //use colors temporarily, should be aligned only
         }
-        SimpleDateFormat simpleDateFormatToDisplay = new SimpleDateFormat("h:mm a");
-        SimpleDateFormat simpleDateFormatInDB = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
-        Date date = null;
-        try {
-            date = simpleDateFormatInDB.parse(timestamp);
-        } catch (ParseException e) {
-            e.printStackTrace();
+
+        if(messageState.equals("unsent")){
+            messageText.setTextColor(Color.RED);
         }
-        timestamp = simpleDateFormatToDisplay.format(date);
-        timeBox.setText(timestamp);
+        else{
+            messageText.setTextColor(Color.BLACK);
+        }
+
+        if(timestamp != null){
+            SimpleDateFormat simpleDateFormatToDisplay = new SimpleDateFormat("h:mm a");
+            SimpleDateFormat simpleDateFormatInDB = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
+            Date date = null;
+            try {
+                date = simpleDateFormatInDB.parse(timestamp);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            timestamp = simpleDateFormatToDisplay.format(date);
+            timeBox.setText(timestamp);
+        }
+        else {
+            timeBox.setText("null time");
+        }
     }
 
     @Override

@@ -4,61 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/chat_page_root_view"
-    tools:context="com.example.android.project1.ChatPageWithListView">
-
-    <EditText
-        android:id="@+id/entered_recepient"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:hint="Type your recepient here...">
-        <requestFocus></requestFocus>
-    </EditText>
-    <!--
-    <LinearLayout
-        android:id="@+id/message_layout_received"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:padding="8dp"
-        android:layout_margin="8dp"
-        android:background="@android:color/darker_gray">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="8:30pm"
-            android:layout_marginRight="8dp"
-            android:textStyle="bold"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello man! How are you doing?"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/message_layout_sent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:padding="8dp"
-        android:layout_margin="8dp"
-        android:background="@android:color/darker_gray"
-        android:layout_below="@id/message_layout_received">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hey there, I'm fine. What about you?"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="8:32pm"
-            android:layout_marginLeft="8dp"
-            android:textStyle="bold"/>
-    </LinearLayout>
-    -->
+    tools:context="com.example.android.project1.ChatPage">
 
     <LinearLayout
         android:id="@+id/message_sending_layout"
@@ -76,8 +22,7 @@
             android:layout_marginLeft="4dp"
             android:src="@drawable/smiley"
             android:layout_gravity="center"
-            android:onClick="toggleEmojis"
-            />
+            android:onClick="toggleEmojis" />
 
         <github.ankushsachdeva.emojicon.EmojiconEditText
             android:layout_height="45dp"
@@ -94,8 +39,8 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:text="Send"
-            android:onClick="sendMessage">
-        </Button>
+            android:onClick="sendMessage"/>
+
     </LinearLayout>
 
     <ListView
@@ -103,11 +48,9 @@
         android:drawSelectorOnTop="false"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_below="@id/entered_recepient"
         android:layout_above="@id/message_sending_layout"
         android:footerDividersEnabled="true"
         android:transcriptMode="normal"
-        android:stackFromBottom="true">
-    </ListView>
+        android:stackFromBottom="true"/>
 
 </RelativeLayout>

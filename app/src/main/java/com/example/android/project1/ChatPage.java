@@ -11,8 +11,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -28,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -41,6 +38,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
@@ -71,7 +69,6 @@ public class ChatPage extends ActionBarActivity {
     String receivedTypingStatus;
     Boolean isTyping = false;
 
-    EditText enteredRecepient;
     String recepientName;
     static String recepientUserName;
 
@@ -90,6 +87,8 @@ public class ChatPage extends ActionBarActivity {
     DBMessagesHelper dbHelper;
     Cursor cursor;
 
+    int messageID;
+
     EmojiconsPopup popup;
 
     int SELECT_FILE = 1;
@@ -103,8 +102,6 @@ public class ChatPage extends ActionBarActivity {
         SERVER_IP = getServerIP();
         getLocalUserInfo();
 
-        enteredRecepient = (EditText) findViewById(R.id.entered_recepient);
-        enteredRecepient.setVisibility(View.GONE);
         message = (EmojiconEditText) findViewById(R.id.textInput);
         sendButton = (Button) findViewById(R.id.send_message_button);
         emojiButton = (ImageButton) findViewById(R.id.emoji_button);
@@ -120,6 +117,7 @@ public class ChatPage extends ActionBarActivity {
 
         dbHelper = DBMessagesHelper.getInstance(this);
 
+        cursor = DBMessagesHelper.readMessages(userName, recepientUserName);
         listAdapter = new ChatPageAdapter(this, cursor);
         listView.setAdapter(listAdapter);
         refreshCursor();
@@ -218,6 +216,9 @@ public class ChatPage extends ActionBarActivity {
 
             }
         });
+
+        //Check if there are any unsent messages and tries to send them again
+        sendUnsentMessages();
     }
 
     @Override
@@ -270,6 +271,63 @@ public class ChatPage extends ActionBarActivity {
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
+    private void sendUnsentMessages(){
+        Cursor c = DBMessagesHelper.readUnsentMessages(userName, recepientUserName);
+        String messageContent;
+        String timestamp2;
+
+        int messageColumnIndex = c.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_CONTENT);
+        int timestampIndex = c.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME);
+        int messageIDColumnIndex = c.getColumnIndexOrThrow(DBMessagesContract.MessageEntry._ID);
+        if(c.moveToFirst()){
+            Log.d("ChatPage", "Old messages detected, sending them...!");
+            do{
+                messageContent = c.getString(messageColumnIndex);
+                timestamp2 = c.getString(timestampIndex);
+                messageID = c.getInt(messageIDColumnIndex);
+
+                Log.d("ChatPage", "Sending old message: " + " _ID= " + messageID + ", message: " + messageContent + " @"+timestamp2);
+
+                //Send the message info to the server in a background thread
+                String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
+
+                HashMap<String, String> params = new HashMap<>();
+                params.put("senderDeviceID", deviceID);
+                params.put("recepientUserName", recepientUserName);
+                params.put("messageContent", messageContent);
+                params.put("timestamp", timestamp2);
+                params.put("messageID", String.valueOf(messageID));
+                JSONObject jsonObject = new JSONObject(params);
+                Log.d("ChatPage", "JSON Message: "+jsonObject.toString());
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("ChatPage", "VolleyResponse" + response.toString());
+                        int msgID = 0;
+                        try {
+                            msgID = response.getInt("messageID");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        DBMessagesHelper.updateMessage(msgID, "sent");
+                        Log.d("ChatPage", "Message _ID= " + msgID + ", sent!" );
+                        refreshCursor();
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        /*DBMessagesHelper.updateMessage(messageID, "unsent");
+                        Log.d("ChatPage", "Message _ID= " +messageID + ", not sent!" );
+                        Log.d("ChatPage", "VolleyErrorResponse" + error.toString());
+                        refreshCursor();*/
+                    }
+                });
+                //Add the request to the RequestQueue.
+                HttpConnector.getInstance(this).addToRequestQueue(jsonObjectRequest);
+            }while (c.moveToNext());
+        }
+    }
+
     public void receiveTypingStatus(Intent i){
         Log.d("ChatPage", "Typing status received!");
         receivedTypingStatus = i.getStringExtra("receivedTypingStatusFromServer_key");
@@ -297,13 +355,13 @@ public class ChatPage extends ActionBarActivity {
             @Override
             public void onResponse(String response) {
                 Log.d("ChatPage", "Typing status sent to server.");
-                Log.i("VOLLEY", response);
+                Log.i("ChatPage", "VolleyResponse" + response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("ChatPage", "Error sending typing status sent to server.");
-                Log.e("VOLLEY", error.toString());
+                Log.e("ChatPage", "VolleyErrorResponse"+error.toString());
             }
         });
         HttpConnector.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
@@ -348,75 +406,64 @@ public class ChatPage extends ActionBarActivity {
         message.setText("");
         isTyping = false;
 
-        //Check if there's an internet connection
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
+        timestamp = simpleDateFormat.format(date);
+        Log.d("TIMESTAMP:", timestamp);
 
-        //If there's an internet connection
-        if (netInfo != null && netInfo.isConnected()) {
-            //Get the value of the textfields from the UI
-            //recepientUserName = enteredRecepient.getText().toString();
+        //Send the message info to the server in a background thread
+        String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
+        /*Message messageObject = new Message();
+        messageObject.setMessageSenderDeviceID(deviceID);
+        messageObject.setMessageRecepientUserName(recepientUserName);
+        messageObject.setMessageContent(mText);
+        messageObject.setTimestamp(timestamp);*/
 
-            Date date = new Date();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
-            timestamp = simpleDateFormat.format(date);
-            Log.d("TIMESTAMP:", timestamp);
+        HashMap<String, String> params = new HashMap<>();
+        params.put("senderDeviceID", deviceID);
+        params.put("recepientUserName", recepientUserName);
+        params.put("messageContent", mText);
+        params.put("timestamp", timestamp);
+        params.put("messageID", String.valueOf(0));
+        JSONObject jsonObject = new JSONObject(params);
+        Log.d("ChatPage", "JSON Message: "+jsonObject.toString());
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp, "sent");
+                refreshCursor();
+                Log.d("ChatPage", "VolleyResponse:" + response.toString());
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp, "unsent");
+                refreshCursor();
+                Log.d("ChatPage", "VolleyErrorResponse:" + error.toString());
+            }
+        });
+        //Add the request to the RequestQueue.
+        HttpConnector.getInstance(this).addToRequestQueue(jsonObjectRequest);
 
-            /*//Send the message info to the server in a background thread
-            //Instantiate the RequestQueue.
-            String url = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText) +"&timestamp="+URLEncoder.encode(timestamp);
-            //Request a string response from the provided URL.
-            StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
-                @Override
-                public void onResponse(String response) {
-                    //TODO: Add a flag marking the message as sent successfully
-                    DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp);
-                    refreshCursor();
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    //TODO: Add a flag marking the message as not sent
-                    DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp);
-                    refreshCursor();
-                }
-            });
-            //Add the request to the RequestQueue.
-            HttpConnector.getInstance(this).addToRequestQueue(request);*/
-
-            //Send the message info to the server in a background thread
-            String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
-            Message messageObject = new Message();
-            messageObject.setMessageSenderDeviceID(deviceID);
-            messageObject.setMessageRecepientUserName(recepientUserName);
-            messageObject.setMessageContent(mText);
-            messageObject.setTimestamp(timestamp);
-
-            HashMap<String, String> params = new HashMap<>();
-            params.put("senderDeviceID", deviceID);
-            params.put("recepientUserName", recepientUserName);
-            params.put("messageContent", mText);
-            params.put("timestamp", timestamp);
-            JSONObject jsonObject = new JSONObject(params);
-            Log.d("ChatPage", "JSON: "+jsonObject.toString());
-            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    //TODO: Add a flag marking the message as sent successfully
-                    DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp);
-                    refreshCursor();
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    //TODO: Add a flag marking the message as not sent
-                    DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp);
-                    refreshCursor();
-                }
-            });
-            //Add the request to the RequestQueue.
-            HttpConnector.getInstance(this).addToRequestQueue(jsonObjectRequest);
-        }
+        /*//Send the message info to the server in a background thread
+        //Instantiate the RequestQueue.
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage?senderDeviceID=" + URLEncoder.encode(deviceID) + "&recepientUserName=" + URLEncoder.encode(recepientUserName) + "&message=" + URLEncoder.encode(mText) +"&timestamp="+URLEncoder.encode(timestamp);
+        //Request a string response from the provided URL.
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
+            @Override
+            public void onResponse(String response) {
+                DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp);
+                refreshCursor();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp);
+                refreshCursor();
+            }
+        });
+        //Add the request to the RequestQueue.
+        HttpConnector.getInstance(this).addToRequestQueue(request);*/
     }
 
     private void changeEmojiKeyboardIcon(ImageButton iconToBeChanged, int drawableResourceId){

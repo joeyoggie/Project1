@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
-import android.util.Log;
 
 /**
  * Created by Joey on 2/20/2016.
@@ -15,7 +14,7 @@ import android.util.Log;
 //TODO: Add an image column to the database
 public final class DBMessagesHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 9;
     public static final String DATABASE_NAME = "Messages.db";
     private static DBMessagesHelper dbHelper;
     private static SQLiteDatabase messagesDB;
@@ -26,11 +25,13 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
 
     public static final String SQL_CREATE_QUERY = "CREATE TABLE " + DBMessagesContract.MessageEntry.TABLE_NAME
             + " (" + DBMessagesContract.MessageEntry._ID + " INTEGER PRIMARY KEY,"
-            + DBMessagesContract.MessageEntry.COLUMN_NAME_ID + " TEXT,"
+            /*+ DBMessagesContract.MessageEntry.COLUMN_NAME_ID + " INTEGER AUTOINCREMENT,"*/
             + DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER + " TEXT,"
             + DBMessagesContract.MessageEntry.COLUMN_NAME_RECEPIENT + " TEXT,"
             + DBMessagesContract.MessageEntry.COLUMN_NAME_CONTENT + " TEXT,"
-            + DBMessagesContract.MessageEntry.COLUMN_NAME_TIME + " TEXT" + ")";
+            + DBMessagesContract.MessageEntry.COLUMN_NAME_TIME + " TEXT,"
+            + DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE + " TEXT" + ")";
+
     public static final String SQL_DELETE_QUERY = "DROP TABLE IF EXISTS " + DBMessagesContract.MessageEntry.TABLE_NAME;
 
     public static synchronized DBMessagesHelper getInstance(Context context) {
@@ -66,13 +67,14 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
         writableMessagesDB = dbHelper.getWritableDatabase();
     }
 
-    public static void insertMessageIntoDB(String senderUserName, String recepientUserName, String message, String timestamp){
+    public static void insertMessageIntoDB(String senderUserName, String recepientUserName, String message, String timestamp, String state){
         ContentValues values = new ContentValues();
-        values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_ID,1);
+        //values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_ID,1);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER, senderUserName);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_RECEPIENT, recepientUserName);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_CONTENT, message);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME, timestamp);
+        values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE, state);
         long newRowId = writableMessagesDB.insert(DBMessagesContract.MessageEntry.TABLE_NAME,null,values);
     }
 
@@ -80,9 +82,11 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
     {
         //Define a projection string that specifies which columns from the database you will actually use after this query.
         String[] projection = {DBMessagesContract.MessageEntry._ID,
+                /*DBMessagesContract.MessageEntry.COLUMN_NAME_ID,*/
                 DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER,
                 DBMessagesContract.MessageEntry.COLUMN_NAME_TIME,
-                DBMessagesContract.MessageEntry.COLUMN_NAME_CONTENT};
+                DBMessagesContract.MessageEntry.COLUMN_NAME_CONTENT,
+                DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE};
         //How you want the results to be sorted in the resulting Cursor
         String sortOrder = DBMessagesContract.MessageEntry.COLUMN_NAME_TIME + " ASC";
         //The columns for the WHERE clause
@@ -94,7 +98,6 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
                 +" AND "
                 + DBMessagesContract.MessageEntry.COLUMN_NAME_RECEPIENT + "=?1" + ")";
 
-        Log.d("ChatPage", selection);
         //The values of the WHERE clause
         //String[] selectionArgs = {"JoeyOggie"};
         String[] selectionArgs = {userName, recepientUserName};
@@ -107,6 +110,43 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
                 null,
                 sortOrder);
         return cursor;
+    }
+
+    public static Cursor readUnsentMessages(String userName, String recepientUserName)
+    {
+        //Define a projection string that specifies which columns from the database you will actually use after this query.
+        String[] projection = {DBMessagesContract.MessageEntry._ID,
+                /*DBMessagesContract.MessageEntry.COLUMN_NAME_ID,*/
+                DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER,
+                DBMessagesContract.MessageEntry.COLUMN_NAME_TIME,
+                DBMessagesContract.MessageEntry.COLUMN_NAME_CONTENT,
+                DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE};
+        //How you want the results to be sorted in the resulting Cursor
+        String sortOrder = DBMessagesContract.MessageEntry.COLUMN_NAME_TIME + " ASC";
+        //The columns for the WHERE clause
+        //String selection = DBMessagesContract.MessageEntry.COLUMN_NAME_RECEPIENT + "=?";
+        String selection = "(" + DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER + "=?1"
+                + " AND "
+                + DBMessagesContract.MessageEntry.COLUMN_NAME_RECEPIENT + "=?2" + ")"
+                +" AND (" + DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE + " = 'unsent' )";
+
+        //The values of the WHERE clause
+        String[] selectionArgs = {userName, recepientUserName};
+        //The cursor object will contain the result of the query
+        cursor = readableMessagesDB.query(DBMessagesContract.MessageEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
+        return cursor;
+    }
+
+    public static void updateMessage(int messageID, String newState){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE, newState);
+        long newRowId = writableMessagesDB.update(DBMessagesContract.MessageEntry.TABLE_NAME, contentValues, "_ID="+messageID, null);
     }
 
     //AsynkTask that will get Writable/Readable databases in a background thread

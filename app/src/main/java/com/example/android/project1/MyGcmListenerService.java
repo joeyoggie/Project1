@@ -52,7 +52,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
             //Store the message that was received in a local SQLite database
             DBMessagesHelper.getInstance(getApplicationContext());
-            DBMessagesHelper.insertMessageIntoDB(sender, recepient, message,timestamp);
+            DBMessagesHelper.insertMessageIntoDB(sender, recepient, message, timestamp, "received");
             //Refresh the ChatPage's listview, in case it was already visible
             refreshListView();
             //Show a notification
