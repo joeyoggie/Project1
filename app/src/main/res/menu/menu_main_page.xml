@@ -13,8 +13,8 @@
         android:orderInCategory="100"
         app:showAsAction="always" />
 
-    <item android:id="@+id/action_alt_profile"
+    <!--<item android:id="@+id/action_alt_profile"
         android:icon="@drawable/default_profile_picture"
         android:title="Alt. Profile View"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
 </menu>

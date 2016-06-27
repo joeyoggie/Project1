@@ -89,8 +89,8 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
         //Check if already registered, and if so, fill the views with the stored values
         SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
         if(prefs.getString("locationServicesRegistration", "notRegistered").equals("registered")) {
-            jobEditText.setText(prefs.getString("job", "No job defined"));
-            addressTextView.setText(prefs.getString("address", "No address defined"));
+            jobEditText.setText(prefs.getString("job", "No job defined yet"));
+            addressTextView.setText(prefs.getString("address", "No address defined yet"));
             latitude = Double.longBitsToDouble(prefs.getLong("latitude", 0));
             longitude = Double.longBitsToDouble(prefs.getLong("longitude", 0));
             locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
@@ -179,8 +179,8 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
         nameTextView.setText(name);
         userNameTextView.setText("@"+userName);
         phoneNumberTextView.setText(phoneNumber);
-        jobEditText.setText(prefs.getString("job", "No job defined"));
-        addressTextView.setText(prefs.getString("address", "No address defined"));
+        jobEditText.setText(prefs.getString("job", "No job defined yet"));
+        addressTextView.setText(prefs.getString("address", "No address defined yet"));
         latitude = Double.longBitsToDouble(prefs.getLong("latitude", 0));
         longitude = Double.longBitsToDouble(prefs.getLong("longitude", 0));
         locationTextView.setText(String.valueOf(latitude) + "," + String.valueOf(longitude));
@@ -309,25 +309,31 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
     public void submitJobInfo(View view){
 
         if(userLocation){
-            job = jobEditText.getText().toString();
-            //save and submit name, userName, phoneNumber, latitude, longitude, job, address
+            if(jobEditText.getText().toString().trim().length() > 0){
+                job = jobEditText.getText().toString();
+                //save and submit name, userName, phoneNumber, latitude, longitude, job, address
 
-            //Send the info to the server
-            sendInfoToServer();
+                //Send the info to the server
+                sendInfoToServer();
 
-            //save the info locally
-            //registered means it won't ask again for this info
-            SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
-            SharedPreferences.Editor prefsEditor = prefs.edit();
-            prefsEditor.putString("locationServicesRegistration", "registered");
-            prefsEditor.putString("job", job);
-            prefsEditor.putString("address", address);
-            prefsEditor.putLong("latitude", Double.doubleToRawLongBits(latitude));
-            prefsEditor.putLong("longitude", Double.doubleToRawLongBits(longitude));
-            prefsEditor.apply();
+                //save the info locally
+                //registered means it won't ask again for this info
+                SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+                SharedPreferences.Editor prefsEditor = prefs.edit();
+                prefsEditor.putString("locationServicesRegistration", "registered");
+                prefsEditor.putString("job", job);
+                prefsEditor.putString("address", address);
+                prefsEditor.putLong("latitude", Double.doubleToRawLongBits(latitude));
+                prefsEditor.putLong("longitude", Double.doubleToRawLongBits(longitude));
+                prefsEditor.apply();
 
-            //update the textviews
-            updateTextViews();
+                //update the textviews
+                updateTextViews();
+            }
+            else{
+                Toast.makeText(LocationServicesRegistration.this, "Please enter your job first", Toast.LENGTH_SHORT).show();
+            }
+
         }
         else{
             Toast.makeText(LocationServicesRegistration.this, "Please select your work location first.", Toast.LENGTH_SHORT).show();

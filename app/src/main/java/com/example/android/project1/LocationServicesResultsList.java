@@ -5,8 +5,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -59,6 +61,14 @@ public class LocationServicesResultsList extends AppCompatActivity {
     private String getServerIP() {
         SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
+    }
+
+    public void contactServiceProvider(View view){
+        Toast.makeText(LocationServicesResultsList.this, "Not implemented yet..", Toast.LENGTH_SHORT).show();
+    }
+
+    public void showOnMap(View view){
+        Toast.makeText(LocationServicesResultsList.this, "Not implemented yet..", Toast.LENGTH_SHORT).show();
     }
 
     public void getServiceProviders(String latitude, String longitude, String serviceCategory) {

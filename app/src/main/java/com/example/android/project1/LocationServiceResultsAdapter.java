@@ -43,13 +43,18 @@ public class LocationServiceResultsAdapter extends ArrayAdapter {
             rowView = inflater.inflate(R.layout.locationservicesitems, null);
             nameTextView = (TextView)rowView.findViewById(R.id.name_text_view);
             ratingTextVew = (TextView)rowView.findViewById(R.id.rating_text_view);
-            addressTextView = (TextView)rowView.findViewById(R.id.location_text_view);
+            addressTextView = (TextView)rowView.findViewById(R.id.address_text_view);
             profilePictureImageView = (ImageView)rowView.findViewById(R.id.profile_picture);
         }
 
         nameTextView.setText(serviceProviders.get(position).getName());
         addressTextView.setText(serviceProviders.get(position).getAddress());
-        ratingTextVew.setText(String.valueOf(serviceProviders.get(position).getRating()) + "/5");
+        if(serviceProviders.get(position).getRating() == 0){
+            ratingTextVew.setText("Be the first to rate this person!");
+        }
+        else{
+            ratingTextVew.setText(String.valueOf(serviceProviders.get(position).getRating()) + "/5");
+        }
         //profilePictureImageView.setImageBitmap(bitmap);
         return rowView;
     }

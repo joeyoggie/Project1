@@ -87,7 +87,7 @@ public class Registration extends ActionBarActivity {
                     prefsEditor.putString("name",intent.getStringExtra("name"));
                     prefsEditor.putString("phoneNumber", intent.getStringExtra("phoneNumber"));
                     prefsEditor.apply();
-                    contentTextView.setText(response);
+                    contentTextView.setText("Registration successful! Click next to continue.");
                     contentTextView.setTextColor(Color.GREEN);
                     Button finishRegistration = (Button) findViewById(R.id.finish_registration_button);
                     finishRegistration.setVisibility(View.VISIBLE);

@@ -29,12 +29,14 @@
         android:layout_toRightOf="@id/second"
         android:onClick="getSimSerialNumber"
         android:visibility="gone"/>
+
     <Button
         android:layout_below="@id/third"
         android:id="@+id/get_info_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Get info from server"
+        android:visibility="gone"
         android:onClick="getInfo"/>
 
     <TextView
@@ -51,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/userName_error_message"
         android:singleLine="true"
-        android:hint="Username (This is how people will be able to message you)"/>
+        android:hint="Username (choose your unique username)"/>
 
     <TextView
         android:id="@+id/name_error_message"
@@ -88,12 +90,12 @@
 
     <Button
         android:id="@+id/submit_info_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_below="@id/entered_phone_number"
         android:layout_centerHorizontal="true"
-        android:text="Submit info"
+        android:text="Register!"
         android:onClick="submitInfo"/>
 
     <TextView
@@ -102,6 +104,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:text="Response: "
+        android:visibility="gone"
         android:layout_below="@id/submit_info_button"/>
 
     <TextView

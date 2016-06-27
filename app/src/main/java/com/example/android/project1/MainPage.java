@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -124,6 +125,9 @@ public class MainPage extends ActionBarActivity {
             startActivity(locationServicesRegistrationPromptIntent);
         }
 
+        if (mDrawerLayout.isDrawerOpen(navigationView)) {
+            mDrawerLayout.closeDrawer(navigationView);
+        }
     }
 
     public void goToChatPage(View view) {
@@ -155,8 +159,10 @@ public class MainPage extends ActionBarActivity {
 
     public void goToSettings(View view)
     {
-        Intent intent = new Intent(this, Settings.class);
-        startActivity(intent);
+        Toast.makeText(MainPage.this, "No settings to change yet. Coming soon!", Toast.LENGTH_SHORT).show();
+
+        /*Intent intent = new Intent(this, Settings.class);
+        startActivity(intent);*/
         if (mDrawerLayout.isDrawerOpen(navigationView)) {
             mDrawerLayout.closeDrawer(navigationView);
         }
@@ -165,6 +171,23 @@ public class MainPage extends ActionBarActivity {
     public void navigateToStatusFragment(View view){
         DialogFragment newFragment = new StatusFragment();
         newFragment.show(getFragmentManager(),"statusFragment");
+        if (mDrawerLayout.isDrawerOpen(navigationView)) {
+            mDrawerLayout.closeDrawer(navigationView);
+        }
+    }
+
+    public void toggleDontDisturbMode(View view){
+        Toast.makeText(MainPage.this, "This feature is not implemented yet..", Toast.LENGTH_SHORT).show();
+        if (mDrawerLayout.isDrawerOpen(navigationView)) {
+            mDrawerLayout.closeDrawer(navigationView);
+        }
+    }
+
+    public void closeFriendsList(View view){
+        Toast.makeText(MainPage.this, "This feature is not implemented yet..", Toast.LENGTH_SHORT).show();
+        if (mDrawerLayout.isDrawerOpen(navigationView)) {
+            mDrawerLayout.closeDrawer(navigationView);
+        }
     }
 
     private void sendOnlineStateToServer(final String state){
@@ -276,12 +299,12 @@ public class MainPage extends ActionBarActivity {
             return true;
         }
 
-        if(id == R.id.action_alt_profile)
+        /*if(id == R.id.action_alt_profile)
         {
             Intent intent = new Intent(this, MyProfile.class);
             startActivity(intent);
             return true;
-        }
+        }*/
 
         if(id == R.id.location_services)
         {

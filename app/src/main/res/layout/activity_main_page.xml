@@ -568,6 +568,7 @@
                     android:gravity="left|center_vertical"
                     android:background="?android:attr/selectableItemBackground"
                     android:text="Don't disturb mode"
+                    android:onClick="toggleDontDisturbMode"
                     android:textAllCaps="false">
                 </Button>
 
@@ -603,6 +604,7 @@
                     android:gravity="left|center_vertical"
                     android:background="?android:attr/selectableItemBackground"
                     android:text="Close Friends list"
+                    android:onClick="closeFriendsList"
                     android:textAllCaps="false">
                 </Button>
 
@@ -657,6 +659,7 @@
                     android:background="?android:attr/selectableItemBackground"
                     android:text="Registration"
                     android:textAllCaps="false"
+                    android:visibility="gone"
                     android:onClick="goToRegistration">
                 </Button>
 
