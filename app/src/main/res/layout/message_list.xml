@@ -3,12 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:gravity="fill_horizontal"
     android:layout_height="wrap_content">
 
     <RelativeLayout
+        android:id="@+id/message_view"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:padding="8dp"
         android:layout_margin="8dp"
         android:background="@android:color/darker_gray">
@@ -17,32 +17,33 @@
             android:id="@+id/sender_username_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
+            android:gravity="left|top"
+            android:text="senderUserName"
             android:textStyle="bold"/>
+
+        <github.ankushsachdeva.emojicon.EmojiconTextView
+            android:id="@+id/message_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start|top"
+            android:layout_below="@id/sender_username_box"
+            android:maxWidth="250dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
+            android:text="messageText"/>
 
         <TextView
             android:id="@+id/time_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end|bottom"
-            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/message_text"
             android:maxLines="1"
             android:text="x:xxPM"
             android:layout_marginLeft="8dp"
+            android:layout_marginTop="4dp"
             android:textStyle="bold" />
-
-        <github.ankushsachdeva.emojicon.EmojiconTextView
-            android:id="@+id/message_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/sender_username_box"
-            android:gravity="start|top"
-            android:layout_toLeftOf="@id/time_box"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="4dp"
-            android:layout_marginStart="4dp" />
 
     </RelativeLayout>
 

@@ -115,7 +115,7 @@ public class ChatPage extends ActionBarActivity {
 
         onNewIntent(getIntent());
         listView = (ListView) findViewById(R.id.list);
-
+        listView.setDividerHeight(0);
         dbHelper = DBMessagesHelper.getInstance(this);
 
         cursor = DBMessagesHelper.readMessages(userName, recepientUserName);

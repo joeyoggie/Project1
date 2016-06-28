@@ -296,8 +296,9 @@ public class MainPage extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, Settings.class);
-            startActivity(intent);
+            Toast.makeText(MainPage.this, "No settings to change yet. Coming soon!", Toast.LENGTH_SHORT).show();
+            /*Intent intent = new Intent(this, Settings.class);
+            startActivity(intent);*/
             return true;
         }
 

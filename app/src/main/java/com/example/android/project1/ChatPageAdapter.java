@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.ParseException;
@@ -58,12 +60,52 @@ public class ChatPageAdapter extends CursorAdapter {
     }
 
     @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent){
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.message_list, parent, false);
+
+        ViewHolder viewHolder = new ViewHolder();
+        viewHolder.messageView = (RelativeLayout) view.findViewById(R.id.message_view);
+        viewHolder.messageText = (TextView) view.findViewById(R.id.message_text);
+        viewHolder.senderText = (TextView) view.findViewById(R.id.sender_username_box);
+        viewHolder.timeBox = (TextView) view.findViewById(R.id.time_box);
+
+        //set up the view parameters programmatically
+        /*viewHolder.messageViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        viewHolder.messageViewParams.setMargins(4,4,4,4);
+        viewHolder.messageView.setLayoutParams(viewHolder.messageViewParams);
+
+        viewHolder.senderTextParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        viewHolder.senderTextParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+        viewHolder.senderTextParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, R.id.message_view);
+        viewHolder.senderText.setLayoutParams(viewHolder.senderTextParams);
+
+        viewHolder.messageTextParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        //viewHolder.messageTextParams.setMargins(4,0,0,0);
+        viewHolder.messageTextParams.addRule(RelativeLayout.BELOW, R.id.sender_username_box);
+        viewHolder.messageTextParams.addRule(RelativeLayout.ALIGN_PARENT_START, RelativeLayout.TRUE);
+        viewHolder.messageTextParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+        viewHolder.messageText.setLayoutParams(viewHolder.messageTextParams);
+
+        viewHolder.timeBoxParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        //viewHolder.timeBoxParams.setMargins(4,4,0,0);
+        viewHolder.timeBoxParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
+        viewHolder.timeBoxParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        viewHolder.timeBoxParams.addRule(RelativeLayout.RIGHT_OF, R.id.message_text);
+        viewHolder.timeBox.setLayoutParams(viewHolder.timeBoxParams);*/
+
+        viewHolder.messageViewParams = (LinearLayout.LayoutParams) viewHolder.messageView.getLayoutParams();
+        viewHolder.senderText.setVisibility(View.GONE);
+
+        view.setTag(viewHolder);
+
+        return view;
+    }
+
+    @Override
     public void bindView(View view, Context context, Cursor cursor){
 
-        TextView messageText = (TextView) view.findViewById(R.id.message_text);
-        TextView senderText = (TextView) view.findViewById(R.id.sender_username_box);
-        TextView timeBox = (TextView) view.findViewById(R.id.time_box);
-
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         message = cursor.getString(messageColumnIndex);
         sender = cursor.getString(senderColumnIndex);
@@ -71,28 +113,30 @@ public class ChatPageAdapter extends CursorAdapter {
         messageState = cursor.getString(messageStateColumnIndex);
 
         if(message != null){
-            messageText.setText(message);
+            viewHolder.messageText.setText(message);
         }
         else{
-            messageText.setText("null message");
+            viewHolder.messageText.setText("null message");
         }
 
-        senderText.setText(sender);
+        viewHolder.senderText.setText(sender);
 
         if(userName.equals(sender)) {
-            messageText.setGravity(Gravity.START);
-            //messageText.setTextColor(Color.GREEN); //use colors temporarily, should be aligned only
+            viewHolder.messageViewParams.gravity = Gravity.RIGHT;
+
+            //viewHolder.senderText.setVisibility(View.GONE);
         }
         else {
-            messageText.setGravity(Gravity.END);
-            //messageText.setTextColor(Color.RED); //use colors temporarily, should be aligned only
+            viewHolder.messageViewParams.gravity = Gravity.LEFT;
+
+            //viewHolder.senderText.setVisibility(View.VISIBLE);
         }
 
         if(messageState.equals("unsent")){
-            messageText.setTextColor(Color.RED);
+            viewHolder.messageText.setTextColor(Color.LTGRAY);
         }
         else{
-            messageText.setTextColor(Color.BLACK);
+            viewHolder.messageText.setTextColor(Color.BLACK);
         }
 
         if(timestamp != null){
@@ -102,29 +146,21 @@ public class ChatPageAdapter extends CursorAdapter {
                 e.printStackTrace();
             }
             timestamp = simpleDateFormatToDisplay.format(date);
-            timeBox.setText(timestamp);
+            viewHolder.timeBox.setText(timestamp);
         }
         else {
-            timeBox.setText("null time");
+            viewHolder.timeBox.setText("null time");
         }
     }
 
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent){
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.message_list, parent, false);
-        return view;
+    static class ViewHolder {
+        RelativeLayout messageView;
+        TextView messageText;
+        TextView senderText;
+        TextView timeBox;
+        LinearLayout.LayoutParams messageViewParams;
+        /*RelativeLayout.LayoutParams timeBoxParams;
+        RelativeLayout.LayoutParams messageTextParams;
+        RelativeLayout.LayoutParams senderTextParams;*/
     }
-/*
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent){
-        if(convertView == null)
-        {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            convertView = inflater.inflate(R.layout.message_list, parent, false);
-            messageText = (TextView) convertView.findViewById(R.id.message_text);
-        }
-        return convertView;
-    }
-*/
 }
