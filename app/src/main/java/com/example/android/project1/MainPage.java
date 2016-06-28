@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 
 public class MainPage extends ActionBarActivity {
@@ -192,7 +193,8 @@ public class MainPage extends ActionBarActivity {
 
     private void sendOnlineStateToServer(final String state){
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String timestamp = simpleDateFormat.format(date);
 
         String url = "http://"+SERVER_IP+":8080/MyFirstServlet/State_change";

@@ -1,11 +1,13 @@
 package com.example.android.project1;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.MenuItem;
@@ -23,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 
 public class PopupMessageDialog extends DialogFragment implements CustomTimePickerDialog.OnTimeSetListener {
@@ -86,7 +89,8 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             Log.d("CALENDAR TIME: ", calendar.toString());
             Date date = calendar.getTime();
             Log.d("DATE: ", date.toString());
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             timestamp = simpleDateFormat.format(date);
             Log.d("TIMESTAMP:", timestamp);
 
@@ -98,17 +102,22 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             params.put("recepientUserName", recepientUserName);
             params.put("messageContent", message);
             params.put("timestamp", timestamp);
+            params.put("messageID", String.valueOf(0));
             JSONObject jsonObject = new JSONObject(params);
             Log.d("ChatPage", "JSON: "+jsonObject.toString());
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
                     DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, message, timestamp, "sent");
+                    Intent intent = new Intent("newMessageIntent");
+                    LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, message, timestamp, "unsent");
+                    Intent intent = new Intent("newMessageIntent");
+                    LocalBroadcastManager.getInstance(getActivity()).sendBroadcast(intent);
                 }
             });
             //Add the request to the RequestQueue.

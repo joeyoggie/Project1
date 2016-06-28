@@ -15,6 +15,7 @@ import android.widget.TextView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by Joey on 2/21/2016.
@@ -31,6 +32,10 @@ public class ChatPageAdapter extends CursorAdapter {
     Bitmap image;
     String messageState;
 
+    SimpleDateFormat simpleDateFormat;
+    SimpleDateFormat simpleDateFormatToDisplay;
+    Date date;
+
     int senderColumnIndex;
     int messageColumnIndex;
     int timestampColumnIndex;
@@ -46,6 +51,10 @@ public class ChatPageAdapter extends CursorAdapter {
         messageStateColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE);
         SharedPreferences prefs = context.getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
         userName = prefs.getString("userName","Me");
+        simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        simpleDateFormatToDisplay = new SimpleDateFormat("h:mm a");
+        simpleDateFormatToDisplay.setTimeZone(TimeZone.getDefault());
     }
 
     @Override
@@ -69,6 +78,7 @@ public class ChatPageAdapter extends CursorAdapter {
         }
 
         senderText.setText(sender);
+
         if(userName.equals(sender)) {
             messageText.setGravity(Gravity.START);
             //messageText.setTextColor(Color.GREEN); //use colors temporarily, should be aligned only
@@ -86,11 +96,8 @@ public class ChatPageAdapter extends CursorAdapter {
         }
 
         if(timestamp != null){
-            SimpleDateFormat simpleDateFormatToDisplay = new SimpleDateFormat("h:mm a");
-            SimpleDateFormat simpleDateFormatInDB = new SimpleDateFormat("dd/MM/yy-HH:mm:ss");
-            Date date = null;
             try {
-                date = simpleDateFormatInDB.parse(timestamp);
+                date = simpleDateFormat.parse(timestamp);
             } catch (ParseException e) {
                 e.printStackTrace();
             }

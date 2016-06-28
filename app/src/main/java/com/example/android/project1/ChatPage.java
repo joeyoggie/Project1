@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.TimeZone;
 
 import github.ankushsachdeva.emojicon.EmojiconEditText;
 import github.ankushsachdeva.emojicon.EmojiconGridView;
@@ -407,7 +408,8 @@ public class ChatPage extends ActionBarActivity {
         isTyping = false;
 
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         timestamp = simpleDateFormat.format(date);
         Log.d("TIMESTAMP:", timestamp);
 
@@ -484,7 +486,8 @@ public class ChatPage extends ActionBarActivity {
 
     private void sendOnlineStateToServer(final String state){
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String timestamp2 = simpleDateFormat.format(date);
 
         String url = "http://"+SERVER_IP+":8080/MyFirstServlet/State_change";
@@ -550,7 +553,8 @@ public class ChatPage extends ActionBarActivity {
         SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
         String deviceID = prefs.getString("deviceUUID","0");
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy-HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         timestamp = simpleDateFormat.format(date);
         String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/AddNewImage?senderDeviceID="+deviceID+"receptientUserName"+ recepientUserName+"&timestamp="+timestamp;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
