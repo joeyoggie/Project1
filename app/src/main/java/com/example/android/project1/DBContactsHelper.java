@@ -116,7 +116,7 @@ public final class DBContactsHelper extends SQLiteOpenHelper{
                 DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER,
                 DBContactsContract.ContactsEntry.COLUMN_NAME_NAME};
         //How you want the results to be sorted in the resulting Cursor
-        String sortOrder = DBContactsContract.ContactsEntry.COLUMN_NAME_ID + " ASC";
+        String sortOrder = DBContactsContract.ContactsEntry.COLUMN_NAME_NAME + " COLLATE NOCASE";
         //The columns for the WHERE clause
         String selection = DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER;
 
@@ -126,7 +126,7 @@ public final class DBContactsHelper extends SQLiteOpenHelper{
         cursor = readableContactsDB.query(DBContactsContract.ContactsEntry.TABLE_NAME,
                 projection,
                 null, /*selection*/
-                selectionArgs,
+                null /*selectionArgs*/,
                 null,
                 null,
                 sortOrder);
@@ -141,7 +141,7 @@ public final class DBContactsHelper extends SQLiteOpenHelper{
                 DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER,
                 DBContactsContract.ContactsEntry.COLUMN_NAME_NAME};
         //How you want the results to be sorted in the resulting Cursor
-        String sortOrder = DBContactsContract.ContactsEntry.COLUMN_NAME_ID + " ASC";
+        String sortOrder = DBContactsContract.ContactsEntry.COLUMN_NAME_NAME + " ASC";
         //The columns for the WHERE clause
         String selection = DBContactsContract.ContactsEntry.COLUMN_NAME_NAME + " LIKE ?";
 

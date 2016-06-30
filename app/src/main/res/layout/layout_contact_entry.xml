@@ -26,6 +26,7 @@
         android:layout_toRightOf="@id/contact_name"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="(@ContactUserName)"
+        android:visibility="gone"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"/>
 

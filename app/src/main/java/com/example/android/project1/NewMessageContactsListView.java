@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,7 +32,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewMessageContactsListView extends ActionBarActivity implements SearchView.OnQueryTextListener{
+public class NewMessageContactsListView extends ActionBarActivity implements SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener{
 
     String SERVER_IP;
     ListView contacts_list_view;
@@ -42,6 +43,9 @@ public class NewMessageContactsListView extends ActionBarActivity implements Sea
 
     private SearchView mSearchView;
 
+    //SwipeRefreshLayout is responsible for showing the loading animations to the user
+    SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +53,14 @@ public class NewMessageContactsListView extends ActionBarActivity implements Sea
 
         SERVER_IP = getServerIP();
 
+        //Initialize the SwipeRefreshLayout
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
         contacts_list_view = (ListView) findViewById(R.id.list);
+
+        //Start the refreshing animation
+        swipeRefreshLayout.setRefreshing(true);
 
         //Initialize the contacts database helper
         DBContactsHelper dbContactsHelper = DBContactsHelper.getInstance(this);
@@ -59,6 +70,9 @@ public class NewMessageContactsListView extends ActionBarActivity implements Sea
         contacts_list_view.setAdapter(contactsAdapter);
         contactsAdapter.changeCursor(cursor);
         contacts_list_view.setTextFilterEnabled(true);
+
+        //Dismiss the swiping animations
+        swipeRefreshLayout.setRefreshing(false);
 
         //Set the adapter's FilterQueryProvider which will allow filtering the list
         contactsAdapter.setFilterQueryProvider(new FilterQueryProvider() {
@@ -147,7 +161,9 @@ public class NewMessageContactsListView extends ActionBarActivity implements Sea
         dialog = new ProgressDialog(this);
         dialog.setMessage("Refreshing local contacts...");
         dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
+        //dialog.show();
+        //Start the refreshing animation
+        swipeRefreshLayout.setRefreshing(true);
 
         refreshContactsFromServer();
     }
@@ -195,16 +211,16 @@ public class NewMessageContactsListView extends ActionBarActivity implements Sea
                     }
                     else
                         Log.d("ContactsListView", "No numbers returned.");
-                    if(dialog != null && dialog.isShowing()){
-                        dialog.dismiss();
-                    }
                 }
                 else {
                     Log.d("ContactsListView", "Receieved an emtpy JSON string");
-                    if(dialog != null && dialog.isShowing()){
-                        dialog.dismiss();
-                    }
+
                 }
+                if(dialog != null && dialog.isShowing()){
+                    dialog.dismiss();
+                }
+                //Dismiss the swiping animations
+                swipeRefreshLayout.setRefreshing(false);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -213,10 +229,18 @@ public class NewMessageContactsListView extends ActionBarActivity implements Sea
                 if(dialog != null && dialog.isShowing()){
                     dialog.dismiss();
                 }
+                //Dismiss the swiping animations
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
         //Add the request to the RequestQueue.
         HttpConnector.getInstance(this).addToRequestQueue(requestArray);
+    }
+
+    //This method will be called whenever the user swipes down to refresh
+    @Override
+    public void onRefresh(){
+        refreshContacts();
     }
 
     @Override

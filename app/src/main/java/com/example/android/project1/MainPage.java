@@ -61,6 +61,7 @@ public class MainPage extends ActionBarActivity {
         {
             Intent reg = new Intent(this, Registration.class);
             startActivity(reg);
+            finish();
         }
 
         //Drawlayout
@@ -136,7 +137,7 @@ public class MainPage extends ActionBarActivity {
         EditText customRecepientName = (EditText) findViewById(R.id.custom_recepient_name);
 
         recepientName = customRecepientName.getText().toString(); //get the name of the clicked contact
-        recepientUserName = customRecepientUserName.getText().toString(); //get the username of the clicked contact
+        recepientUserName = customRecepientUserName.getText().toString().trim(); //get the username of the clicked contact
         Intent intent = new Intent(this, ChatPage.class);
         intent.putExtra("recepientName",recepientName);
         intent.putExtra("recepientUserName",recepientUserName);
@@ -246,15 +247,32 @@ public class MainPage extends ActionBarActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        //Send 'offline' state to server
+        sendOnlineStateToServer("offline");
+        super.onDestroy();
+    }
+
+    @Override
     public void onStop()
     {
+        //Send 'offline' state to server
         sendOnlineStateToServer("offline");
         super.onStop();
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        //Send 'online' state to server
+        sendOnlineStateToServer("online");
     }
 
     /*@Override
     public void onPause()
     {
+        //Send 'offline' state to server
         sendOnlineStateToServer("offline");
         super.onPause();
     }*/
@@ -263,21 +281,9 @@ public class MainPage extends ActionBarActivity {
     public void onResume()
     {
         super.onResume();
+        //Send 'online' state to server
         sendOnlineStateToServer("online");
     }*/
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-        sendOnlineStateToServer("online");
-    }
-
-    @Override
-    protected void onDestroy() {
-        sendOnlineStateToServer("offline");
-        super.onDestroy();
-    }
 
 
     @Override

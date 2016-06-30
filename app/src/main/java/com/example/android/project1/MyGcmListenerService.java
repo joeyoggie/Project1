@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -55,8 +56,13 @@ public class MyGcmListenerService extends GcmListenerService {
             DBMessagesHelper.insertMessageIntoDB(sender, recepient, message, timestamp, "received");
             //Refresh the ChatPage's listview, in case it was already visible
             refreshListView();
-            //Show a notification
-            sendNotification(sender, message);
+
+            //Show a notification, only if the activity is not visible
+            SharedPreferences prefs  = getSharedPreferences("com.example.android.project1.ChatPageState",0);
+            Log.d("MyGcmListenerService", "ChatPage visibility is " + prefs.getBoolean("isVisible", false));
+            if(!prefs.getBoolean("isVisible", false)){
+                sendNotification(sender, message);
+            }
         }
         else if (data.containsKey("typingStatus")){
             String receivedTypingStatusFromServer = data.getString("typingStatus");

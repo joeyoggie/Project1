@@ -95,13 +95,15 @@ public class ChatPage extends ActionBarActivity {
     int SELECT_FILE = 1;
     private String KEY_IMAGE = "image";
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_page);
         setupActionBar();
         SERVER_IP = getServerIP();
         getLocalUserInfo();
+
+        //Set the activity as visible
+        setActivityVisibleState(true);
 
         message = (EmojiconEditText) findViewById(R.id.textInput);
         sendButton = (Button) findViewById(R.id.send_message_button);
@@ -396,8 +398,6 @@ public class ChatPage extends ActionBarActivity {
         //Hide the keyboard
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        //Disable the sendButton temporarily
-
 
         mText = message.getText().toString();
         if(mText.trim().length() == 0)
@@ -476,12 +476,6 @@ public class ChatPage extends ActionBarActivity {
     {
         DialogFragment newFragment = new PopupMessageDialog();
         newFragment.show(getSupportFragmentManager(), "timePicker");
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        refreshCursor();
     }
 
     private void sendOnlineStateToServer(final String state){
@@ -675,42 +669,63 @@ public class ChatPage extends ActionBarActivity {
 
     }
 
+    //Use this method to set a flag during the activity's life cycle methods to indicate whether it's shown or not
+    private void setActivityVisibleState(boolean isVisible){
+        SharedPreferences prefs  = getSharedPreferences("com.example.android.project1.ChatPageState",0);
+        SharedPreferences.Editor prefsEditor;
+        prefsEditor = prefs.edit();
+        prefsEditor.putBoolean("isVisible", isVisible);
+        prefsEditor.apply();
+    }
+
     @Override
     protected void onDestroy() {
+        //Set the activity as invisible
+        setActivityVisibleState(false);
+        //Send 'offline' state to server
         sendOnlineStateToServer("offline");
         super.onDestroy();
-        //dbHelper.close();
     }
 
     @Override
     public void onStop()
     {
+        //Set the activity as invisible
+        setActivityVisibleState(false);
+        //Send 'offline' state to server
         sendOnlineStateToServer("offline");
         super.onStop();
     }
-
-    /*@Override
-    public void onPause()
-    {
-        sendOnlineStateToServer("offline");
-        super.onPause();
-    }*/
-
-    /*@Override
-    public void onResume()
-    {
-        super.onResume();
-        sendOnlineStateToServer("online");
-    }*/
 
     @Override
     public void onStart()
     {
         super.onStart();
+        //Set the activity as visible
+        setActivityVisibleState(true);
+        //Send 'online' state to server
         sendOnlineStateToServer("online");
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        //Set the activity as visible
+        setActivityVisibleState(true);
+        //Send 'online' state to server
+        //sendOnlineStateToServer("online");
+        refreshCursor();
+    }
 
+    @Override
+    public void onPause()
+    {
+        //Set the activity as invisible
+        setActivityVisibleState(false);
+        //Send 'offline' state to server
+        //sendOnlineStateToServer("offline");
+        super.onPause();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

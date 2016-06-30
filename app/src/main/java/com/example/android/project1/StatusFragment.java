@@ -1,12 +1,14 @@
 package com.example.android.project1;
 
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -38,6 +40,12 @@ public class StatusFragment extends DialogFragment {
         statusEditText = (EditText) view.findViewById(R.id.status_box);
         postStatusButton = (Button) view.findViewById(R.id.post_button);
         cancelButton = (Button) view.findViewById(R.id.cancel_button);
+
+        //Show the keyboard
+        statusEditText.requestFocus();
+        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
         postStatusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,14 +81,19 @@ public class StatusFragment extends DialogFragment {
             @Override
             public void onResponse(String response) {
                 Log.d("StatusFragment", "Status sent to server.");
-                Log.i("VOLLEY", response);
+                Log.i("StatusFragment", "Volley response: " + response);
                 getDialog().dismiss();
+                InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("StatusFragment", "Error sending status to server.");
-                Log.e("VOLLEY", error.toString());
+                Log.e("StatusFragment", "Volley error: " + error.toString());
+                getDialog().dismiss();
+                InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
             }
         });
         HttpConnector.getInstance(getActivity().getApplicationContext()).addToRequestQueue(stringRequest);
