@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,7 +26,8 @@ public class UserProfile extends ActionBarActivity {
     String SERVER_IP;
     TextView userNameTextView, statusTextView, phoneNumberTextView;
     ImageView profilePictureImageView;
-    String receivedUserName, receivedPhoneNumber, receivedStatus, receivedName;
+    Button sendMessageButton;
+    String receivedUserName, receivedPhoneNumber, receivedStatus, receivedName, localUserName;
     Bitmap receivedProfilePicture;
 
     @Override
@@ -34,19 +36,25 @@ public class UserProfile extends ActionBarActivity {
         setContentView(R.layout.activity_user_profile);
 
         SERVER_IP = getServerIP();
+        getLocalUserInfo();
 
+        sendMessageButton = (Button) findViewById(R.id.send_message_button);
         userNameTextView = (TextView) findViewById(R.id.profileusername);
         statusTextView = (TextView) findViewById(R.id.profieStatus);
         phoneNumberTextView = (TextView) findViewById(R.id.profilePhoneNo);
         profilePictureImageView = (ImageView) findViewById(R.id.userpp);
 
         Bundle bundle = getIntent().getExtras();
-        if(bundle!=null){
+        if(bundle != null){
             receivedUserName = bundle.getString("userName");
             receivedName = bundle.getString("name");
             receivedPhoneNumber = bundle.getString("phoneNumber");
             setupActionBar();
-            send_username_to_Server();
+            if(receivedUserName.equals(localUserName)){
+                sendMessageButton.setVisibility(View.GONE);
+                //TODO show button to change the profile picture
+            }
+            getUpdatedInfoFromServer(receivedUserName);
         }
     }
 
@@ -58,13 +66,18 @@ public class UserProfile extends ActionBarActivity {
         getSupportActionBar().setLogo(R.mipmap.ic_launcher);
     }
 
+    private void getLocalUserInfo(){
+        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences",0);
+        localUserName = prefs.getString("userName","Me");
+    }
+
     private String getServerIP() {
         SharedPreferences tempPrefs = getSharedPreferences("com.example.android.project1.NetworkPreferences", 0);
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
-    public void send_username_to_Server() {
-        String URL = "http://"+SERVER_IP+":8080/MyFirstServlet/GetUserInfo?userName=" + URLEncoder.encode(receivedUserName);
+    public void getUpdatedInfoFromServer(String userName) {
+        String URL = "http://"+SERVER_IP+":8080/MyFirstServlet/GetUserInfo?userName=" + URLEncoder.encode(userName);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

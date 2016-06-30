@@ -15,13 +15,9 @@ import android.widget.TextView;
  */
 public class ContactsAdapter extends CursorAdapter{
 
-    TextView phoneNumberTextView;
-    TextView nameTextView;
-    TextView userNameTextView;
     String phoneNo;
     String name;
     String userName;
-    ImageView userProfilePictureImageView;
     Context context;
 
     public ContactsAdapter(Context con, Cursor c) {
@@ -31,32 +27,41 @@ public class ContactsAdapter extends CursorAdapter{
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.layout_contact_entry, parent, false);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.layout_contact_entry, parent, false);
+
+        ViewHolder viewHolder = new ViewHolder();
+        viewHolder.phoneNumberTextView = (TextView) view.findViewById(R.id.contact_phone_number);
+        viewHolder.nameTextView = (TextView) view.findViewById(R.id.contact_name);
+        viewHolder.userNameTextView = (TextView) view.findViewById(R.id.contact_username);
+        viewHolder.userProfilePictureImageView = (ImageView)view.findViewById(R.id.contact_profile_picture);
+
+        view.setTag(viewHolder);
+
+        return view;
     }
 
     @Override
-    public void bindView(final View view, final Context context, final Cursor cursor) {
-        phoneNumberTextView = (TextView) view.findViewById(R.id.contact_phone_number);
-        nameTextView = (TextView) view.findViewById(R.id.contact_name);
-        userNameTextView = (TextView) view.findViewById(R.id.contact_username);
-        userProfilePictureImageView = (ImageView)view.findViewById(R.id.contact_profile_picture);
+    public void bindView(View view, final Context context, final Cursor cursor) {
+
+        final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         phoneNo = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER));
         name = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_NAME));
         userName = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_USERNAME));
         //get image as well from the cursor
-        phoneNumberTextView.setText(phoneNo);
-        nameTextView.setText(name);
-        userNameTextView.setText("(@"+userName+")");
-        //userProfilePictureImageView.setImageBitmap(bitmap);
+        viewHolder.phoneNumberTextView.setText(phoneNo);
+        viewHolder.nameTextView.setText(name);
+        viewHolder.userNameTextView.setText("(@"+userName+")");
+        //viewHolder.userProfilePictureImageView.setImageBitmap(bitmap);
 
         //use the tag to determine which row is selected in the onclicklistener below
-        view.setTag(cursor.getPosition());
+        viewHolder.tag = cursor.getPosition();
 
-        userProfilePictureImageView.setOnClickListener(new View.OnClickListener() {
+        viewHolder.userProfilePictureImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position = (int) view.getTag();
+                int position = (int) viewHolder.tag;
                 cursor.moveToPosition(position);
                 phoneNo = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER));
                 name = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_NAME));
@@ -69,5 +74,13 @@ public class ContactsAdapter extends CursorAdapter{
                 context.startActivity(intent);
             }
         });
+    }
+
+    public static class ViewHolder{
+        TextView phoneNumberTextView;
+        TextView nameTextView;
+        TextView userNameTextView;
+        ImageView userProfilePictureImageView;
+        int tag;
     }
 }

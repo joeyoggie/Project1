@@ -60,6 +60,7 @@
         android:layout_toRightOf="@id/status_static" />
 
     <Button
+        android:id="@+id/send_message_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/status_static"

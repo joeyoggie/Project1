@@ -159,6 +159,14 @@ public class MainPage extends ActionBarActivity {
         }
     }
 
+    public void goToMyProfile(View view){
+        Intent intent = new Intent(this, UserProfile.class);
+        intent.putExtra("userName",userName);
+        intent.putExtra("name", name);
+        intent.putExtra("phoneNumber", phoneNumber);
+        startActivity(intent);
+    }
+
     public void goToSettings(View view)
     {
         Toast.makeText(MainPage.this, "No settings to change yet. Coming soon!", Toast.LENGTH_SHORT).show();
