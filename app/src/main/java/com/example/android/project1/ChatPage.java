@@ -619,6 +619,7 @@ public class ChatPage extends ActionBarActivity {
                 Log.d("ChatPage", "Image sent successfully.");
                 Log.d("ChatPage", "Volley respose: " + response.toString());
                 DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imageByteArray, timestamp, "sent");
+                refreshCursor();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -628,6 +629,7 @@ public class ChatPage extends ActionBarActivity {
                 progressDialog.dismiss();
                 Log.d("ChatPage", "Volley error: " + error.toString());
                 DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imageByteArray, timestamp, "unsent");
+                refreshCursor();
             }
         });
         multipartRequest.setRetryPolicy(new DefaultRetryPolicy(15000,
@@ -683,8 +685,11 @@ public class ChatPage extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("ChatPage", "onActivityResult");
         if (resultCode == Activity.RESULT_OK) {
+            Log.d("ChatPage", "RESULT_OK. resultCode="+resultCode);
             if (requestCode == SELECT_PICTURE){
+                Log.d("ChatPage", "SELECT_PICTURE. requestCode=" + requestCode);
                 String selectedImagePath = null;
                 Uri selectedImageUri = data.getData();
                 String[] projection = { MediaStore.MediaColumns.DATA };
