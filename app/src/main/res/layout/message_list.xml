@@ -32,6 +32,16 @@
             android:layout_marginStart="4dp"
             android:text="messageText"/>
 
+        <ImageView
+            android:id="@+id/message_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="start|top"
+            android:layout_below="@id/sender_username_box"
+            android:maxWidth="250dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"/>
+
         <TextView
             android:id="@+id/time_box"
             android:layout_width="wrap_content"
@@ -39,6 +49,7 @@
             android:gravity="end|bottom"
             android:layout_alignParentBottom="true"
             android:layout_toRightOf="@id/message_text"
+            android:layout_alignWithParentIfMissing="true"
             android:maxLines="1"
             android:text="x:xxPM"
             android:layout_marginLeft="8dp"

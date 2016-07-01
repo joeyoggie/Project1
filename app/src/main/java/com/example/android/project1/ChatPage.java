@@ -32,20 +32,26 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageMultiPartRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -92,7 +98,7 @@ public class ChatPage extends ActionBarActivity {
 
     EmojiconsPopup popup;
 
-    int SELECT_FILE = 1;
+    int SELECT_PICTURE = 1;
     private String KEY_IMAGE = "image";
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -221,7 +227,9 @@ public class ChatPage extends ActionBarActivity {
         });
 
         //Check if there are any unsent messages and tries to send them again
-        sendUnsentMessages();
+        sendUnsentTextMessages();
+        //TODO check for unsent images as well (use the function from DBMessagesHelper.readUnsentImageMessages
+        //TODO and implement method below
     }
 
     @Override
@@ -274,8 +282,8 @@ public class ChatPage extends ActionBarActivity {
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
-    private void sendUnsentMessages(){
-        Cursor c = DBMessagesHelper.readUnsentMessages(userName, recepientUserName);
+    private void sendUnsentTextMessages(){
+        Cursor c = DBMessagesHelper.readUnsentTextMessages(userName, recepientUserName);
         String messageContent;
         String timestamp2;
 
@@ -312,7 +320,7 @@ public class ChatPage extends ActionBarActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        DBMessagesHelper.updateMessage(msgID, "sent");
+                        DBMessagesHelper.updateTextMessage(msgID, "sent");
                         Log.d("ChatPage", "Message _ID= " + msgID + ", sent!" );
                         refreshCursor();
                     }
@@ -393,6 +401,56 @@ public class ChatPage extends ActionBarActivity {
             popup.dismiss();
         }
     }
+
+    /*public void getImage(String id){
+        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetImage?imageID=" + id;
+
+        ImageDownloader dImage = new ImageDownloader();
+        dImage.execute(url);
+
+        *//*ImageRequest imageRequest = new ImageRequest(url, new Response.Listener<Bitmap>() {
+            @Override
+            public void onResponse(Bitmap response) {
+                Log.d("ChatPage", "Volley image response: " + response.toString());
+                ImageView imgView = (ImageView) findViewById(R.id.test_image);
+                imgView.setImageBitmap(response);
+            }
+        }, 0, 0, null, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("ChatPage", "Volley image error response " + error.toString());
+            }
+        });
+        HttpConnector.getInstance(this).addToRequestQueue(imageRequest);*//*
+
+        *//*StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d("ChatPage", "Volley response: " + response);
+
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    String imageData = jsonObject.getString("binaryData");
+
+                    Log.d("ChatPage", "ImageData: " + imageData);
+                    byte[] encodeByte = Base64.decode(imageData, Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+                    ImageView imgView = (ImageView) findViewById(R.id.test_image);
+                    imgView.setImageBitmap(bitmap);
+                } catch (JSONException e) {
+                    Log.d("ChatPage", "Parse error!!!!!!!! " + e.getMessage());
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        HttpConnector.getInstance(this).addToRequestQueue(stringRequest);*//*
+    }*/
 
     public void sendMessage(View view) {
         //Hide the keyboard
@@ -522,151 +580,143 @@ public class ChatPage extends ActionBarActivity {
         HttpConnector.getInstance(this).addToRequestQueue(stringRequest);
     }
 
-    public void loadImagefromGallery() {
-//        // Create intent to Open Image applications like Gallery, Google Photos
-//        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        // Start the Intent
-//        startActivityForResult(galleryIntent,RESULT_LOAD_IMG);
-        //  Intent intent = new Intent();
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
-//        startActivityForResult(Intent.createChooser(intent, "Select Picture"), RESULT_LOAD_IMG);
-        Intent intent = new Intent(
-                Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+    public void loadImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
-        startActivityForResult(
-                Intent.createChooser(intent, "Select File"),
-                SELECT_FILE);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
+
+        /*Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);*/
     }
 
-    public void sendImage(Bitmap bitmap){
-        final Bitmap bm = bitmap;
-        final ProgressDialog loading = ProgressDialog.show(this,"Uploading...","Please wait...",false,false);
-        SharedPreferences prefs = getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
-        String deviceID = prefs.getString("deviceUUID","0");
+    public void sendImage(Bitmap imageBitmap, String imageName){
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"Uploading image...","Please wait...",false,false);
+        progressDialog.setCanceledOnTouchOutside(false);
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         timestamp = simpleDateFormat.format(date);
-        String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/AddNewImage?senderDeviceID="+deviceID+"receptientUserName"+ recepientUserName+"&timestamp="+timestamp;
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String s) {
-                        //Disimissing the progress dialog
-                        loading.dismiss();
-                        //Showing toast message of the response
-                        Toast.makeText(ChatPage.this, s, Toast.LENGTH_LONG).show();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        //Dismissing the progress dialog
-                        loading.dismiss();
-                        //Showing toast
-                        //Toast.makeText(ChatPage.this, volleyError.getMessage().toString(), Toast.LENGTH_LONG).
-                          //      show();
-                    }
-                }) {
-            protected Map<String, String> getParams() throws AuthFailureError
-            {
-                //Converting Bitmap to String
-                String Image = bm.toString();
-                //Getting Image Name
 
-                //Creating parameters
-                Map<String, String> params = new Hashtable<String, String>();
+        String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/AddNewImage?senderDeviceID="+deviceID+"&recepientUserName="+ recepientUserName+"&timestamp="+timestamp;
 
-                //Adding parameters
-                params.put(KEY_IMAGE, Image);
-                //  params.put(KEY_NAME, name);
+        final String boundary = "begBoundary-" + deviceID + userName + deviceID;
+        final String mimeType = "multipart/form-data; boundary=" + boundary;
+        //Convert image into multipart byte[]
+        byte[] multipartBody = getMultiPartDataFromBitmap(imageBitmap, imageName);
 
-                //returning parameters
-                return params;
+        ByteArrayOutputStream imageByteArrayOutputStream = new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.PNG, 0, imageByteArrayOutputStream);
+        final byte[] imageByteArray = imageByteArrayOutputStream.toByteArray();
+
+        ImageMultiPartRequest multipartRequest = new ImageMultiPartRequest(url, null, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
+            @Override
+            public void onResponse(NetworkResponse response) {
+                Toast.makeText(ChatPage.this, "Image sent successfully!", Toast.LENGTH_SHORT).show();
+                //Dismiss the progress dialog
+                progressDialog.dismiss();
+                Log.d("ChatPage", "Image sent successfully.");
+                Log.d("ChatPage", "Volley respose: " + response.toString());
+                DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imageByteArray, timestamp, "sent");
             }
-        };
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(ChatPage.this, "Image upload failed!\r\n" + error.toString(), Toast.LENGTH_SHORT).show();
+                //Dismiss the progress dialog
+                progressDialog.dismiss();
+                Log.d("ChatPage", "Volley error: " + error.toString());
+                DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imageByteArray, timestamp, "unsent");
+            }
+        });
+        multipartRequest.setRetryPolicy(new DefaultRetryPolicy(15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         //Adding request to the queue
-        HttpConnector.getInstance(this).addToRequestQueue(stringRequest);
+        HttpConnector.getInstance(this).addToRequestQueue(multipartRequest);
+    }
+
+    private byte[] getMultiPartDataFromBitmap(Bitmap imageBitmap, String imageName){
+        final String twoHyphens = "--";
+        final String lineEnd = "\r\n";
+        final String boundary = "begBoundary-" + deviceID + userName + deviceID;
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] imageData = byteArrayOutputStream.toByteArray();
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(bos);
+        try {
+            dos.writeBytes(twoHyphens + boundary + lineEnd);
+            //dataOutputStream.writeBytes("Content-Type: image/png; charset=UTF-8" + lineEnd);
+            dos.writeBytes("Content-Disposition: form-data; name=\"image_file\"; filename=\""
+                    + imageName + "\"" + lineEnd);
+            dos.writeBytes(lineEnd);
+
+            ByteArrayInputStream fileInputStream = new ByteArrayInputStream(imageData);
+            int bytesAvailable = fileInputStream.available();
+
+            int maxBufferSize = 1024 * 1024;
+            int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+            byte[] buffer = new byte[bufferSize];
+
+            //read file and write it into form...
+            int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+            while (bytesRead > 0) {
+                dos.write(buffer, 0, bufferSize);
+                bytesAvailable = fileInputStream.available();
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+            }
+            dos.writeBytes(lineEnd);
+            //send multipart form data necesssary after file data
+            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bos.toByteArray();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-//        try {
-//            // When an Image is picked
-//            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
-//                    && null != data) {
-//                // Get the Image from data
-//
-//                Uri selectedImage = data.getData();
-//                String[] filePathColumn = { MediaStore.Images.Media.DATA };
-//
-//                // Get the cursor
-//                Cursor cursor = getContentResolver().query(selectedImage,
-//                        filePathColumn, null, null, null);
-//                // Move to first row
-//                cursor.moveToFirst();
-//
-//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//                imgDecodableString = cursor.getString(columnIndex);
-//                cursor.close();
-////                ImageView imgView = (ImageView) findViewById(R.id.imgView);
-////                // Set the Image in ImageView after decoding the String
-////                imgView.setImageBitmap(BitmapFactory
-////                        .decodeFile(imgDecodableString));
-//                PopUp_Window pop=new PopUp_Window();
-//                pop.init();
-//                //    pop.popupInit();
-//                pop.setImage(BitmapFactory.decodeFile(imgDecodableString));
-        //  if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK && data != null && data.getData() != null) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == SELECT_FILE){
+            if (requestCode == SELECT_PICTURE){
+                String selectedImagePath = null;
                 Uri selectedImageUri = data.getData();
                 String[] projection = { MediaStore.MediaColumns.DATA };
-                Cursor cursor = managedQuery(selectedImageUri, projection, null, null,
-                        null);
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                cursor.moveToFirst();
-
-                String selectedImagePath = cursor.getString(column_index);
+                //String[] projection = { MediaStore.Images.Media.DATA };
+                //Cursor cursor = managedQuery(selectedImageUri, projection, null, null, null);
+                Cursor cursor = this.getContentResolver().query(selectedImageUri, projection, null, null, null);
+                if(cursor != null){
+                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                    //int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                    cursor.moveToFirst();
+                    selectedImagePath = cursor.getString(column_index);
+                }
+                else{
+                    selectedImagePath = selectedImageUri.getPath();
+                }
 
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inJustDecodeBounds = true;
                 BitmapFactory.decodeFile(selectedImagePath, options);
-                final int REQUIRED_SIZE = 200;
+                final int REQUIRED_SIZE = 1000;
                 int scale = 1;
                 while (options.outWidth / scale / 2 >= REQUIRED_SIZE
                         && options.outHeight / scale / 2 >= REQUIRED_SIZE)
                     scale *= 2;
                 options.inSampleSize = scale;
                 options.inJustDecodeBounds = false;
-                Bitmap bm = BitmapFactory.decodeFile(selectedImagePath, options);
-                sendImage(bm);
+                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath, options);
+                /*ImageView imgView = (ImageView) findViewById(R.id.test_image);
+                imgView.setImageBitmap(bitmap);*/
+                sendImage(bitmap, selectedImagePath);
             }
         }
-
-
-//            Uri filePath = data.getData();
-//            try {
-//                //Getting the Bitmap from Gallery
-//                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-//                //Setting the Bitmap to ImageView
-//             //   imageView.setImageBitmap(bitmap);
-//                PopUp_Window pop=new PopUp_Window();
-//                pop.init();
-//                pop.setImage(bitmap);
-
-//            }else{
-//                Toast.makeText(this, "You haven't picked Image",
-//                        Toast.LENGTH_LONG).show();
-//            }
-//        } catch (Exception ex) {
-//            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-//                    .show();
-
     }
 
     //Use this method to set a flag during the activity's life cycle methods to indicate whether it's shown or not
@@ -752,11 +802,29 @@ public class ChatPage extends ActionBarActivity {
         }
         if(id==R.id.image_upload)
         {
-            //  DialogFragment newFragment = new PopupMessageDialog();
-            //  ViewGroup group = (ViewGroup) findViewById(R.id.imageLayout);
-            // loadImagefromGallery(group);
-            loadImagefromGallery();
+            loadImageFromGallery();
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /*private class ImageDownloader extends AsyncTask<String, Bitmap, Bitmap>{
+
+        @Override
+        protected Bitmap doInBackground(String... url){
+            Bitmap bitmap = null;
+            try {
+                bitmap = BitmapFactory.decodeStream((InputStream)new URL(url[0]).getContent());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap){
+            *//*ImageView i = (ImageView)findViewById(R.id.test_image);
+            i.setImageBitmap(bitmap);*//*
+        }
+    }*/
+
 }

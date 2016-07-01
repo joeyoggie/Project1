@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -22,6 +24,7 @@ import java.util.TimeZone;
 /**
  * Created by Joey on 2/21/2016.
  */
+//TODO listview stutters, maybe compress images and find an alternative for toggling the imageview/textview
 public class ChatPageAdapter extends CursorAdapter {
 
     Context context;
@@ -33,6 +36,7 @@ public class ChatPageAdapter extends CursorAdapter {
     String userName;
     Bitmap image;
     String messageState;
+    String messageType;
 
     SimpleDateFormat simpleDateFormat;
     SimpleDateFormat simpleDateFormatToDisplay;
@@ -42,6 +46,8 @@ public class ChatPageAdapter extends CursorAdapter {
     int messageColumnIndex;
     int timestampColumnIndex;
     int messageStateColumnIndex;
+    int messageTypeColumnIndex;
+    int imageBlobColumnIndex;
 
     public ChatPageAdapter(Context context, Cursor cursor) {
         super(context, cursor);
@@ -51,6 +57,9 @@ public class ChatPageAdapter extends CursorAdapter {
         senderColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER);
         timestampColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME);
         messageStateColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE);
+        messageTypeColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_TYPE);
+        imageBlobColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_BLOB);
+
         SharedPreferences prefs = context.getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
         userName = prefs.getString("userName","Me");
         simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
@@ -69,6 +78,7 @@ public class ChatPageAdapter extends CursorAdapter {
         viewHolder.messageText = (TextView) view.findViewById(R.id.message_text);
         viewHolder.senderText = (TextView) view.findViewById(R.id.sender_username_box);
         viewHolder.timeBox = (TextView) view.findViewById(R.id.time_box);
+        viewHolder.messageImage = (ImageView) view.findViewById(R.id.message_image);
 
         //set up the view parameters programmatically
         /*viewHolder.messageViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -107,16 +117,30 @@ public class ChatPageAdapter extends CursorAdapter {
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        message = cursor.getString(messageColumnIndex);
         sender = cursor.getString(senderColumnIndex);
         timestamp = cursor.getString(timestampColumnIndex);
         messageState = cursor.getString(messageStateColumnIndex);
 
-        if(message != null){
-            viewHolder.messageText.setText(message);
+        //Check type of message, text or image
+        messageType = cursor.getString(messageTypeColumnIndex);
+        if(messageType.equals("text")){
+            viewHolder.messageText.setVisibility(View.VISIBLE);
+            message = cursor.getString(messageColumnIndex);
+            if(message != null){
+                viewHolder.messageText.setText(message);
+            }
+            else{
+                viewHolder.messageText.setText("null message");
+            }
+            viewHolder.messageImage.setVisibility(View.INVISIBLE);
         }
-        else{
-            viewHolder.messageText.setText("null message");
+        else if(messageType.equals("image")){
+            viewHolder.messageImage.setVisibility(View.VISIBLE);
+            viewHolder.messageText.setText("Loading picture...");
+            byte[] imageByteArray = cursor.getBlob(imageBlobColumnIndex);
+            image = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.length);
+            viewHolder.messageImage.setImageBitmap(image);
+            viewHolder.messageText.setVisibility(View.INVISIBLE);
         }
 
         viewHolder.senderText.setText(sender);
@@ -134,9 +158,11 @@ public class ChatPageAdapter extends CursorAdapter {
 
         if(messageState.equals("unsent")){
             viewHolder.messageText.setTextColor(Color.LTGRAY);
+            //TODO Mark viewHolder.messageImage as grey or something
         }
         else{
             viewHolder.messageText.setTextColor(Color.BLACK);
+            //TODO Leave the viewHolder.messageImage as it normally should be
         }
 
         if(timestamp != null){
@@ -158,6 +184,7 @@ public class ChatPageAdapter extends CursorAdapter {
         TextView messageText;
         TextView senderText;
         TextView timeBox;
+        ImageView messageImage;
         LinearLayout.LayoutParams messageViewParams;
         /*RelativeLayout.LayoutParams timeBoxParams;
         RelativeLayout.LayoutParams messageTextParams;
