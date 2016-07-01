@@ -132,7 +132,7 @@ public class ChatPageAdapter extends CursorAdapter {
             else{
                 viewHolder.messageText.setText("null message");
             }
-            viewHolder.messageImage.setVisibility(View.INVISIBLE);
+            viewHolder.messageImage.setVisibility(View.GONE);
         }
         else if(messageType.equals("image")){
             viewHolder.messageImage.setVisibility(View.VISIBLE);
@@ -140,7 +140,7 @@ public class ChatPageAdapter extends CursorAdapter {
             byte[] imageByteArray = cursor.getBlob(imageBlobColumnIndex);
             image = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.length);
             viewHolder.messageImage.setImageBitmap(image);
-            viewHolder.messageText.setVisibility(View.INVISIBLE);
+            viewHolder.messageText.setVisibility(View.GONE);
         }
 
         viewHolder.senderText.setText(sender);
