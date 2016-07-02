@@ -141,7 +141,7 @@ public class MyGcmListenerService extends GcmListenerService {
         extras.putString("message", message);
         extras.putString("recepientUserName", sender);
         intent.putExtras(extras);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); //also removed launchMode=singleInstance from manifest
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 

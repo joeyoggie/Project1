@@ -69,7 +69,7 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
         writableMessagesDB = dbHelper.getWritableDatabase();
     }
 
-    public static void insertMessageIntoDB(String senderUserName, String recepientUserName, String message, String timestamp, String state){
+    public static long insertMessageIntoDB(String senderUserName, String recepientUserName, String message, String timestamp, String state){
         ContentValues values = new ContentValues();
         //values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_ID,1);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER, senderUserName);
@@ -78,7 +78,8 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME, timestamp);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE, state);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_TYPE, "text");
-        long newRowId = writableMessagesDB.insert(DBMessagesContract.MessageEntry.TABLE_NAME,null,values);
+        long messageID = writableMessagesDB.insert(DBMessagesContract.MessageEntry.TABLE_NAME,null,values);
+        return messageID;
     }
 
     public static Cursor readMessages(String userName, String recepientUserName)
@@ -152,7 +153,7 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public static void updateTextMessage(int messageID, String newState){
+    public static void updateTextMessage(long messageID, String newState){
         ContentValues contentValues = new ContentValues();
         contentValues.put(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE, newState);
         long newRowId = writableMessagesDB.update(DBMessagesContract.MessageEntry.TABLE_NAME, contentValues, "_ID="+messageID, null);

@@ -97,7 +97,6 @@
         <activity
             android:name=".ChatPage"
             android:label="@string/title_activity_chat_page"
-            android:launchMode="singleInstance"
             android:parentActivityName=".MainPage"
             android:windowSoftInputMode="stateHidden" />
         <activity

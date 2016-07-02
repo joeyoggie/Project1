@@ -98,7 +98,7 @@ public class ChatPage extends ActionBarActivity {
 
     EmojiconsPopup popup;
 
-    int SELECT_PICTURE = 1;
+    int SELECT_PICTURE = 44;
     private String KEY_IMAGE = "image";
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -479,26 +479,37 @@ public class ChatPage extends ActionBarActivity {
         messageObject.setMessageContent(mText);
         messageObject.setTimestamp(timestamp);*/
 
+        //insert the message into the database
+        long messageID = DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp, "unsent");
+        refreshCursor();
+
         HashMap<String, String> params = new HashMap<>();
         params.put("senderDeviceID", deviceID);
         params.put("recepientUserName", recepientUserName);
         params.put("messageContent", mText);
         params.put("timestamp", timestamp);
-        params.put("messageID", String.valueOf(0));
+        params.put("messageID", String.valueOf(messageID));
         JSONObject jsonObject = new JSONObject(params);
         Log.d("ChatPage", "JSON Message: "+jsonObject.toString());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp, "sent");
-                refreshCursor();
+                //DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp, "sent");
                 Log.d("ChatPage", "VolleyResponse:" + response.toString());
+                long msgID = 0;
+                try {
+                    msgID = response.getLong("messageID");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                DBMessagesHelper.updateTextMessage(msgID, "sent");
+                refreshCursor();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp, "unsent");
-                refreshCursor();
+                //DBMessagesHelper.insertMessageIntoDB(userName, recepientUserName, mText, timestamp, "unsent");
+                //refreshCursor();
                 Log.d("ChatPage", "VolleyErrorResponse:" + error.toString());
             }
         });
@@ -686,10 +697,10 @@ public class ChatPage extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("ChatPage", "onActivityResult");
+        Log.d("ChatPage", "resultCode="+resultCode);
         if (resultCode == Activity.RESULT_OK) {
-            Log.d("ChatPage", "RESULT_OK. resultCode="+resultCode);
+            Log.d("ChatPage", "requestCode=" + requestCode);
             if (requestCode == SELECT_PICTURE){
-                Log.d("ChatPage", "SELECT_PICTURE. requestCode=" + requestCode);
                 String selectedImagePath = null;
                 Uri selectedImageUri = data.getData();
                 String[] projection = { MediaStore.MediaColumns.DATA };
