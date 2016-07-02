@@ -239,6 +239,8 @@ public class MyGcmListenerService extends GcmListenerService {
         @Override
         protected void onPostExecute(ImageInfo imageInfoObject){
             DBMessagesHelper.getInstance(getApplicationContext());
+            //TODO insert a flag indicating whether the image was downloaded successfully or not
+            //TODO and check in ChatPage whether any images still need to be downloaded
             DBMessagesHelper.insertImageIntoDB(imageInfoObject.getSenderUserName(),
                     imageInfoObject.getRecepientUserName(),
                     String.valueOf(imageInfoObject.getImageID()),

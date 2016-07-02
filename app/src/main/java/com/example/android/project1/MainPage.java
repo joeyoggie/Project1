@@ -107,8 +107,9 @@ public class MainPage extends ActionBarActivity {
 
     public void goToPrivacySettings(View view)
     {
-        Intent intent = new Intent(this, PrivacySettings.class);
-        startActivity(intent);
+        Toast.makeText(MainPage.this, "Coming very soon, stay tuned!", Toast.LENGTH_SHORT).show();
+        /*Intent intent = new Intent(this, PrivacySettings.class);
+        startActivity(intent);*/
         if (mDrawerLayout.isDrawerOpen(navigationView)) {
             mDrawerLayout.closeDrawer(navigationView);
         }
