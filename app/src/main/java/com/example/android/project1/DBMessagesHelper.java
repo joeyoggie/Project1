@@ -11,9 +11,10 @@ import android.os.AsyncTask;
  * Created by Joey on 2/20/2016.
  */
 //TODO: Get the readable/writable databases in a background thread
+//TODO (DONE, needs testing)save the images in a file and only store its path in the database because cursor.configureWIndowSize has a limit of 1MB
 public final class DBMessagesHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 14;
     public static final String DATABASE_NAME = "Messages.db";
     private static DBMessagesHelper dbHelper;
     private static SQLiteDatabase messagesDB;
@@ -32,7 +33,7 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
             + DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE + " TEXT,"
             + DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_TYPE + " TEXT, "
             + DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_ID + " TEXT, "
-            + DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_BLOB + " BLOB" + ")";
+            + DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_PATH + " TEXT" + ")";
 
     public static final String SQL_DELETE_QUERY = "DROP TABLE IF EXISTS " + DBMessagesContract.MessageEntry.TABLE_NAME;
 
@@ -93,7 +94,7 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
                 DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE,
                 DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_TYPE,
                 DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_ID,
-                DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_BLOB};
+                DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_PATH};
         //How you want the results to be sorted in the resulting Cursor
         String sortOrder = DBMessagesContract.MessageEntry.COLUMN_NAME_TIME + " ASC";
         //The columns for the WHERE clause
@@ -159,17 +160,18 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
         long newRowId = writableMessagesDB.update(DBMessagesContract.MessageEntry.TABLE_NAME, contentValues, "_ID="+messageID, null);
     }
 
-    public static void insertImageIntoDB(String senderUserName, String recepientUserName, String remoteImageID, byte[] imageData, String timestamp, String state){
+    public static long insertImageIntoDB(String senderUserName, String recepientUserName, String remoteImageID, String imagePath, String timestamp, String state){
         ContentValues values = new ContentValues();
         //values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_ID,1);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER, senderUserName);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_RECEPIENT, recepientUserName);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_ID, remoteImageID);
-        values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_BLOB, imageData);
+        values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_PATH, imagePath);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME, timestamp);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE, state);
         values.put(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_TYPE, "image");
-        long newRowId = writableMessagesDB.insert(DBMessagesContract.MessageEntry.TABLE_NAME,null,values);
+        long imageID = writableMessagesDB.insert(DBMessagesContract.MessageEntry.TABLE_NAME,null,values);
+        return imageID;
     }
 
     public static Cursor readUnsentImageMessages(String userName, String recepientUserName)
@@ -179,7 +181,7 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
                 /*DBMessagesContract.MessageEntry.COLUMN_NAME_ID,*/
                 DBMessagesContract.MessageEntry.COLUMN_NAME_SENDER,
                 DBMessagesContract.MessageEntry.COLUMN_NAME_TIME,
-                DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_BLOB,
+                DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_PATH,
                 DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE,
                 DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_TYPE};
         //How you want the results to be sorted in the resulting Cursor
@@ -204,6 +206,12 @@ public final class DBMessagesHelper extends SQLiteOpenHelper {
                 null,
                 sortOrder);
         return cursor;
+    }
+
+    public static void updateImageState(long imageID, String newState){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE, newState);
+        long newRowId = writableMessagesDB.update(DBMessagesContract.MessageEntry.TABLE_NAME, contentValues, "_ID="+imageID, null);
     }
 
     //AsynkTask that will get Writable/Readable databases in a background thread

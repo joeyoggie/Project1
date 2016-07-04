@@ -12,13 +12,15 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -104,15 +106,6 @@ public class MyGcmListenerService extends GcmListenerService {
             imageInfoObject.setImageID(Long.parseLong(imageID));
             imageInfoObject.setTimestamp(timestamp);
             downloadImage(imageInfoObject);
-
-            //Show a notification, only if the activity is not visible
-            //TODO check for MainPage as well
-            //TODO move this code to the onPostExecute of downloading the image and pass the bitmap the sendNotification()
-            SharedPreferences prefs  = getSharedPreferences("com.example.android.project1.ChatPageState",0);
-            Log.d("MyGcmListenerService", "ChatPage visibility is " + prefs.getBoolean("isVisible", false));
-            if(!prefs.getBoolean("isVisible", false)){
-                sendImageNotification(sender, imageID);
-            }
         }
     }
 
@@ -170,7 +163,7 @@ public class MyGcmListenerService extends GcmListenerService {
         notificationManager.notify(rnd.nextInt() /* ID of notification */, notificationBuilder.build());
     }
 
-    private void sendImageNotification(String sender, String message) {
+    private void sendImageNotification(String sender, String message, Bitmap image) {
         //Create a pending intent that will launch when the notification is pressed
         Intent intent = new Intent(this, ChatPage.class);
         Bundle extras = new Bundle();
@@ -185,10 +178,11 @@ public class MyGcmListenerService extends GcmListenerService {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.powered_by_google_dark)
                 .setContentTitle("New image from "+sender)
-                .setContentText(message)
+                .setContentText("ImageID = "+message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
+        //TODO put the received image bitmap in the notification
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -227,17 +221,40 @@ public class MyGcmListenerService extends GcmListenerService {
                 inputStream.read(baos);*//*
 
                 inputStream.close();*/
-                Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(urlString).getContent());
 
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                //Get the bitmap from the server
+                Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(urlString).getContent());
+                String imagePath = null;
+                //Save the bitmap on the external storage
+                String state = Environment.getExternalStorageState();
+                if(Environment.MEDIA_MOUNTED.equals(state)){
+                    File dataDir = new File(Environment.getExternalStorageDirectory(), "OnTime");
+                    if(!dataDir.exists()){
+                        dataDir.mkdirs();
+                    }
+                    File receivedDataDir = new File(Environment.getExternalStorageDirectory()+"/OnTime", "Received");
+                    if(!receivedDataDir.exists()){
+                        receivedDataDir.mkdirs();
+                    }
+                    String fileName = imgObject[0].getTimestamp();
+                    fileName = fileName.replaceAll("/", "-");
+                    imagePath = receivedDataDir + "/" + fileName + ".png";
+                    FileOutputStream outputStream = new FileOutputStream(imagePath);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    outputStream.flush();
+                    outputStream.close();
+                }
+
+                /*ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
-                imageData = bos.toByteArray();
+                imageData = bos.toByteArray();*/
 
                 imageInfoObject.setSenderUserName(imgObject[0].getSenderUserName());
                 imageInfoObject.setRecepientUserName(imgObject[0].getRecepientUserName());
                 imageInfoObject.setImageID(imgObject[0].getImageID());
                 imageInfoObject.setTimestamp(imgObject[0].getTimestamp());
-                imageInfoObject.setImageData(imageData);
+                //imageInfoObject.setImageData(imageData);
+                imageInfoObject.setimageFilePath(imagePath);
 
                 //imageData = BitmapFactory.decodeStream((InputStream)new URL(urlString[0]).getContent());
             } catch (IOException e) {
@@ -254,12 +271,23 @@ public class MyGcmListenerService extends GcmListenerService {
             DBMessagesHelper.insertImageIntoDB(imageInfoObject.getSenderUserName(),
                     imageInfoObject.getRecepientUserName(),
                     String.valueOf(imageInfoObject.getImageID()),
-                    imageInfoObject.getImageData(),
+                    imageInfoObject.getimageFilePath(),
                     imageInfoObject.getTimestamp(),
-                    "received");
-            //TODO show the notification here and pass the bitmap to sendNotification()
+                    "downloaded");
+
+            //Show a notification, only if the activity is not visible
+            //TODO check for MainPage as well
+            SharedPreferences prefs  = getSharedPreferences("com.example.android.project1.ChatPageState",0);
+            Log.d("MyGcmListenerService", "ChatPage visibility is " + prefs.getBoolean("isVisible", false));
+            if(!prefs.getBoolean("isVisible", false)){
+                Bitmap image = BitmapFactory.decodeFile(imageInfoObject.getimageFilePath());
+                sendImageNotification(imageInfoObject.getSenderUserName(),
+                        String.valueOf(imageInfoObject.getImageID()),
+                        image);
+            }
             //Refresh the ChatPage's listview, in case it was already visible
             refreshListView();
+
         }
     }
 }

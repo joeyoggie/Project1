@@ -47,7 +47,7 @@ public class ChatPageAdapter extends CursorAdapter {
     int timestampColumnIndex;
     int messageStateColumnIndex;
     int messageTypeColumnIndex;
-    int imageBlobColumnIndex;
+    int imagePathColumnIndex;
 
     public ChatPageAdapter(Context context, Cursor cursor) {
         super(context, cursor);
@@ -58,7 +58,7 @@ public class ChatPageAdapter extends CursorAdapter {
         timestampColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_TIME);
         messageStateColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_STATE);
         messageTypeColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_MESSAGE_TYPE);
-        imageBlobColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_BLOB);
+        imagePathColumnIndex = cursor.getColumnIndexOrThrow(DBMessagesContract.MessageEntry.COLUMN_NAME_IMAGE_PATH);
 
         SharedPreferences prefs = context.getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
         userName = prefs.getString("userName","Me");
@@ -123,6 +123,7 @@ public class ChatPageAdapter extends CursorAdapter {
 
         //Check type of message, text or image
         messageType = cursor.getString(messageTypeColumnIndex);
+        //If the current message is a text message
         if(messageType.equals("text")){
             viewHolder.messageText.setVisibility(View.VISIBLE);
             message = cursor.getString(messageColumnIndex);
@@ -132,17 +133,31 @@ public class ChatPageAdapter extends CursorAdapter {
             else{
                 viewHolder.messageText.setText("null message");
             }
+            if(messageState.equals("unsent")){
+                viewHolder.messageText.setTextColor(Color.LTGRAY);
+            }
+            else{
+                viewHolder.messageText.setTextColor(Color.BLACK);
+            }
             viewHolder.messageImage.setVisibility(View.GONE);
         }
+        //if the current message is an image
         else if(messageType.equals("image")){
             viewHolder.messageImage.setVisibility(View.VISIBLE);
             viewHolder.messageText.setText("Loading picture...");
-            byte[] imageByteArray = cursor.getBlob(imageBlobColumnIndex);
-            image = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.length);
-            viewHolder.messageImage.setImageBitmap(image);
+            String imagePath = cursor.getString(imagePathColumnIndex);
+            if( messageState.equals("downloaded") || messageState.equals("sent") || messageState.equals("unsent") ){
+                image = BitmapFactory.decodeFile(imagePath);
+                viewHolder.messageImage.setImageBitmap(image);
+            }
+            else if(messageState.equals("errorInDownload")){
+                viewHolder.messageImage.setImageResource(R.drawable.image_error);
+            }
+            else {
+                viewHolder.messageImage.setImageResource(R.drawable.image_error);
+            }
             viewHolder.messageText.setVisibility(View.GONE);
         }
-
         viewHolder.senderText.setText(sender);
 
         if(userName.equals(sender)) {
@@ -154,15 +169,6 @@ public class ChatPageAdapter extends CursorAdapter {
             viewHolder.messageViewParams.gravity = Gravity.LEFT;
 
             //viewHolder.senderText.setVisibility(View.VISIBLE);
-        }
-
-        if(messageState.equals("unsent")){
-            viewHolder.messageText.setTextColor(Color.LTGRAY);
-            //TODO Mark viewHolder.messageImage as grey or something
-        }
-        else{
-            viewHolder.messageText.setTextColor(Color.BLACK);
-            //TODO Leave the viewHolder.messageImage as it normally should be
         }
 
         if(timestamp != null){

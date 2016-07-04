@@ -3,14 +3,14 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <!--<item name="colorAccent">@android:color/darker_gray</item>-->
+        <item name="colorAccent">@android:color/darker_gray</item>
         <!--<&lt;!&ndash;item name="colorAccent">#C47009</item>
         <item name="colorPrimary">#C47009</item>
         <item name="colorPrimaryDark">#C47009</item>&ndash;&gt;-->
 
-        <item name="colorAccent">#B86807</item>
+        <!--<item name="colorAccent">#B86807</item>
         <item name="colorPrimary">#B86807</item>
-        <item name="colorPrimaryDark">#B86807</item>
+        <item name="colorPrimaryDark">#B86807</item>-->
 
         <!--<item name="colorAccent">#daa520</item>
         <item name="colorPrimary">#daa520</item>

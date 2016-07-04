@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,64 +7,82 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     tools:context="com.example.android.project1.UserProfile">
 
     <ImageView
         android:id="@+id/userpp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:src="@drawable/default_profile_picture"
         />
 
-    <TextView
-        android:id="@+id/phone_number_static"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/userpp"
-        android:textStyle="bold"
-        android:text="Phone number: "/>
-    <TextView
-        android:id="@+id/profilePhoneNo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/userpp"
-        android:layout_toRightOf="@id/phone_number_static"/>
-
-    <TextView
-        android:id="@+id/profile_name_static"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/phone_number_static"
-        android:textStyle="bold"
-        android:text="Username: " />
-    <TextView
-        android:id="@+id/profileusername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/profile_name_static"
-        android:layout_below="@id/phone_number_static"/>
-
-
-    <TextView
-        android:id="@+id/status_static"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/profile_name_static"
-        android:textStyle="bold"
-        android:text="Status: "/>
-    <TextView
-        android:id="@+id/profieStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/profile_name_static"
-        android:layout_toRightOf="@id/status_static" />
-
-    <Button
-        android:id="@+id/send_message_button"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/status_static"
-        android:text="Send message"
-        android:onClick="goToChatPage"/>
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/change_profile_picture_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Change profile picture"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp"
+            android:onClick="changeProfilePicture"/>
+
+        <TextView
+            android:id="@+id/phone_number_static"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/change_profile_picture_button"
+            android:textStyle="bold"
+            android:text="Phone number: "/>
+        <TextView
+            android:id="@+id/profilePhoneNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/change_profile_picture_button"
+            android:layout_toRightOf="@id/phone_number_static"/>
+
+        <TextView
+            android:id="@+id/profile_name_static"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/phone_number_static"
+            android:textStyle="bold"
+            android:text="Username: " />
+        <TextView
+            android:id="@+id/profileusername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/profile_name_static"
+            android:layout_below="@id/phone_number_static"/>
+
+
+        <TextView
+            android:id="@+id/status_static"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/profile_name_static"
+            android:textStyle="bold"
+            android:text="Status: "/>
+        <TextView
+            android:id="@+id/profieStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/profile_name_static"
+            android:layout_toRightOf="@id/status_static" />
+
+        <Button
+            android:id="@+id/send_message_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/status_static"
+            android:text="Send message"
+            android:onClick="goToChatPage"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

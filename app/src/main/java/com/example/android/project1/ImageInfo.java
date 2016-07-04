@@ -1,7 +1,5 @@
 package com.example.android.project1;
 
-import android.graphics.Bitmap;
-
 /**
  * Created by Joey on 7/1/2016.
  */
@@ -10,9 +8,9 @@ public class ImageInfo {
     private String senderUserName;
     private String recepientUserName;
     private String timestamp;
-    private String imageFileName;
-    Bitmap imageContent;
-    byte[] imageData;
+    private String imageFilePath;
+    /*Bitmap imageContent;
+    byte[] imageData;*/
 
     public void setImageID(long imageID) {
         ImageID = imageID;
@@ -26,15 +24,15 @@ public class ImageInfo {
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
-    public void setImageFileName(String imageFileName) {
-        this.imageFileName = imageFileName;
+    public void setimageFilePath(String imageFileName) {
+        this.imageFilePath = imageFileName;
     }
-    public void setImageContent(Bitmap imageContent) {
+    /*public void setImageContent(Bitmap imageContent) {
         this.imageContent = imageContent;
     }
     public void setImageData(byte[] imageData) {
         this.imageData = imageData;
-    }
+    }*/
 
     public long getImageID() {
         return ImageID;
@@ -48,13 +46,13 @@ public class ImageInfo {
     public String getTimestamp() {
         return timestamp;
     }
-    public String getImageFileName() {
-        return imageFileName;
+    public String getimageFilePath() {
+        return imageFilePath;
     }
-    public Bitmap getImageContent() {
+    /*public Bitmap getImageContent() {
         return imageContent;
     }
     public byte[] getImageData() {
         return imageData;
-    }
+    }*/
 }

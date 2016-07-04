@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -47,6 +48,8 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -99,7 +102,8 @@ public class ChatPage extends ActionBarActivity {
     EmojiconsPopup popup;
 
     int SELECT_PICTURE = 44;
-    private String KEY_IMAGE = "image";
+    String imagePath;
+    long imageID;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -610,16 +614,43 @@ public class ChatPage extends ActionBarActivity {
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         timestamp = simpleDateFormat.format(date);
 
-        String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/AddNewImage?senderDeviceID="+deviceID+"&recepientUserName="+ recepientUserName+"&timestamp="+timestamp;
-
         final String boundary = "begBoundary-" + deviceID + userName + deviceID;
         final String mimeType = "multipart/form-data; boundary=" + boundary;
         //Convert image into multipart byte[]
         byte[] multipartBody = getMultiPartDataFromBitmap(imageBitmap, imageName);
 
-        ByteArrayOutputStream imageByteArrayOutputStream = new ByteArrayOutputStream();
+        /*ByteArrayOutputStream imageByteArrayOutputStream = new ByteArrayOutputStream();
         imageBitmap.compress(Bitmap.CompressFormat.PNG, 0, imageByteArrayOutputStream);
-        final byte[] imageByteArray = imageByteArrayOutputStream.toByteArray();
+        final byte[] imageByteArray = imageByteArrayOutputStream.toByteArray();*/
+
+        //Save the bitmap on the external storage
+        String state = Environment.getExternalStorageState();
+        if(Environment.MEDIA_MOUNTED.equals(state)){
+            File dataDir = new File(Environment.getExternalStorageDirectory(), "OnTime");
+            if(!dataDir.exists()){
+                dataDir.mkdirs();
+            }
+            File sentDataDir = new File(Environment.getExternalStorageDirectory()+"/OnTime", "Sent");
+            if(!sentDataDir.exists()){
+                sentDataDir.mkdirs();
+            }
+            String fileName = timestamp;
+            fileName = fileName.replaceAll("/", "-");
+            imagePath = sentDataDir + "/" + fileName + ".png";
+            try{
+                FileOutputStream outputStream = new FileOutputStream(imagePath);
+                imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                outputStream.flush();
+                outputStream.close();
+                imageID = DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imagePath, timestamp, "unsent");
+                refreshCursor();
+            }
+            catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+
+        String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/AddNewImage?senderDeviceID="+deviceID+"&recepientUserName="+ recepientUserName + "&imageID=" + imageID +"&timestamp="+timestamp;
 
         ImageMultiPartRequest multipartRequest = new ImageMultiPartRequest(url, null, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
             @Override
@@ -628,9 +659,9 @@ public class ChatPage extends ActionBarActivity {
                 //Dismiss the progress dialog
                 progressDialog.dismiss();
                 Log.d("ChatPage", "Image sent successfully.");
-                Log.d("ChatPage", "Volley respose: " + response.toString());
-                //TODO insert into DB before starting the upload
-                DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imageByteArray, timestamp, "sent");
+                Log.d("ChatPage", "Volley response: " + response.toString());
+                String imageIDString = new String(response.data);
+                DBMessagesHelper.updateImageState(Long.parseLong(imageIDString), "sent");
                 refreshCursor();
             }
         }, new Response.ErrorListener() {
@@ -640,9 +671,6 @@ public class ChatPage extends ActionBarActivity {
                 //Dismiss the progress dialog
                 progressDialog.dismiss();
                 Log.d("ChatPage", "Volley error: " + error.toString());
-                //TODO insert into DB before starting the upload
-                DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imageByteArray, timestamp, "unsent");
-                refreshCursor();
             }
         });
         multipartRequest.setRetryPolicy(new DefaultRetryPolicy(15000,

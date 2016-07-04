@@ -20,6 +20,6 @@ public final class DBMessagesContract {
         public static final String COLUMN_NAME_MESSAGE_STATE = "messageStatus";
         public static final String COLUMN_NAME_MESSAGE_TYPE = "messageType";
         public static final String COLUMN_NAME_IMAGE_ID = "imageID";
-        public static final String COLUMN_NAME_IMAGE_BLOB = "imageBlob";
+        public static final String COLUMN_NAME_IMAGE_PATH = "imagePath";
     }
 }
