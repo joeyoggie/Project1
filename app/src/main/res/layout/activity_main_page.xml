@@ -10,38 +10,45 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/custom_recepient_username"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_centerHorizontal="true"
-            android:inputType="textCapWords"
-            android:hint="Enter the receient username here"/>
+            android:layout_centerInParent="true">
 
-        <EditText
-            android:id="@+id/custom_recepient_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/custom_recepient_username"
-            android:layout_marginTop="8dp"
-            android:layout_centerHorizontal="true"
-            android:visibility="gone"
-            android:hint="Enter the recepient name here"/>
+            <EditText
+                android:id="@+id/custom_recepient_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_centerHorizontal="true"
+                android:inputType="textCapWords"
+                android:hint="Enter the receient username here"/>
 
-        <Button
-            android:id="@+id/custom_recepient_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Go"
-            android:layout_below="@id/custom_recepient_name"
-            android:layout_centerHorizontal="true"
-            android:onClick="goToChatPage"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/custom_recepient_button"
-            android:text="Or use the '+' at the bottom to select a contact from your contact list"/>
+            <EditText
+                android:id="@+id/custom_recepient_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/custom_recepient_username"
+                android:layout_marginTop="8dp"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                android:hint="Enter the recepient name here"/>
+
+            <Button
+                android:id="@+id/custom_recepient_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Go"
+                android:layout_below="@id/custom_recepient_name"
+                android:layout_centerHorizontal="true"
+                android:onClick="goToChatPage"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/custom_recepient_button"
+                android:text="Or use the '+' at the bottom to select a contact from your contact list"/>
+
+        </RelativeLayout>
 
 <!--
         <RelativeLayout

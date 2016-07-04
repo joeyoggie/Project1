@@ -629,6 +629,7 @@ public class ChatPage extends ActionBarActivity {
                 progressDialog.dismiss();
                 Log.d("ChatPage", "Image sent successfully.");
                 Log.d("ChatPage", "Volley respose: " + response.toString());
+                //TODO insert into DB before starting the upload
                 DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imageByteArray, timestamp, "sent");
                 refreshCursor();
             }
@@ -639,6 +640,7 @@ public class ChatPage extends ActionBarActivity {
                 //Dismiss the progress dialog
                 progressDialog.dismiss();
                 Log.d("ChatPage", "Volley error: " + error.toString());
+                //TODO insert into DB before starting the upload
                 DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imageByteArray, timestamp, "unsent");
                 refreshCursor();
             }
@@ -696,42 +698,56 @@ public class ChatPage extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         Log.d("ChatPage", "onActivityResult");
-        Log.d("ChatPage", "resultCode="+resultCode);
         if (resultCode == Activity.RESULT_OK) {
-            Log.d("ChatPage", "requestCode=" + requestCode);
             if (requestCode == SELECT_PICTURE){
-                String selectedImagePath = null;
-                Uri selectedImageUri = data.getData();
-                String[] projection = { MediaStore.MediaColumns.DATA };
-                //String[] projection = { MediaStore.Images.Media.DATA };
-                //Cursor cursor = managedQuery(selectedImageUri, projection, null, null, null);
-                Cursor cursor = this.getContentResolver().query(selectedImageUri, projection, null, null, null);
-                if(cursor != null){
-                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-                    //int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                    cursor.moveToFirst();
-                    selectedImagePath = cursor.getString(column_index);
+                if(data != null){
+                    String selectedImagePath = null;
+                    Uri selectedImageUri = data.getData();
+                    String[] projection = { MediaStore.MediaColumns.DATA };
+                    //String[] projection = { MediaStore.Images.Media.DATA };
+                    //Cursor cursor = managedQuery(selectedImageUri, projection, null, null, null);
+                    Cursor cursor = this.getContentResolver().query(selectedImageUri, projection, null, null, null);
+                    if(cursor != null){
+                        int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+                        //int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                        cursor.moveToFirst();
+                        selectedImagePath = cursor.getString(column_index);
+                    }
+                    else{
+                        selectedImagePath = selectedImageUri.getPath();
+                    }
+
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(selectedImagePath, options);
+                    final int REQUIRED_SIZE = 1000;
+                    int scale = 1;
+                    while (options.outWidth / scale / 2 >= REQUIRED_SIZE
+                            && options.outHeight / scale / 2 >= REQUIRED_SIZE)
+                        scale *= 2;
+                    options.inSampleSize = scale;
+                    options.inJustDecodeBounds = false;
+                    Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath, options);
+                    /*ImageView imgView = (ImageView) findViewById(R.id.test_image);
+                    imgView.setImageBitmap(bitmap);*/
+                    sendImage(bitmap, selectedImagePath);
                 }
                 else{
-                    selectedImagePath = selectedImageUri.getPath();
+                    Log.d("ChatPage", "ResultCode= " + resultCode + " & RequestCode= " +requestCode);
+                    Log.d("ChatPage", "Intent 'data' is null.");
+                    Toast.makeText(ChatPage.this, "Image null error!", Toast.LENGTH_SHORT).show();
                 }
-
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeFile(selectedImagePath, options);
-                final int REQUIRED_SIZE = 1000;
-                int scale = 1;
-                while (options.outWidth / scale / 2 >= REQUIRED_SIZE
-                        && options.outHeight / scale / 2 >= REQUIRED_SIZE)
-                    scale *= 2;
-                options.inSampleSize = scale;
-                options.inJustDecodeBounds = false;
-                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath, options);
-                /*ImageView imgView = (ImageView) findViewById(R.id.test_image);
-                imgView.setImageBitmap(bitmap);*/
-                sendImage(bitmap, selectedImagePath);
             }
+            else{
+                Log.d("ChatPage", "ResultCode= " + resultCode + " & RequestCode= " +requestCode);
+                Toast.makeText(ChatPage.this, "Unable to select image. \"" + "ResultCode= " + resultCode + " & RequestCode= " + requestCode, Toast.LENGTH_SHORT).show();
+            }
+        }
+        else{
+            Log.d("ChatPage", "ResultCode= " + resultCode + " & RequestCode= " +requestCode);
+            Toast.makeText(ChatPage.this, "Unable to select image. \"" + "ResultCode= " +resultCode + " & RequestCode= " + requestCode, Toast.LENGTH_SHORT).show();
         }
     }
 

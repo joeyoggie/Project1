@@ -1,5 +1,6 @@
 package com.example.android.project1;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -21,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Random;
 
 /**
  * Created by Joey on 11/9/2015.
@@ -69,6 +71,7 @@ public class MyGcmListenerService extends GcmListenerService {
             refreshListView();
 
             //Show a notification, only if the activity is not visible
+            //TODO check for MainPage as well
             SharedPreferences prefs  = getSharedPreferences("com.example.android.project1.ChatPageState",0);
             Log.d("MyGcmListenerService", "ChatPage visibility is " + prefs.getBoolean("isVisible", false));
             if(!prefs.getBoolean("isVisible", false)){
@@ -103,6 +106,8 @@ public class MyGcmListenerService extends GcmListenerService {
             downloadImage(imageInfoObject);
 
             //Show a notification, only if the activity is not visible
+            //TODO check for MainPage as well
+            //TODO move this code to the onPostExecute of downloading the image and pass the bitmap the sendNotification()
             SharedPreferences prefs  = getSharedPreferences("com.example.android.project1.ChatPageState",0);
             Log.d("MyGcmListenerService", "ChatPage visibility is " + prefs.getBoolean("isVisible", false));
             if(!prefs.getBoolean("isVisible", false)){
@@ -148,16 +153,21 @@ public class MyGcmListenerService extends GcmListenerService {
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.powered_by_google_dark)
-                .setContentTitle("Message from "+sender)
+                .setContentTitle(sender)
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
+                .setOnlyAlertOnce(true)
+                .setGroup("newMessage")
+                .setPriority(Notification.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        Random rnd = new Random();
+
+        notificationManager.notify(rnd.nextInt() /* ID of notification */, notificationBuilder.build());
     }
 
     private void sendImageNotification(String sender, String message) {
@@ -247,6 +257,7 @@ public class MyGcmListenerService extends GcmListenerService {
                     imageInfoObject.getImageData(),
                     imageInfoObject.getTimestamp(),
                     "received");
+            //TODO show the notification here and pass the bitmap to sendNotification()
             //Refresh the ChatPage's listview, in case it was already visible
             refreshListView();
         }
