@@ -40,7 +40,7 @@ public class ChatPageAdapter extends CursorAdapter {
 
     SimpleDateFormat simpleDateFormat;
     SimpleDateFormat simpleDateFormatToDisplay;
-    Date date;
+    Date date, currentDate;
 
     int senderColumnIndex;
     int messageColumnIndex;
@@ -174,6 +174,13 @@ public class ChatPageAdapter extends CursorAdapter {
         if(timestamp != null){
             try {
                 date = simpleDateFormat.parse(timestamp);
+                currentDate = new Date();
+                if(date.compareTo(currentDate) > 0){
+                    viewHolder.messageView.setBackgroundColor(Color.YELLOW);
+                }
+                else{
+                    viewHolder.messageView.setBackgroundColor(Color.GRAY);
+                }
             } catch (ParseException e) {
                 e.printStackTrace();
             }

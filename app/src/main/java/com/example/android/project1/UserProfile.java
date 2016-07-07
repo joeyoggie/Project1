@@ -345,7 +345,7 @@ public class UserProfile extends ActionBarActivity {
                 profilePictureImageView.setImageBitmap(profilePicture);
             }
             else{
-                profilePictureImageView.setImageResource(R.drawable.image_error);
+                profilePictureImageView.setImageResource(R.drawable.default_profile_picture);
             }
         }
     }

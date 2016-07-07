@@ -22,4 +22,9 @@
         app:showAsAction="always"
         />
 
+    <item android:id="@+id/draw_image"
+        android:title="Draw"
+        app:showAsAction="always">
+    </item>
+
 </menu>

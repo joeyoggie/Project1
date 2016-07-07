@@ -3,6 +3,7 @@ package com.example.android.project1;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -134,20 +135,31 @@ public class MyGcmListenerService extends GcmListenerService {
      */
     private void sendNotification(String sender, String message) {
         //Create a pending intent that will launch when the notification is pressed
-        Intent intent = new Intent(this, ChatPage.class);
+        Intent chatPageIntent = new Intent(this, ChatPage.class);
         Bundle extras = new Bundle();
         extras.putString("message", message);
         extras.putString("recepientUserName", sender);
-        intent.putExtras(extras);
+        chatPageIntent.putExtras(extras);
+
+        //The stack builder object will contain an artificial back stack for the started Activity.
+        //This ensures that navigating backward from the Activity leads out of your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        //Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(ChatPage.class);
+        //Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(chatPageIntent);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); //also removed launchMode=singleInstance from manifest
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        /*PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 *//* Request code *//*, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);*/
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.powered_by_google_dark)
+                .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.drawable.default_profile_picture))
                 .setContentTitle(sender)
                 .setContentText(message)
+                .setWhen(System.currentTimeMillis())
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setOnlyAlertOnce(true)
@@ -158,9 +170,40 @@ public class MyGcmListenerService extends GcmListenerService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+        //Generate a random number for the notification ID and save it in a SharedPreference,
+        //to be able to cancel it later using the generated ID
         Random rnd = new Random();
+        int notifID = rnd.nextInt();
+        SharedPreferences prefs  = getSharedPreferences("com.example.android.project1.NotificationData",0);
+        //int numberOfUnreadNotifications = prefs.getInt("unreadNotifications", 0);
+        SharedPreferences.Editor prefsEditor = prefs.edit();
+        prefsEditor.putInt(sender, notifID);
+        //numberOfUnreadNotifications++;
+        //prefsEditor.putInt("unreadNotifications", numberOfUnreadNotifications);
+        prefsEditor.apply();
 
-        notificationManager.notify(rnd.nextInt() /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(notifID /* ID of notification */, notificationBuilder.build());
+
+        /*if (numberOfUnreadNotifications>1) {
+            Intent mainPageIntent = new Intent(this, MainPage.class);
+            PendingIntent mainPagePendingIntent = PendingIntent.getActivity(this, 0 *//* Request code *//*, mainPageIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Notification summaryNotification = new NotificationCompat.Builder(this)
+                    .setContentTitle("You have new messages")
+                    .setSmallIcon(R.drawable.powered_by_google_dark)
+                    *//*.setLargeIcon(largeIcon)*//*
+                    .setStyle(new NotificationCompat.InboxStyle()
+                            *//*.addLine("Message1")
+                            .addLine("Message2")*//*
+                            .setBigContentTitle(Integer.toString(numberOfUnreadNotifications)+" new messages")
+                            .setSummaryText(Integer.toString(numberOfUnreadNotifications)+" new messages"))
+                    .setGroup("newMessage")
+                    .setGroupSummary(true)
+                    .setContentIntent(mainPagePendingIntent)
+                    .build();
+            notificationManager.notify(0, summaryNotification);
+        }*/
     }
 
     private void sendImageNotification(String sender, String message, Bitmap image) {

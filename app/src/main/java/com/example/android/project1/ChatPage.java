@@ -1,6 +1,7 @@
 package com.example.android.project1;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -134,6 +135,15 @@ public class ChatPage extends ActionBarActivity {
         listAdapter = new ChatPageAdapter(this, cursor);
         listView.setAdapter(listAdapter);
         refreshCursor();
+
+        //Hide the notification, if it's shown, using the ID generated when the notification was created
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        SharedPreferences prefs  = getSharedPreferences("com.example.android.project1.NotificationData",0);
+        notificationManager.cancel(prefs.getInt(recepientUserName, 0));
+        /*SharedPreferences.Editor prefsEditor = prefs.edit();
+        prefsEditor.putInt("unreadNotifications", 0);
+        prefsEditor.apply();*/
 
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
@@ -859,10 +869,18 @@ public class ChatPage extends ActionBarActivity {
         {
             DialogFragment newFragment = new PopupMessageDialog();
             newFragment.show(getSupportFragmentManager(), "timePicker");
+            return true;
         }
         if(id==R.id.image_upload)
         {
             loadImageFromGallery();
+            return true;
+        }
+        if(id==R.id.draw_image)
+        {
+            android.app.DialogFragment newFragment = new DrawingFragment();
+            newFragment.show(getFragmentManager(),"DrawingFragment");
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
