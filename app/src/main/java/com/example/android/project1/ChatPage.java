@@ -606,7 +606,10 @@ public class ChatPage extends ActionBarActivity {
     }
 
     public void loadImageFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        //Intent intent = new Intent(Intent.ACTION_GET_CONTENT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        //ACTION_GET_CONTENT allows users to pick from other sources (other than Gallery) such as Google Drive
+        //But somehow it didn't work on all devices, so we'll stick with ACTION_PICK
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
 
