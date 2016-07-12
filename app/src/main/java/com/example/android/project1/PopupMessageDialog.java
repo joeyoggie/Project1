@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.TimeZone;
 
 
@@ -89,13 +90,12 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             Log.d("CALENDAR TIME: ", calendar.toString());
             Date date = calendar.getTime();
             Log.d("DATE: ", date.toString());
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss", Locale.US);
             simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             timestamp = simpleDateFormat.format(date);
             Log.d("TIMESTAMP:", timestamp);
 
             //Send the message info to the server in a background thread
-            String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
 
             HashMap<String, String> params = new HashMap<>();
             params.put("senderDeviceID", deviceID);
@@ -105,6 +105,8 @@ public class PopupMessageDialog extends DialogFragment implements CustomTimePick
             params.put("messageID", String.valueOf(0));
             JSONObject jsonObject = new JSONObject(params);
             Log.d("ChatPage", "JSON: "+jsonObject.toString());
+            String url2 = SERVER_IP + "/MyFirstServlet/AddNewMessage";
+            HttpsTrustManager.allowAllSSL();
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {

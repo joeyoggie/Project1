@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:padding="8dp"
         android:layout_margin="8dp"
-        android:background="@android:color/darker_gray">
+        android:background="@drawable/background_with_shadow">
 
         <TextView
             android:id="@+id/sender_username_box"

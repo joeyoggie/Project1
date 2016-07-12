@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.android.project1.ChatPageWithListView">
+    tools:context="com.example.android.project1.ChatPage">
 
     <item
         android:id="@+id/action_settings"
@@ -13,18 +13,14 @@
     <item
         android:id="@+id/schedule_message_button"
         android:title="Later"
-        android:orderInCategory="100"
+        android:icon="@drawable/calender"
+        android:orderInCategory="10"
         app:showAsAction="always" />
 
-    <item android:id="@+id/image_upload"
-        android:title="Image"
-        android:orderInCategory="100"
-        app:showAsAction="always"
-        />
-
-    <item android:id="@+id/draw_image"
-        android:title="Draw"
-        app:showAsAction="always">
-    </item>
+    <item android:id="@+id/attachment_button"
+        android:title="Attachment"
+        android:icon="@drawable/attachment"
+        android:orderInCategory="1"
+        app:showAsAction="always"/>
 
 </menu>

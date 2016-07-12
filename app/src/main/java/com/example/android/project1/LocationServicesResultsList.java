@@ -5,10 +5,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -56,6 +54,7 @@ public class LocationServicesResultsList extends AppCompatActivity {
         }
 
         getServiceProviders(latitude, longitude, serviceCategory);
+        getSupportActionBar().setTitle("Nearby " + serviceCategory + "s:");
     }
 
     private String getServerIP() {
@@ -63,20 +62,12 @@ public class LocationServicesResultsList extends AppCompatActivity {
         return tempPrefs.getString("SERVER_IP", getResources().getString(R.string.server_ip_address));
     }
 
-    public void contactServiceProvider(View view){
-        Toast.makeText(LocationServicesResultsList.this, "Not implemented yet..", Toast.LENGTH_SHORT).show();
-    }
-
-    public void showOnMap(View view){
-        Toast.makeText(LocationServicesResultsList.this, "Not implemented yet..", Toast.LENGTH_SHORT).show();
-    }
-
     public void getServiceProviders(String latitude, String longitude, String serviceCategory) {
 
-        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetLocalServices?serviceCategory="+URLEncoder.encode(serviceCategory)
+        String url = SERVER_IP + "/MyFirstServlet/GetLocalServices?serviceCategory="+URLEncoder.encode(serviceCategory)
                 +"&userLongitude="+URLEncoder.encode(longitude)
                 +"&userLatitude="+URLEncoder.encode(latitude);
-
+        HttpsTrustManager.allowAllSSL();
         //Request a response from the provided URL.
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
             Gson gson = new Gson();

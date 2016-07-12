@@ -71,22 +71,37 @@
         android:layout_below="@id/address_text_view"
         android:text="4/5"/>
 
-    <Button
-        android:id="@+id/contact_button"
+    <LinearLayout
+        android:id="@+id/contact_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rating_static_text_view"
-        android:text="Contact"
-        android:onClick="contactServiceProvider"
-        android:textAllCaps="false"/>
+        android:orientation="horizontal"
+        android:layout_below="@id/rating_static_text_view">
+
+        <Button
+            android:id="@+id/contact_button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Contact (via OnTime)"
+            android:textAllCaps="false"/>
+
+        <Button
+            android:id="@+id/call_button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Call"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+
 
     <Button
         android:id="@+id/map_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/contact_button"
+        android:layout_below="@id/contact_layout"
         android:text="Show on map"
-        android:onClick="showOnMap"
         android:textAllCaps="false"/>
 
     <!--<View

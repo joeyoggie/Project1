@@ -155,8 +155,8 @@ public class MyGcmListenerService extends GcmListenerService {
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.powered_by_google_dark)
-                .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.drawable.default_profile_picture))
+                .setSmallIcon(R.drawable.notification_icon)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.default_profile_picture))
                 .setContentTitle(sender)
                 .setContentText(message)
                 .setWhen(System.currentTimeMillis())
@@ -219,7 +219,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.powered_by_google_dark)
+                .setSmallIcon(R.drawable.notification_icon)
                 .setContentTitle("New image from "+sender)
                 .setContentText("ImageID = "+message)
                 .setAutoCancel(true)
@@ -244,7 +244,9 @@ public class MyGcmListenerService extends GcmListenerService {
         protected ImageInfo doInBackground(ImageInfo... imgObject){
             byte[] imageData = null;
             ImageInfo imageInfoObject = new ImageInfo();
-            String urlString = "http://"+SERVER_IP+":8080/MyFirstServlet/GetImage?imageID=" + imgObject[0].getImageID();
+            String urlString = SERVER_IP + "/MyFirstServlet/GetImage?imageID=" + imgObject[0].getImageID();
+            HttpsTrustManager.allowAllSSL();
+
             try {
                 /*HttpURLConnection conn;
                 URL url = new URL(urlString);
@@ -280,7 +282,7 @@ public class MyGcmListenerService extends GcmListenerService {
                         receivedDataDir.mkdirs();
                     }
                     String fileName = imgObject[0].getTimestamp();
-                    fileName = fileName.replaceAll("/", "-");
+                    fileName = fileName.replaceAll("/", "-").replaceAll(":", "-");
                     imagePath = receivedDataDir + "/" + fileName + ".png";
                     FileOutputStream outputStream = new FileOutputStream(imagePath);
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);

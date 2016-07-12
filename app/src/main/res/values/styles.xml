@@ -3,23 +3,79 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorAccent">@android:color/darker_gray</item>
-        <!--<&lt;!&ndash;item name="colorAccent">#C47009</item>
-        <item name="colorPrimary">#C47009</item>
-        <item name="colorPrimaryDark">#C47009</item>&ndash;&gt;-->
+
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
 
         <!--<item name="colorAccent">#B86807</item>
         <item name="colorPrimary">#B86807</item>
         <item name="colorPrimaryDark">#B86807</item>-->
 
-        <!--<item name="colorAccent">#ee5c42</item>
-        <item name="colorPrimary">#ee5c42</item>
-        <item name="colorPrimaryDark">#ee5c42</item>-->
+        <!--<item name="android:popupMenuStyle">@style/popupMenuStyle</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/myPopupMenuTextAppearanceLarge</item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/myPopupMenuTextAppearanceSmall</item>-->
 
-        <!--<item name="colorAccent">#daa520</item>
-        <item name="colorPrimary">#daa520</item>
-        <item name="colorPrimaryDark">#daa520</item>-->
+        <item name="android:dialogTheme">@style/AppTheme.DialogTheme</item>
+
+        <!--<item name="android:buttonStyle">@style/AppTheme.Buttons</item>-->
+        <item name="colorButtonNormal">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+        <!--<item name="android:colorFocusedHighlight">@color/colorPrimary</item>
+        <item name="android:colorPressedHighlight">@color/colorAccent</item>-->
     </style>
+
+    <!--<style name="popupMenuStyle" parent="@android:style/Widget.PopupMenu">
+        <item name="android:popupBackground">@color/colorPrimary</item>
+        &lt;!&ndash;<item name="android:textColor">@color/textColor</item>&ndash;&gt;
+    </style>
+
+    <style name="myPopupMenuTextAppearanceSmall" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Small">
+        <item name="android:textColor">@android:color/white</item>
+        &lt;!&ndash;<item name="android:textSize">15sp</item>&ndash;&gt;
+    </style>
+
+    <style name="myPopupMenuTextAppearanceLarge" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large">
+        <item name="android:textColor">@android:color/white</item>
+        &lt;!&ndash;<item name="android:textSize">25sp</item>&ndash;&gt;
+    </style>-->
+
+
+    <style name="AppTheme.DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
+    </style>
+
+    <style name="Dialog.NoTitle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
+        <!--<item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>-->
+    </style>
+
+
+    <!--<style name="AppTheme.Buttons" parent="@android:style/Widget.Button">
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:shadowColor">#FF000000</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">-1</item>
+        <item name="android:shadowRadius">0.2</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="android:background">@color/colorAccent</item>
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+        <item name="android:textColor">@color/textTitleColor</item>
+    </style>-->
+
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>

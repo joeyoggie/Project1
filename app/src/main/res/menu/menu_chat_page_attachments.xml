@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.android.project1.ChatPage">
+
+    <item android:id="@+id/image_upload"
+        android:title="Image"
+        android:icon="@drawable/image"
+        android:orderInCategory="1"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/draw_image"
+        android:title="Sketch"
+        android:icon="@drawable/draw"
+        android:orderInCategory="2"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/voice_note"
+        android:title="Voice note"
+        android:icon="@drawable/voice"
+        android:orderInCategory="3"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/file"
+        android:title="File"
+        android:icon="@drawable/file_icon"
+        android:orderInCategory="4"
+        app:showAsAction="always"/>
+
+</menu>

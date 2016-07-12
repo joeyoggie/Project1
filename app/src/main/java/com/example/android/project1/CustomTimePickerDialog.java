@@ -97,6 +97,7 @@ public class CustomTimePickerDialog extends AlertDialog
 
         Context themeContext = getContext();
         setButton(BUTTON_POSITIVE, "Send!", this);
+        setButton(BUTTON_NEGATIVE, "Cancel", this);
 
         LayoutInflater inflater =
                 (LayoutInflater) themeContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

@@ -88,9 +88,11 @@ public class Registration extends ActionBarActivity {
                     prefsEditor.putString("phoneNumber", intent.getStringExtra("phoneNumber"));
                     prefsEditor.apply();
                     contentTextView.setText("Registration successful! Click next to continue.");
-                    contentTextView.setTextColor(Color.GREEN);
+                    contentTextView.setTextColor(getResources().getColor(R.color.colorAccent));
                     Button finishRegistration = (Button) findViewById(R.id.finish_registration_button);
                     finishRegistration.setVisibility(View.VISIBLE);
+                    Button submitInfo = (Button) findViewById(R.id.submit_info_button);
+                    submitInfo.setVisibility(View.GONE);
                 }
                 else if(response!=null && response.contains("phoneNumber"))
                 {
@@ -284,7 +286,8 @@ public class Registration extends ActionBarActivity {
             //Get the info from the server in a background thread
             //Instantiate the RequestQueue.
             //RequestQueue queue = HttpConnector.getInstance(this.getApplicationContext()).getRequestQueue();
-            String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/GetInfo?deviceID=" + deviceID;
+            String url = SERVER_IP + "/MyFirstServlet/GetInfo?deviceID=" + deviceID;
+            HttpsTrustManager.allowAllSSL();
             //Request a string response from the provided URL.
             StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
                 @Override

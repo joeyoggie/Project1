@@ -167,7 +167,8 @@ public class LocationServices extends ActionBarActivity implements GoogleApiClie
             }
         });
 
-        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetAllServiceProviderCategories";
+        String url = SERVER_IP + "/MyFirstServlet/GetAllServiceProviderCategories";
+        HttpsTrustManager.allowAllSSL();
         //Request a response from the provided URL.
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
             Gson gson = new Gson();

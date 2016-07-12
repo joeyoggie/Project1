@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +17,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -49,6 +52,11 @@ public class ChatPageAdapter extends CursorAdapter {
     int messageTypeColumnIndex;
     int imagePathColumnIndex;
 
+    ViewHolder viewHolder;
+    ImageDecoder imageDecoder;
+    static ImagePopup imgPopup;
+    String imagePath;
+    static boolean isImageOpened = false;
     public ChatPageAdapter(Context context, Cursor cursor) {
         super(context, cursor);
         this.context = context;
@@ -62,9 +70,9 @@ public class ChatPageAdapter extends CursorAdapter {
 
         SharedPreferences prefs = context.getSharedPreferences("com.example.android.project1.RegistrationPreferences", 0);
         userName = prefs.getString("userName","Me");
-        simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        simpleDateFormatToDisplay = new SimpleDateFormat("h:mm a");
+        simpleDateFormatToDisplay = new SimpleDateFormat("h:mm a", Locale.getDefault());
         simpleDateFormatToDisplay.setTimeZone(TimeZone.getDefault());
     }
 
@@ -113,9 +121,9 @@ public class ChatPageAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor){
+    public void bindView(View view, final Context context, final Cursor cursor){
 
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
+        viewHolder = (ViewHolder) view.getTag();
 
         sender = cursor.getString(senderColumnIndex);
         timestamp = cursor.getString(timestampColumnIndex);
@@ -145,16 +153,23 @@ public class ChatPageAdapter extends CursorAdapter {
         else if(messageType.equals("image")){
             viewHolder.messageImage.setVisibility(View.VISIBLE);
             viewHolder.messageText.setText("Loading picture...");
-            String imagePath = cursor.getString(imagePathColumnIndex);
+            imagePath = cursor.getString(imagePathColumnIndex);
             if( messageState.equals("downloaded") || messageState.equals("sent") || messageState.equals("unsent") ){
-                image = BitmapFactory.decodeFile(imagePath);
+                image = decodeSampledBitmap(imagePath, 400, 400);
                 viewHolder.messageImage.setImageBitmap(image);
+
+                //TODO fix the asynctask populating imageviews in wrong order
+                /*//Cancel loading an image if it's already in progress
+                if(imageDecoder != null)
+                    imageDecoder.cancel(true);*/
+                /*imageDecoder = new ImageDecoder(viewHolder.messageImage);
+                imageDecoder.execute(imagePath);*/
             }
             else if(messageState.equals("errorInDownload")){
-                viewHolder.messageImage.setImageResource(R.drawable.image_error);
+                viewHolder.messageImage.setImageResource(R.drawable.image_broken);
             }
             else {
-                viewHolder.messageImage.setImageResource(R.drawable.image_error);
+                viewHolder.messageImage.setImageResource(R.drawable.image_broken);
             }
             viewHolder.messageText.setVisibility(View.GONE);
         }
@@ -162,12 +177,13 @@ public class ChatPageAdapter extends CursorAdapter {
 
         if(userName.equals(sender)) {
             viewHolder.messageViewParams.gravity = Gravity.RIGHT;
+            viewHolder.messageView.setBackgroundResource(R.drawable.background_with_shadow);
 
             //viewHolder.senderText.setVisibility(View.GONE);
         }
         else {
             viewHolder.messageViewParams.gravity = Gravity.LEFT;
-
+            viewHolder.messageView.setBackgroundResource(R.drawable.background_with_shadow_1);
             //viewHolder.senderText.setVisibility(View.VISIBLE);
         }
 
@@ -179,7 +195,7 @@ public class ChatPageAdapter extends CursorAdapter {
                     viewHolder.messageView.setBackgroundColor(Color.YELLOW);
                 }
                 else{
-                    viewHolder.messageView.setBackgroundColor(Color.GRAY);
+                    //viewHolder.messageView.setBackgroundColor(Color.GRAY);
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -190,6 +206,55 @@ public class ChatPageAdapter extends CursorAdapter {
         else {
             viewHolder.timeBox.setText("null time");
         }
+
+        //use the tag to determine which row is selected in the onclicklistener below
+        viewHolder.tag = cursor.getPosition();
+        viewHolder.messageImage.setTag(viewHolder);
+
+        viewHolder.messageImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewHolder = (ViewHolder) v.getTag();
+                int pos = (int) viewHolder.tag;
+                cursor.moveToPosition(pos);
+                String imgPath = cursor.getString(imagePathColumnIndex);
+                imgPopup = new ImagePopup(context, v, imgPath);
+                isImageOpened = true;
+            }
+        });
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        //Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+            //Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            //height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
+    }
+
+    public static Bitmap decodeSampledBitmap(String imagePath, int reqWidth, int reqHeight) {
+        //First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(imagePath, options);
+
+        //Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        //Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(imagePath, options);
     }
 
     static class ViewHolder {
@@ -198,9 +263,34 @@ public class ChatPageAdapter extends CursorAdapter {
         TextView senderText;
         TextView timeBox;
         ImageView messageImage;
+        int tag;
         LinearLayout.LayoutParams messageViewParams;
         /*RelativeLayout.LayoutParams timeBoxParams;
         RelativeLayout.LayoutParams messageTextParams;
         RelativeLayout.LayoutParams senderTextParams;*/
+    }
+
+    public class ImageDecoder extends AsyncTask<String, Void, Bitmap>{
+
+        private final WeakReference<ImageView> imageViewWeakReference;
+        public ImageDecoder(ImageView imgView){
+            imageViewWeakReference = new WeakReference<>(imgView);
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... path){
+            Bitmap image = BitmapFactory.decodeFile(path[0]);
+            return image;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap decodedImage){
+            if(imageViewWeakReference != null){
+                ImageView imageView = imageViewWeakReference.get();
+                if(imageView != null){
+                    imageView.setImageBitmap(decodedImage);
+                }
+            }
+        }
     }
 }

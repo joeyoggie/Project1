@@ -118,7 +118,8 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
         suggestedJobsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, suggestedJobs);
         jobEditText.setAdapter(suggestedJobsAdapter);
 
-        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/GetAllServiceProviderCategories";
+        String url = SERVER_IP + "/MyFirstServlet/GetAllServiceProviderCategories";
+        HttpsTrustManager.allowAllSSL();
         //Request a response from the provided URL.
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
             Gson gson = new Gson();
@@ -343,13 +344,14 @@ public class LocationServicesRegistration extends AppCompatActivity implements M
 
     public void sendInfoToServer(){
         //Send the message info to the server in a background thread
-        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewServiceProvider?name=" + URLEncoder.encode(name)
+        String url = SERVER_IP + "/MyFirstServlet/AddNewServiceProvider?name=" + URLEncoder.encode(name)
                 + "&phoneNumber=" + URLEncoder.encode(phoneNumber)
                 + "&userName=" + URLEncoder.encode(userName)
                 + "&latitude=" + String.valueOf(latitude)
                 + "&longitude=" + String.valueOf(longitude)
                 + "&job=" + URLEncoder.encode(job)
                 + "&address=" + URLEncoder.encode(address);
+        HttpsTrustManager.allowAllSSL();
         //Request a string response from the provided URL.
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
             @Override

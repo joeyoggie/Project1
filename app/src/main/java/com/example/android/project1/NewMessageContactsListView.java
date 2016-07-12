@@ -87,6 +87,7 @@ public class NewMessageContactsListView extends ActionBarActivity implements Sea
         contacts_list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = DBContactsHelper.readContacts();
                 cursor.moveToPosition(position);
                 String readable_phone_no = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_PHONE_NUMBER));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow(DBContactsContract.ContactsEntry.COLUMN_NAME_NAME));
@@ -115,7 +116,7 @@ public class NewMessageContactsListView extends ActionBarActivity implements Sea
                 }*/
             }
         });
-        refreshContactsFromServer();
+        //refreshContactsFromServer();
     }
 
     private String getServerIP() {
@@ -148,6 +149,9 @@ public class NewMessageContactsListView extends ActionBarActivity implements Sea
     public boolean onQueryTextSubmit(String query)
     {
         Log.d("CONTACTS","onQueryTextSubmit YES");
+        Intent chatIntent = new Intent(this, ChatPage.class);
+        chatIntent.putExtra("recepientUserName", query);
+        startActivity(chatIntent);
         contacts_list_view.clearTextFilter();
         return false;
     }
@@ -191,7 +195,8 @@ public class NewMessageContactsListView extends ActionBarActivity implements Sea
     private void sendNumbersToServer(ArrayList<String> phoneNumbers)
     {
         //Send the data to the server in a background thread
-        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/CheckRegisteredContacts";
+        String url = SERVER_IP + "/MyFirstServlet/CheckRegisteredContacts";
+        HttpsTrustManager.allowAllSSL();
         JSONArray jsonArray = new JSONArray(phoneNumbers);
         //Request a response from the provided URL.
         JsonArrayRequest requestArray = new JsonArrayRequest(Request.Method.POST, url, jsonArray, new Response.Listener<JSONArray>(){

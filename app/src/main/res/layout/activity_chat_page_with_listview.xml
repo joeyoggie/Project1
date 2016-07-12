@@ -43,7 +43,7 @@
                     android:layout_height="32dp"
                     android:layout_marginRight="4dp"
                     android:layout_marginLeft="4dp"
-                    android:src="@drawable/emow"
+                    android:src="@drawable/smiley"
                     android:layout_gravity="center"
                     />
                 <EditText

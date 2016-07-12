@@ -8,11 +8,13 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@android:color/white">
 
-        <RelativeLayout
+        <!--<RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="16dp"
             android:layout_centerInParent="true">
 
             <EditText
@@ -22,6 +24,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_centerHorizontal="true"
                 android:inputType="textCapWords"
+                android:visibility="gone"
                 android:hint="Enter the receient username here"/>
 
             <EditText
@@ -41,12 +44,40 @@
                 android:text="Go"
                 android:layout_below="@id/custom_recepient_name"
                 android:layout_centerHorizontal="true"
+                android:visibility="gone"
                 android:onClick="goToChatPage"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/custom_recepient_button"
-                android:text="Or use the '+' at the bottom to select a contact from your contact list"/>
+                android:gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/seperatorColor"
+                android:text="Use the '+' at the bottom to start chatting!"/>
+
+        </RelativeLayout>-->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true">
+
+            <ImageView
+                android:id="@+id/welcome_image"
+                android:layout_width="350dp"
+                android:layout_height="350dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/welcome"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/welcome_image"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/seperatorColor"
+                android:textSize="16sp"
+                android:text="Use the '+' at the bottom to start chatting!"/>
 
         </RelativeLayout>
 

@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +25,7 @@ import com.instabug.library.Instabug;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -59,10 +59,13 @@ public class MainPage extends ActionBarActivity {
         boolean registered = prefs.getBoolean("isRegistered", false);
         if(!registered)
         {
+            Log.d("MainPage", "User not registered yet. Launching registration activity");
             Intent reg = new Intent(this, Registration.class);
             startActivity(reg);
             finish();
+            return;
         }
+        Log.d("MainPage", "User registered, continuing with MainPage loading");
 
         //Drawlayout
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -90,10 +93,12 @@ public class MainPage extends ActionBarActivity {
 
     private void setupActionBar() {
         getSupportActionBar().setDisplayUseLogoEnabled(true); //Enable the Logo to be shown
-        getSupportActionBar().setDisplayShowHomeEnabled(true); //Show the Logo
+        //getSupportActionBar().setDisplayShowHomeEnabled(true); //Show the Logo
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show the Up/Back arrow
         getSupportActionBar().setLogo(R.mipmap.ic_launcher); //Specify the logo image
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_drawer); //Specify the Up/Back arrow image
+        //getSupportActionBar().setTitle("OnTime");
+
     }
 
     private void getLocalUserInfo(){
@@ -133,7 +138,7 @@ public class MainPage extends ActionBarActivity {
         }
     }
 
-    public void goToChatPage(View view) {
+    /*public void goToChatPage(View view) {
         EditText customRecepientUserName = (EditText) findViewById(R.id.custom_recepient_username);
         EditText customRecepientName = (EditText) findViewById(R.id.custom_recepient_name);
 
@@ -143,7 +148,7 @@ public class MainPage extends ActionBarActivity {
         intent.putExtra("recepientName",recepientName);
         intent.putExtra("recepientUserName",recepientUserName);
         startActivity(intent);
-    }
+    }*/
 
     public void newMessageContactListView(View view){
         Intent intent = new Intent(this, NewMessageContactsListView.class);
@@ -203,12 +208,12 @@ public class MainPage extends ActionBarActivity {
 
     private void sendOnlineStateToServer(final String state){
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String timestamp = simpleDateFormat.format(date);
 
-        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/State_change";
-
+        String url = SERVER_IP + "/MyFirstServlet/State_change";
+        HttpsTrustManager.allowAllSSL();
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

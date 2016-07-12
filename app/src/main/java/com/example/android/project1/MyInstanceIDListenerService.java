@@ -103,11 +103,14 @@ public class MyInstanceIDListenerService extends IntentService {
 
         //Send the info in a background thread
         //Instantiate the RequestQueue.
-        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token);
+        String url = SERVER_IP + "/MyFirstServlet/Register?userName="+ URLEncoder.encode(userName)+"&name="+URLEncoder.encode(name)+"&phoneNumber="+URLEncoder.encode(phoneNumber)+"&deviceID="+URLEncoder.encode(deviceID)+"&regID="+URLEncoder.encode(token);
+        HttpsTrustManager.allowAllSSL();
+        Log.d("MyInstanceID", "ServerIP: " + url);
         //Request a string response from the provided URL.
         StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>(){
             @Override
             public void onResponse(String response) {
+                Log.d("MyInstanceID", "Registration success, response: " + response);
                 //Send the server response to Registration activity to dismiss the progress indicator and
                 //display the response to the user in contentTextView textbox
                 Intent intent = new Intent("registrationCompleteIntent");
@@ -121,6 +124,7 @@ public class MyInstanceIDListenerService extends IntentService {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Log.d("MyInstanceID", "Registration error, response: " + error.toString());
                 //Send the server response to Registration activity to dismiss the progress indicator and
                 //display the response to the user in contentTextView textbox
                 Intent intent = new Intent("registrationCompleteIntent");

@@ -42,7 +42,8 @@ public class DrawingFragment extends DialogFragment {
 
 
     private DrawingView drawView;
-    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, opacityBtn;
+    private ImageButton currPaint, drawBtn, eraseBtn, /*newBtn, saveBtn,*/ opacityBtn;
+    private Button newBtn, saveBtn, cancelBtn;
     //sizes
     private float smallBrush, mediumBrush, largeBrush;
     Bitmap imageBitmap;
@@ -73,7 +74,7 @@ public class DrawingFragment extends DialogFragment {
             mediumBrush = getResources().getInteger(R.integer.medium_size);
             largeBrush = getResources().getInteger(R.integer.large_size);
 
-            ImageButton red=  (ImageButton) view.findViewById(R.id.red);
+            ImageButton red = (ImageButton) view.findViewById(R.id.red);
             red.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -179,7 +180,7 @@ public class DrawingFragment extends DialogFragment {
             });
 
             //new button
-            newBtn = (ImageButton) view.findViewById(R.id.new_btn);
+            newBtn = (Button) view.findViewById(R.id.new_btn);
             newBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -202,7 +203,7 @@ public class DrawingFragment extends DialogFragment {
             });
 
             //save button
-            saveBtn = (ImageButton) view.findViewById(R.id.save_btn);
+            saveBtn = (Button) view.findViewById(R.id.save_btn);
             saveBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -211,6 +212,15 @@ public class DrawingFragment extends DialogFragment {
                     sendImage(imageBitmap, "drawing");
                 }
 
+            });
+
+            //cancel button
+            cancelBtn = (Button) view.findViewById(R.id.cancel_button);
+            cancelBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getDialog().dismiss();
+                }
             });
 
             //opacity
@@ -325,8 +335,8 @@ public class DrawingFragment extends DialogFragment {
             }
         }
 
-        String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/AddNewImage?senderDeviceID="+deviceID+"&recepientUserName="+ recepientUserName + "&imageID=" + imageID +"&timestamp="+timestamp;
-
+        String url = SERVER_IP + "/MyFirstServlet/AddNewImage?senderDeviceID="+deviceID+"&recepientUserName="+ recepientUserName + "&imageID=" + imageID +"&timestamp="+timestamp;
+        HttpsTrustManager.allowAllSSL();
         ImageMultiPartRequest multipartRequest = new ImageMultiPartRequest(url, null, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
             @Override
             public void onResponse(NetworkResponse response) {

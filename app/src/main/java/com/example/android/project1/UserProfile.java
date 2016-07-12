@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -32,6 +33,8 @@ import com.google.gson.reflect.TypeToken;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -46,12 +49,16 @@ public class UserProfile extends ActionBarActivity {
     String SERVER_IP;
     TextView userNameTextView, statusTextView, phoneNumberTextView;
     ImageView profilePictureImageView;
-    Button sendMessageButton, changeProfilePictureButton;
+    Button sendMessageButton;
     String receivedUserName, receivedPhoneNumber, receivedStatus, receivedName, localUserName, deviceID;
     Bitmap receivedProfilePicture;
 
     int SELECT_PICTURE = 44;
 
+    ProfilePicturePopup profilePicturePopup;
+
+    String imagePath, fileName;
+    boolean localImagePresent = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +72,6 @@ public class UserProfile extends ActionBarActivity {
         statusTextView = (TextView) findViewById(R.id.profieStatus);
         phoneNumberTextView = (TextView) findViewById(R.id.profilePhoneNo);
         profilePictureImageView = (ImageView) findViewById(R.id.userpp);
-        changeProfilePictureButton = (Button) findViewById(R.id.change_profile_picture_button);
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null){
@@ -75,10 +81,31 @@ public class UserProfile extends ActionBarActivity {
             setupActionBar();
             if(receivedUserName.equals(localUserName)){
                 sendMessageButton.setVisibility(View.GONE);
-                changeProfilePictureButton.setVisibility(View.VISIBLE);
             }
             getUpdatedInfoFromServer(receivedUserName);
             downloadProfilePicture(receivedUserName);
+
+            //Load the bitmap from the external storage, until the new one is downloaded
+            String state = Environment.getExternalStorageState();
+            if(Environment.MEDIA_MOUNTED.equals(state)){
+                File dataDir = new File(Environment.getExternalStorageDirectory(), "OnTime");
+                if(!dataDir.exists()){
+                    dataDir.mkdirs();
+                }
+                File profilePictureDataDir = new File(Environment.getExternalStorageDirectory()+"/OnTime", "ProfilePictures");
+                if(!profilePictureDataDir.exists()){
+                    profilePictureDataDir.mkdirs();
+                }
+                fileName = receivedUserName;
+                fileName = fileName.replaceAll("/", "-").replaceAll(":", "-");
+                imagePath = profilePictureDataDir + "/" + fileName + ".png";
+                Log.d("UserProfile", "Loading image: " + imagePath);
+                receivedProfilePicture = BitmapFactory.decodeFile(imagePath);
+                if(receivedProfilePicture != null){
+                    profilePictureImageView.setImageBitmap(receivedProfilePicture);
+                    localImagePresent = true;
+                }
+            }
         }
     }
 
@@ -87,7 +114,7 @@ public class UserProfile extends ActionBarActivity {
         getSupportActionBar().setDisplayUseLogoEnabled(true); //Enable the Logo to be shown
         getSupportActionBar().setDisplayShowHomeEnabled(true); //Show the Logo
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show the Up/Back arrow
-        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
+        getSupportActionBar().setLogo(R.drawable.default_profile_picture);
     }
 
     private void getLocalUserInfo(){
@@ -102,7 +129,8 @@ public class UserProfile extends ActionBarActivity {
     }
 
     public void getUpdatedInfoFromServer(String userName) {
-        String URL = "http://"+SERVER_IP+":8080/MyFirstServlet/GetUserInfo?userName=" + URLEncoder.encode(userName);
+        String URL = SERVER_IP + "/MyFirstServlet/GetUserInfo?userName=" + URLEncoder.encode(userName);
+        HttpsTrustManager.allowAllSSL();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -155,12 +183,34 @@ public class UserProfile extends ActionBarActivity {
         startActivity(intent);
     }
 
+    public void popupImage(View view){
+        if(localImagePresent || localUserName.equals(receivedUserName)) {
+            profilePicturePopup = new ProfilePicturePopup(this, view, receivedUserName);
+        }
+        else {
+            Toast.makeText(UserProfile.this, "No profile picture", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(profilePicturePopup != null && profilePicturePopup.isVisible()){
+            profilePicturePopup.hide();
+        }
+        else{
+            UserProfile.super.onBackPressed();
+        }
+    }
+
     public void changeProfilePicture(View view){
         loadImageFromGallery();
     }
 
     public void loadImageFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        //Intent intent = new Intent(Intent.ACTION_GET_CONTENT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        //ACTION_GET_CONTENT allows users to pick from other sources (other than Gallery) such as Google Drive
+        //But somehow it didn't work on all devices, so we'll stick with ACTION_PICK
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
 
@@ -233,7 +283,6 @@ public class UserProfile extends ActionBarActivity {
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String timestamp = simpleDateFormat.format(date);
 
-        String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/AddNewProfilePicture?userName="+localUserName+"&timestamp="+ timestamp;
 
         final String boundary = "begBoundary-" + deviceID + localUserName + deviceID;
         final String mimeType = "multipart/form-data; boundary=" + boundary;
@@ -243,7 +292,8 @@ public class UserProfile extends ActionBarActivity {
         ByteArrayOutputStream imageByteArrayOutputStream = new ByteArrayOutputStream();
         imageBitmap.compress(Bitmap.CompressFormat.PNG, 0, imageByteArrayOutputStream);
         final byte[] imageByteArray = imageByteArrayOutputStream.toByteArray();
-
+        String url = SERVER_IP + "/MyFirstServlet/AddNewProfilePicture?userName="+localUserName+"&timestamp="+ timestamp;
+        HttpsTrustManager.allowAllSSL();
         ImageMultiPartRequest multipartRequest = new ImageMultiPartRequest(url, null, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
             @Override
             public void onResponse(NetworkResponse response) {
@@ -324,15 +374,31 @@ public class UserProfile extends ActionBarActivity {
         @Override
         protected Bitmap doInBackground(String... userNames){
             Bitmap profilePicture = null;
-            String urlString = "http://"+SERVER_IP+":8080/MyFirstServlet/GetProfilePicture?userName=" + userNames[0];
+            String urlString = SERVER_IP + "/MyFirstServlet/GetProfilePicture?userName=" + userNames[0];
+            HttpsTrustManager.allowAllSSL();
             try {
                 profilePicture = BitmapFactory.decodeStream((InputStream)new URL(urlString).getContent());
 
-                /*ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                profilePicture.compress(Bitmap.CompressFormat.PNG, 100, bos);*/
-
-
-                //imageData = BitmapFactory.decodeStream((InputStream)new URL(urlString[0]).getContent());
+                String imagePath = null;
+                //Save the bitmap on the external storage
+                String state = Environment.getExternalStorageState();
+                if(Environment.MEDIA_MOUNTED.equals(state)){
+                    File dataDir = new File(Environment.getExternalStorageDirectory(), "OnTime");
+                    if(!dataDir.exists()){
+                        dataDir.mkdirs();
+                    }
+                    File profilePictureDataDir = new File(Environment.getExternalStorageDirectory()+"/OnTime", "ProfilePictures");
+                    if(!profilePictureDataDir.exists()){
+                        profilePictureDataDir.mkdirs();
+                    }
+                    String fileName = receivedUserName;
+                    fileName = fileName.replaceAll("/", "-").replaceAll(":", "-");
+                    imagePath = profilePictureDataDir + "/" + fileName + ".png";
+                    FileOutputStream outputStream = new FileOutputStream(imagePath);
+                    profilePicture.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    outputStream.flush();
+                    outputStream.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -345,7 +411,7 @@ public class UserProfile extends ActionBarActivity {
                 profilePictureImageView.setImageBitmap(profilePicture);
             }
             else{
-                profilePictureImageView.setImageResource(R.drawable.default_profile_picture);
+                profilePictureImageView.setImageResource(R.drawable.default_profile_picture_large);
             }
         }
     }

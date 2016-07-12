@@ -76,7 +76,8 @@ public class StatusFragment extends DialogFragment {
     }
 
     public void sendStatusToServer() {
-        String URL =  "http://"+SERVER_IP+":8080/MyFirstServlet/UpdateStatus?userName=" + URLEncoder.encode(statusUserName) + "&status=" + URLEncoder.encode(status);
+        String URL =  SERVER_IP + "/MyFirstServlet/UpdateStatus?userName=" + URLEncoder.encode(statusUserName) + "&status=" + URLEncoder.encode(status);
+        HttpsTrustManager.allowAllSSL();
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {

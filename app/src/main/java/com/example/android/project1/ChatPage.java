@@ -27,9 +27,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
@@ -52,10 +52,13 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -87,7 +90,7 @@ public class ChatPage extends ActionBarActivity {
     ImageButton emojiButton;
     String mText;
     String timestamp;
-    Button sendButton;
+    ImageButton sendButton;
 
     ChatPageAdapter listAdapter;
     ListView listView;
@@ -117,7 +120,7 @@ public class ChatPage extends ActionBarActivity {
         setActivityVisibleState(true);
 
         message = (EmojiconEditText) findViewById(R.id.textInput);
-        sendButton = (Button) findViewById(R.id.send_message_button);
+        sendButton = (ImageButton) findViewById(R.id.send_message_button);
         emojiButton = (ImageButton) findViewById(R.id.emoji_button);
 
         // Give the topmost view of your activity layout hierarchy. This will be used to measure soft keyboard height
@@ -288,7 +291,7 @@ public class ChatPage extends ActionBarActivity {
         getSupportActionBar().setDisplayUseLogoEnabled(true); //Enable the Logo to be shown
         getSupportActionBar().setDisplayShowHomeEnabled(true); //Show the Logo
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show the Up/Back arrow
-        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
+        getSupportActionBar().setLogo(R.drawable.default_profile_picture);
     }
 
     private String getServerIP() {
@@ -314,7 +317,6 @@ public class ChatPage extends ActionBarActivity {
                 Log.d("ChatPage", "Sending old message: " + " _ID= " + messageID + ", message: " + messageContent + " @"+timestamp2);
 
                 //Send the message info to the server in a background thread
-                String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
 
                 HashMap<String, String> params = new HashMap<>();
                 params.put("senderDeviceID", deviceID);
@@ -324,6 +326,8 @@ public class ChatPage extends ActionBarActivity {
                 params.put("messageID", String.valueOf(messageID));
                 JSONObject jsonObject = new JSONObject(params);
                 Log.d("ChatPage", "JSON Message: "+jsonObject.toString());
+                String url2 = SERVER_IP + "/MyFirstServlet/AddNewMessage";
+                HttpsTrustManager.allowAllSSL();
                 JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -351,6 +355,7 @@ public class ChatPage extends ActionBarActivity {
                 HttpConnector.getInstance(this).addToRequestQueue(jsonObjectRequest);
             }while (c.moveToNext());
         }
+        c.close();
     }
 
     public void receiveTypingStatus(Intent i){
@@ -375,7 +380,8 @@ public class ChatPage extends ActionBarActivity {
 
     public void sendTypingStatusToServer(String typingStatus){
 
-        String URL = "http://"+SERVER_IP+":8080/MyFirstServlet/UpdateTypingStatus?senderUserName="+URLEncoder.encode(userName)+"&recepientUserName="+URLEncoder.encode(recepientUserName)+"&typingStatus="+URLEncoder.encode(typingStatus);
+        String URL = SERVER_IP + "/MyFirstServlet/UpdateTypingStatus?senderUserName="+URLEncoder.encode(userName)+"&recepientUserName="+URLEncoder.encode(recepientUserName)+"&typingStatus="+URLEncoder.encode(typingStatus);
+        HttpsTrustManager.allowAllSSL();
         StringRequest stringRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -480,13 +486,12 @@ public class ChatPage extends ActionBarActivity {
         isTyping = false;
 
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         timestamp = simpleDateFormat.format(date);
         Log.d("TIMESTAMP:", timestamp);
 
         //Send the message info to the server in a background thread
-        String url2 = "http://"+SERVER_IP+":8080/MyFirstServlet/AddNewMessage";
         /*Message messageObject = new Message();
         messageObject.setMessageSenderDeviceID(deviceID);
         messageObject.setMessageRecepientUserName(recepientUserName);
@@ -505,6 +510,8 @@ public class ChatPage extends ActionBarActivity {
         params.put("messageID", String.valueOf(messageID));
         JSONObject jsonObject = new JSONObject(params);
         Log.d("ChatPage", "JSON Message: "+jsonObject.toString());
+        String url2 = SERVER_IP + "/MyFirstServlet/AddNewMessage";
+        HttpsTrustManager.allowAllSSL();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url2, jsonObject, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -563,12 +570,12 @@ public class ChatPage extends ActionBarActivity {
 
     private void sendOnlineStateToServer(final String state){
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         final String timestamp2 = simpleDateFormat.format(date);
 
-        String url = "http://"+SERVER_IP+":8080/MyFirstServlet/State_change";
-
+        String url = SERVER_IP + "/MyFirstServlet/State_change";
+        HttpsTrustManager.allowAllSSL();
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -623,7 +630,7 @@ public class ChatPage extends ActionBarActivity {
         final ProgressDialog progressDialog = ProgressDialog.show(this,"Uploading image...","Please wait...",false,false);
         progressDialog.setCanceledOnTouchOutside(false);
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         timestamp = simpleDateFormat.format(date);
 
@@ -639,6 +646,7 @@ public class ChatPage extends ActionBarActivity {
         //Save the bitmap on the external storage
         String state = Environment.getExternalStorageState();
         if(Environment.MEDIA_MOUNTED.equals(state)){
+            Log.d("ChatPage", "getExternalStorageState = true");
             File dataDir = new File(Environment.getExternalStorageDirectory(), "OnTime");
             if(!dataDir.exists()){
                 dataDir.mkdirs();
@@ -648,7 +656,7 @@ public class ChatPage extends ActionBarActivity {
                 sentDataDir.mkdirs();
             }
             String fileName = timestamp;
-            fileName = fileName.replaceAll("/", "-");
+            fileName = fileName.replaceAll("/", "-").replaceAll(":", "-");
             imagePath = sentDataDir + "/" + fileName + ".png";
             try{
                 FileOutputStream outputStream = new FileOutputStream(imagePath);
@@ -659,12 +667,16 @@ public class ChatPage extends ActionBarActivity {
                 refreshCursor();
             }
             catch (IOException e){
+                Log.d("ChatPage", "Saving image locally failed: " + e.getMessage());
                 e.printStackTrace();
             }
         }
+        else{
+            Log.d("ChatPage", "getExternalStorageState = false");
+        }
 
-        String url = "http://" + SERVER_IP + ":8080/MyFirstServlet/AddNewImage?senderDeviceID="+deviceID+"&recepientUserName="+ recepientUserName + "&imageID=" + imageID +"&timestamp="+timestamp;
-
+        String url = SERVER_IP + "/MyFirstServlet/AddNewImage?senderDeviceID="+deviceID+"&recepientUserName="+ recepientUserName + "&imageID=" + imageID +"&timestamp="+timestamp;
+        HttpsTrustManager.allowAllSSL();
         ImageMultiPartRequest multipartRequest = new ImageMultiPartRequest(url, null, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
             @Override
             public void onResponse(NetworkResponse response) {
@@ -802,6 +814,20 @@ public class ChatPage extends ActionBarActivity {
     }
 
     @Override
+    public void onBackPressed(){
+        if(ChatPageAdapter.isImageOpened){
+            //hide popup
+            if(ChatPageAdapter.imgPopup != null){
+                ChatPageAdapter.imgPopup.hide();
+            }
+            ChatPageAdapter.isImageOpened = false;
+        }
+        else{
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         //Set the activity as invisible
         setActivityVisibleState(false);
@@ -874,16 +900,68 @@ public class ChatPage extends ActionBarActivity {
             newFragment.show(getSupportFragmentManager(), "timePicker");
             return true;
         }
-        if(id==R.id.image_upload)
+        if(id == R.id.image_upload)
         {
             loadImageFromGallery();
             return true;
         }
-        if(id==R.id.draw_image)
+        if(id == R.id.draw_image)
         {
             android.app.DialogFragment newFragment = new DrawingFragment();
+            //newFragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Dialog_NoTitle);
             newFragment.show(getFragmentManager(),"DrawingFragment");
             return true;
+        }
+        if(id == R.id.attachment_button){
+            //popup here
+            View menuItemView = findViewById(R.id.attachment_button);
+            PopupMenu menuPopup = new PopupMenu(this, menuItemView);
+            try {
+                Field[] fields = menuPopup.getClass().getDeclaredFields();
+                for (Field field : fields) {
+                    if ("mPopup".equals(field.getName())) {
+                        field.setAccessible(true);
+                        Object menuPopupHelper = field.get(menuPopup);
+                        Class<?> classPopupHelper = Class.forName(menuPopupHelper
+                                .getClass().getName());
+                        Method setForceIcons = classPopupHelper.getMethod(
+                                "setForceShowIcon", boolean.class);
+                        setForceIcons.invoke(menuPopupHelper, true);
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            menuPopup.inflate(R.menu.menu_chat_page_attachments);
+            menuPopup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    int clickedItemID = item.getItemId();
+                    if(clickedItemID == R.id.image_upload)
+                    {
+                        loadImageFromGallery();
+                        return true;
+                    }
+                    if(clickedItemID == R.id.draw_image)
+                    {
+                        android.app.DialogFragment newFragment = new DrawingFragment();
+                        newFragment.show(getFragmentManager(),"DrawingFragment");
+                        return true;
+                    }
+                    if(clickedItemID == R.id.voice_note){
+                        Toast.makeText(ChatPage.this, "Coming very soon, stay tuned!", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                    if(clickedItemID == R.id.file){
+                        Toast.makeText(ChatPage.this, "Coming very soon, stay tuned!", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                    return true;
+                }
+            });
+            menuPopup.show();
+            //return true;
         }
         return super.onOptionsItemSelected(item);
     }
