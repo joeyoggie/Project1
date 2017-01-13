@@ -2,7 +2,6 @@ package com.example.android.project1;
 
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -627,8 +626,9 @@ public class ChatPage extends ActionBarActivity {
     }
 
     public void sendImage(Bitmap imageBitmap, String imageName){
-        final ProgressDialog progressDialog = ProgressDialog.show(this,"Uploading image...","Please wait...",false,false);
-        progressDialog.setCanceledOnTouchOutside(false);
+        //final ProgressDialog progressDialog = ProgressDialog.show(this,"Uploading image...","Please wait...",false,false);
+        //progressDialog.setCanceledOnTouchOutside(false);
+        Toast.makeText(ChatPage.this, "Your image is being sent...", Toast.LENGTH_SHORT).show();
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -663,7 +663,7 @@ public class ChatPage extends ActionBarActivity {
                 imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
                 outputStream.flush();
                 outputStream.close();
-                imageID = DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imagePath, timestamp, "unsent");
+                imageID = DBMessagesHelper.insertImageIntoDB(userName, recepientUserName, "0", imagePath, timestamp, "sending");
                 refreshCursor();
             }
             catch (IOException e){
@@ -682,7 +682,8 @@ public class ChatPage extends ActionBarActivity {
             public void onResponse(NetworkResponse response) {
                 Toast.makeText(ChatPage.this, "Image sent successfully!", Toast.LENGTH_SHORT).show();
                 //Dismiss the progress dialog
-                progressDialog.dismiss();
+                //progressDialog.dismiss();
+                Toast.makeText(ChatPage.this, "Image sent successfully", Toast.LENGTH_SHORT).show();
                 Log.d("ChatPage", "Image sent successfully.");
                 Log.d("ChatPage", "Volley response: " + response.toString());
                 String imageIDString = new String(response.data);
@@ -694,8 +695,10 @@ public class ChatPage extends ActionBarActivity {
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(ChatPage.this, "Image upload failed!\r\n" + error.toString(), Toast.LENGTH_SHORT).show();
                 //Dismiss the progress dialog
-                progressDialog.dismiss();
+                //progressDialog.dismiss();
+                Toast.makeText(ChatPage.this, "Error sending image.", Toast.LENGTH_SHORT).show();
                 Log.d("ChatPage", "Volley error: " + error.toString());
+                DBMessagesHelper.updateImageState(imageID, "unsent");
             }
         });
         multipartRequest.setRetryPolicy(new DefaultRetryPolicy(15000,

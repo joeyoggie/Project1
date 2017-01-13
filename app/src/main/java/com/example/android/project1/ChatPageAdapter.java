@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -87,6 +88,7 @@ public class ChatPageAdapter extends CursorAdapter {
         viewHolder.senderText = (TextView) view.findViewById(R.id.sender_username_box);
         viewHolder.timeBox = (TextView) view.findViewById(R.id.time_box);
         viewHolder.messageImage = (ImageView) view.findViewById(R.id.message_image);
+        viewHolder.progressBar = (ProgressBar) view.findViewById(R.id.image_loading_progress_bar);
 
         //set up the view parameters programmatically
         /*viewHolder.messageViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -133,6 +135,7 @@ public class ChatPageAdapter extends CursorAdapter {
         messageType = cursor.getString(messageTypeColumnIndex);
         //If the current message is a text message
         if(messageType.equals("text")){
+            viewHolder.progressBar.setVisibility(View.GONE);
             viewHolder.messageText.setVisibility(View.VISIBLE);
             message = cursor.getString(messageColumnIndex);
             if(message != null){
@@ -155,6 +158,7 @@ public class ChatPageAdapter extends CursorAdapter {
             viewHolder.messageText.setText("Loading picture...");
             imagePath = cursor.getString(imagePathColumnIndex);
             if( messageState.equals("downloaded") || messageState.equals("sent") || messageState.equals("unsent") ){
+                viewHolder.progressBar.setVisibility(View.GONE);
                 image = decodeSampledBitmap(imagePath, 400, 400);
                 viewHolder.messageImage.setImageBitmap(image);
 
@@ -165,10 +169,17 @@ public class ChatPageAdapter extends CursorAdapter {
                 /*imageDecoder = new ImageDecoder(viewHolder.messageImage);
                 imageDecoder.execute(imagePath);*/
             }
+            else if(messageState.equals("sending")){
+                viewHolder.progressBar.setVisibility(View.VISIBLE);
+                image = decodeSampledBitmap(imagePath, 400, 400);
+                viewHolder.messageImage.setImageBitmap(image);
+            }
             else if(messageState.equals("errorInDownload")){
+                viewHolder.progressBar.setVisibility(View.GONE);
                 viewHolder.messageImage.setImageResource(R.drawable.image_broken);
             }
             else {
+                viewHolder.progressBar.setVisibility(View.GONE);
                 viewHolder.messageImage.setImageResource(R.drawable.image_broken);
             }
             viewHolder.messageText.setVisibility(View.GONE);
@@ -263,6 +274,7 @@ public class ChatPageAdapter extends CursorAdapter {
         TextView senderText;
         TextView timeBox;
         ImageView messageImage;
+        ProgressBar progressBar;
         int tag;
         LinearLayout.LayoutParams messageViewParams;
         /*RelativeLayout.LayoutParams timeBoxParams;
